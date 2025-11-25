@@ -1,0 +1,3181 @@
+<!doctype html>
+<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Ezoft</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="Ezoft Admin Panel" name="description" />
+    <meta content="Ezoft Role Based User Management System" name="author" />
+    
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="assets/images/favicon.png?v=1759925682335">
+
+    <!-- Layout config Js -->
+    <script src="assets/js/layout.js"></script>
+    <!-- Socket.io Client -->
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- Bootstrap Css -->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <!-- Icons Css -->
+    <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <!-- App Css-->
+    <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
+    <!-- custom Css-->
+    <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <!-- Begin page -->
+    <div id="layout-wrapper">
+        <!-- Header -->
+        <header id="page-topbar">
+    <div class="layout-width">
+        <div class="navbar-header">
+            <div class="d-flex">
+                <!-- LOGO -->
+                <div class="navbar-brand-box horizontal-logo">
+                    <a href="/dashboard" class="logo logo-dark">
+                        <span class="logo-sm">
+                            <img src="assets/images/logo-sm.png" alt="" height="40">
+                        </span>
+                        <span class="logo-lg">
+                            <img src="assets/images/logo-dark.png" alt="" height="50">
+                        </span>
+                    </a>
+
+                    <a href="/dashboard" class="logo logo-light">
+                        <span class="logo-sm">
+                            <img src="assets/images/logo-sm.png" alt="" height="40">
+                        </span>
+                        <span class="logo-lg">
+                            <img src="assets/images/logo-light.png" alt="" height="50">
+                        </span>
+                    </a>
+                </div>
+
+                <button type="button" class="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger" id="topnav-hamburger-icon">
+                    <span class="hamburger-icon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
+                </button>
+
+                <!-- App Search-->
+                <form class="app-search d-none d-md-block">
+                    <div class="position-relative">
+                        <input type="text" class="form-control" placeholder="Search..." autocomplete="off" id="search-options" value="">
+                        <span class="mdi mdi-magnify search-widget-icon"></span>
+                        <span class="mdi mdi-close-circle search-widget-icon search-widget-icon-close d-none" id="search-close-options"></span>
+                    </div>
+                    <div class="dropdown-menu dropdown-menu-lg" id="search-dropdown">
+                        <div data-simplebar style="max-height: 320px;">
+                            <!-- item-->
+                            <div class="dropdown-header">
+                                <h6 class="text-overflow text-muted mb-0 text-uppercase">Recent Searches</h6>
+                            </div>
+
+                            <div class="dropdown-item bg-transparent text-wrap">
+                                <a href="index.html" class="btn btn-soft-secondary btn-sm rounded-pill">how to setup <i class="mdi mdi-magnify ms-1"></i></a>
+                                <a href="index.html" class="btn btn-soft-secondary btn-sm rounded-pill">buttons <i class="mdi mdi-magnify ms-1"></i></a>
+                            </div>
+                            <!-- item-->
+                            <div class="dropdown-header mt-2">
+                                <h6 class="text-overflow text-muted mb-1 text-uppercase">Pages</h6>
+                            </div>
+
+                            <!-- item-->
+                            <a href="javascript:void(0);" class="dropdown-item notify-item">
+                                <i class="ri-bubble-chart-line align-middle fs-18 text-muted me-2"></i>
+                                <span>Analytics Dashboard</span>
+                            </a>
+
+                            <!-- item-->
+                            <a href="javascript:void(0);" class="dropdown-item notify-item">
+                                <i class="ri-lifebuoy-line align-middle fs-18 text-muted me-2"></i>
+                                <span>Help Center</span>
+                            </a>
+
+                            <!-- item-->
+                            <a href="javascript:void(0);" class="dropdown-item notify-item">
+                                <i class="ri-user-settings-line align-middle fs-18 text-muted me-2"></i>
+                                <span>My account settings</span>
+                            </a>
+
+                            <!-- item-->
+                            <div class="dropdown-header mt-2">
+                                <h6 class="text-overflow text-muted mb-2 text-uppercase">Members</h6>
+                            </div>
+
+                            <div class="notification-list">
+                                <!-- item -->
+                                <a href="javascript:void(0);" class="dropdown-item notify-item py-2">
+                                    <div class="d-flex">
+                                        <img src="assets/images/users/avatar-2.jpg" class="me-3 rounded-circle avatar-xs" alt="user-pic">
+                                        <div class="flex-grow-1">
+                                            <h6 class="m-0">Angela Bernier</h6>
+                                            <span class="fs-11 mb-0 text-muted">Manager</span>
+                                        </div>
+                                    </div>
+                                </a>
+                                <!-- item -->
+                                <a href="javascript:void(0);" class="dropdown-item notify-item py-2">
+                                    <div class="d-flex">
+                                        <img src="assets/images/users/avatar-3.jpg" class="me-3 rounded-circle avatar-xs" alt="user-pic">
+                                        <div class="flex-grow-1">
+                                            <h6 class="m-0">David Grasso</h6>
+                                            <span class="fs-11 mb-0 text-muted">Web Designer</span>
+                                        </div>
+                                    </div>
+                                </a>
+                                <!-- item -->
+                                <a href="javascript:void(0);" class="dropdown-item notify-item py-2">
+                                    <div class="d-flex">
+                                        <img src="assets/images/users/avatar-5.jpg" class="me-3 rounded-circle avatar-xs" alt="user-pic">
+                                        <div class="flex-grow-1">
+                                            <h6 class="m-0">Mike Bunch</h6>
+                                            <span class="fs-11 mb-0 text-muted">React Developer</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="text-center pt-3 pb-1">
+                            <a href="pages-search-results.html" class="btn btn-primary btn-sm">View All Results <i class="ri-arrow-right-line ms-1"></i></a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="d-flex align-items-center">
+
+                <div class="dropdown d-md-none topbar-head-dropdown header-item">
+                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle" id="page-header-search-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="bx bx-search fs-22"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" aria-labelledby="page-header-search-dropdown">
+                        <form class="p-3">
+                            <div class="form-group m-0">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
+                                    <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="dropdown ms-1 topbar-head-dropdown header-item">
+                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img id="header-lang-img" src="assets/images/flags/us.svg" alt="Header Language" height="20" class="rounded">
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end">
+
+                        <!-- item-->
+                        <a href="javascript:void(0);" class="dropdown-item notify-item language py-2" data-lang="en" title="English">
+                            <img src="assets/images/flags/us.svg" alt="user-image" class="me-2 rounded" height="18">
+                            <span class="align-middle">English</span>
+                        </a>
+
+                        <!-- item-->
+                        <a href="javascript:void(0);" class="dropdown-item notify-item language" data-lang="sp" title="Spanish">
+                            <img src="assets/images/flags/spain.svg" alt="user-image" class="me-2 rounded" height="18">
+                            <span class="align-middle">Española</span>
+                        </a>
+
+                        <!-- item-->
+                        <a href="javascript:void(0);" class="dropdown-item notify-item language" data-lang="gr" title="German">
+                            <img src="assets/images/flags/germany.svg" alt="user-image" class="me-2 rounded" height="18"> <span class="align-middle">Deutsche</span>
+                        </a>
+
+                        <!-- item-->
+                        <a href="javascript:void(0);" class="dropdown-item notify-item language" data-lang="it" title="Italian">
+                            <img src="assets/images/flags/italy.svg" alt="user-image" class="me-2 rounded" height="18">
+                            <span class="align-middle">Italiana</span>
+                        </a>
+
+                        <!-- item-->
+                        <a href="javascript:void(0);" class="dropdown-item notify-item language" data-lang="ru" title="Russian">
+                            <img src="assets/images/flags/russia.svg" alt="user-image" class="me-2 rounded" height="18">
+                            <span class="align-middle">русский</span>
+                        </a>
+
+                        <!-- item-->
+                        <a href="javascript:void(0);" class="dropdown-item notify-item language" data-lang="ch" title="Chinese">
+                            <img src="assets/images/flags/china.svg" alt="user-image" class="me-2 rounded" height="18">
+                            <span class="align-middle">中国人</span>
+                        </a>
+
+                        <!-- item-->
+                        <a href="javascript:void(0);" class="dropdown-item notify-item language" data-lang="fr" title="French">
+                            <img src="assets/images/flags/french.svg" alt="user-image" class="me-2 rounded" height="18">
+                            <span class="align-middle">français</span>
+                        </a>
+
+                        <!-- item-->
+                        <a href="javascript:void(0);" class="dropdown-item notify-item language" data-lang="ar" title="Arabic">
+                            <img src="assets/images/flags/ae.svg" alt="user-image" class="me-2 rounded" height="18">
+                            <span class="align-middle">Arabic</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="dropdown topbar-head-dropdown ms-1 header-item">
+                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class='bx bx-category-alt fs-22'></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-lg p-0 dropdown-menu-end">
+                        <div class="p-3 border-top-0 border-start-0 border-end-0 border-dashed border">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h6 class="m-0 fw-semibold fs-15"> Web Apps </h6>
+                                </div>
+                                <div class="col-auto">
+                                    <a href="#!" class="btn btn-sm btn-soft-info"> View All Apps
+                                        <i class="ri-arrow-right-s-line align-middle"></i></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-2">
+                            <div class="row g-0">
+                                <div class="col">
+                                    <a class="dropdown-icon-item" href="#!">
+                                        <img src="assets/images/brands/github.png" alt="Github">
+                                        <span>GitHub</span>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a class="dropdown-icon-item" href="#!">
+                                        <img src="assets/images/brands/bitbucket.png" alt="bitbucket">
+                                        <span>Bitbucket</span>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a class="dropdown-icon-item" href="#!">
+                                        <img src="assets/images/brands/dribbble.png" alt="dribbble">
+                                        <span>Dribbble</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="row g-0">
+                                <div class="col">
+                                    <a class="dropdown-icon-item" href="#!">
+                                        <img src="assets/images/brands/dropbox.png" alt="dropbox">
+                                        <span>Dropbox</span>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a class="dropdown-icon-item" href="#!">
+                                        <img src="assets/images/brands/mail_chimp.png" alt="mail_chimp">
+                                        <span>Mail Chimp</span>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a class="dropdown-icon-item" href="#!">
+                                        <img src="assets/images/brands/slack.png" alt="slack">
+                                        <span>Slack</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dropdown topbar-head-dropdown ms-1 header-item">
+                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle" id="page-header-cart-dropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false">
+                        <i class='bx bx-shopping-bag fs-22'></i>
+                        <span class="position-absolute topbar-badge cartitem-badge fs-10 translate-middle badge rounded-pill bg-info">5</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-xl dropdown-menu-end p-0 dropdown-menu-cart" aria-labelledby="page-header-cart-dropdown">
+                        <div class="p-3 border-top-0 border-start-0 border-end-0 border-dashed border">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h6 class="m-0 fs-16 fw-semibold"> My Cart</h6>
+                                </div>
+                                <div class="col-auto">
+                                    <span class="badge bg-info-subtle text-info fs-13"> 5 items</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div data-simplebar style="max-height: 300px;">
+                            <div class="p-2">
+                                <div class="text-center py-3">
+                                    <div class="avatar-md mx-auto mb-4">
+                                        <div class="avatar-title bg-info-subtle text-info rounded-circle fs-36">
+                                            <i class='bx bx-shopping-bag'></i>
+                                        </div>
+                                    </div>
+                                    <h5>Your Cart is Empty!</h5>
+                                    <p class="text-muted fs-15 mb-0">Add some items to your cart to continue.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-3 border-top-0 border-start-0 border-end-0 border-dashed border d-grid">
+                            <div class="d-flex justify-content-between align-items-center pb-3">
+                                <h5 class="m-0 text-muted">Total:</h5>
+                                <div class="px-2">
+                                    <h5 class="m-0">$1258.58</h5>
+                                </div>
+                            </div>
+
+                            <a href="ecommerce-checkout.html" class="btn btn-success text-decoration-none">Checkout</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ms-1 header-item d-none d-sm-flex">
+                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle" data-toggle="fullscreen">
+                        <i class='bx bx-fullscreen fs-22'></i>
+                    </button>
+                </div>
+
+                <div class="ms-1 header-item d-none d-sm-flex">
+                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle light-dark-mode">
+                        <i class='bx bx-moon fs-22'></i>
+                    </button>
+                </div>
+
+                <div class="dropdown ms-1 topbar-head-dropdown header-item">
+                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle" id="page-header-notifications-dropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false">
+                        <i class='bx bx-bell fs-22'></i>
+                        <span class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger" style="display: none;"><span class="visually-hidden">unread messages</span></span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" aria-labelledby="page-header-notifications-dropdown">
+                        <div class="dropdown-head bg-primary bg-pattern rounded-top">
+                            <div class="p-3">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <h6 class="m-0 fs-16 fw-semibold text-white"> Bildirimler </h6>
+                                    </div>
+                                    <div class="col-auto dropdown-tabs">
+                                        <span class="badge bg-light-subtle text-body fs-13" id="headerNotificationBadge" style="display: none;">0 Yeni</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-content position-relative" id="notificationItemsTab">
+                            <div class="tab-pane fade show active py-2 ps-2" id="all-noti-tab" role="tabpanel">
+                                <div data-simplebar style="max-height: 300px;" class="pe-2" id="headerNotificationsList">
+                                    <div class="text-center py-4">
+                                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                            <span class="visually-hidden">Yükleniyor...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dropdown ms-sm-3 header-item topbar-user">
+                    <button type="button" class="btn" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="d-flex align-items-center">
+                            <img class="rounded-circle header-profile-user" src="assets/images/users/avatar-1.jpg" alt="Header Avatar">
+                            <span class="text-start ms-xl-2">
+                                <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text" id="userName">Yükleniyor...</span>
+                                <span class="d-none d-xl-block ms-1 fs-12 user-name-sub-text" id="userRole">Yükleniyor...</span>
+                            </span>
+                        </span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <!-- item-->
+                        <h6 class="dropdown-header">Hoş Geldiniz!</h6>
+                        <a class="dropdown-item" href="pages-profile.html"><i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Profile</span></a>
+                        <a class="dropdown-item" href="apps-chat.html"><i class="mdi mdi-message-text-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Messages</span></a>
+                        <a class="dropdown-item" href="apps-tasks-kanban.html"><i class="mdi mdi-calendar-check-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Taskboard</span></a>
+                        <a class="dropdown-item" href="pages-faqs.html"><i class="mdi mdi-lifebuoy text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Help</span></a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="pages-profile.html"><i class="mdi mdi-wallet text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Balance : <b>$5971.67</b></span></a>
+                        <a class="dropdown-item" href="pages-profile-settings.html"><span class="badge bg-success-subtle text-success mt-1 float-end">New</span><i class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Settings</span></a>
+                        <a class="dropdown-item" href="auth-lockscreen-basic.html"><i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Lock screen</span></a>
+                        <a class="dropdown-item" href="javascript:void(0);" data-logout><i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span class="align-middle" data-key="t-logout">Logout</span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+        <!-- ========== App Menu ========== -->
+        <div class="app-menu navbar-menu">
+            <!-- LOGO -->
+            <div class="navbar-brand-box">
+                <!-- Dark Logo-->
+                <a href="/dashboard" class="logo logo-dark">
+                    <span class="logo-sm">
+                        <img src="assets/images/logo-sm.png" alt="" height="40">
+                    </span>
+                    <span class="logo-lg">
+                        <img src="assets/images/logo-dark.png" alt="" height="50">
+                    </span>
+                </a>
+                <!-- Light Logo-->
+                <a href="/dashboard" class="logo logo-light">
+                    <span class="logo-sm">
+                        <img src="assets/images/logo-sm.png" alt="" height="40">
+                    </span>
+                    <span class="logo-lg">
+                        <img src="assets/images/logo-light.png" alt="" height="50">
+                    </span>
+                </a>
+                <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover" id="vertical-hover">
+                    <i class="ri-record-circle-line"></i>
+                </button>
+            </div>
+
+            <div id="scrollbar">
+                <div class="container-fluid">
+
+                    <div id="two-column-menu">
+                    </div>
+                    <ul class="navbar-nav" id="navbar-nav" style="display: none;">
+                        <li class="menu-title"><span data-key="t-menu">Menu</span></li>
+                        <li class="menu-title"><span data-key="t-dashboard">Dashboard</span></li>
+                        <li class="nav-item">
+                            <a class="nav-link menu-link" href="/dashboard">
+                                <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboard">Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="menu-title"><span data-key="t-admin-operations">Admin İşlemleri</span></li>
+                        <li class="nav-item">
+                            <a class="nav-link menu-link" href="/users">
+                                <i class="ri-user-settings-line"></i> <span data-key="t-user-management">Kullanıcı Yönetimi</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link menu-link" href="/roles">
+                                <i class="ri-shield-user-line"></i> <span data-key="t-role-management">Rol Yönetimi</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link menu-link" href="/menus">
+                                <i class="ri-menu-line"></i> <span data-key="t-menu-management">Menü Yönetimi</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="sidebar-background"></div>
+        </div>
+        <div class="vertical-overlay"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-content">
+                <div class="container-fluid">
+                    <!-- Page Title -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                                <h4 class="mb-sm-0" id="pageTitle">Dashboard</h4>
+                                <div class="page-title-right">
+                                    <ol class="breadcrumb m-0">
+                                        <li class="breadcrumb-item"><a href="javascript: void(0);">Ana Sayfa</a></li>
+                                        <li class="breadcrumb-item active" id="breadcrumbActive">Dashboard</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Content Area -->
+                    <div id="dynamicContent">
+                        <!-- İçerik buraya yüklenecek -->
+                    </div>
+                </div>
+            </div>
+
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <script>document.write(new Date().getFullYear())</script> © Ezoft</div>
+                        <div class="col-sm-6">
+                            <div class="text-sm-end d-none d-sm-block">
+                                <!-- Design & Develop by Themesbrand kaldırıldı -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Kullanıcı Ekleme/Düzenleme Modal -->
+    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userModalLabel">Yeni Kullanıcı</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="userForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="userName" class="form-label">Ad Soyad <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="userName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="userEmail" class="form-label">E-posta <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="userEmail" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="userPassword" class="form-label">Şifre <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" id="userPassword" required>
+                                    <small class="text-muted">
+                                        En az 8 karakter, 1 büyük harf, 1 küçük harf, 1 rakam ve 1 özel karakter (@$!%*?&) içermelidir.
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="newUserRole" class="form-label">Rol <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="newUserRole" required>
+                                        <option value="">Rol seçin</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="userStatusRow" style="display: none;">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="userStatus">
+                                        <label class="form-check-label" for="userStatus">
+                                            Aktif
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                        <button type="submit" class="btn btn-primary" id="saveUserBtn">
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rol Ekleme/Düzenleme Modal -->
+    <div class="modal fade" id="roleModal" tabindex="-1" aria-labelledby="roleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="roleModalLabel">Yeni Rol</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="roleForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="roleName" class="form-label">Rol Adı <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="roleName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="roleDescription" class="form-label">Açıklama</label>
+                                    <input type="text" class="form-control" id="roleDescription">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Menü Yetkileri (Genişletilmiş: Görüntüleme + CRUD) -->
+                        <div class="mb-3">
+                            <label class="form-label">Menü Yetkileri</label>
+                            <div class="table-responsive border rounded">
+                                <table class="table table-bordered align-middle mb-0" id="menuPermsTable">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 40%">Menü</th>
+                                            <th class="text-center">Görüntüleme</th>
+                                            <th class="text-center">Oluşturma</th>
+                                            <th class="text-center">Düzenleme</th>
+                                            <th class="text-center">Silme</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="menuPermsBody">
+                                        <tr><td colspan="5" class="text-muted small">Menüler yükleniyor...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                        <button type="submit" class="btn btn-primary" id="saveRoleBtn">
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kategori Ekleme/Düzenleme Modal -->
+    <div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="categoryModalLabel">Yeni Kategori</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="categoryForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="categoryTitle" class="form-label">Kategori Adı <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="categoryTitle" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="categoryOrder" class="form-label">Sıra <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="categoryOrder" min="0" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                        <button type="submit" class="btn btn-info" id="saveCategoryBtn">
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menü Ekleme/Düzenleme Modal -->
+    <div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="menuModalLabel">Yeni Menü</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="menuForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="menuTitle" class="form-label">Menü Adı <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="menuTitle" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="menuCategory" class="form-label">Kategori</label>
+                                    <select class="form-select" id="menuCategory">
+                                        <option value="">Kategori Seçin</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="menuUrl" class="form-label">URL</label>
+                                    <input type="text" class="form-control" id="menuUrl" placeholder="/sayfa-adi">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="menuIcon" class="form-label">İkon</label>
+                                    <input type="text" class="form-control" id="menuIcon" placeholder="ri-dashboard-line">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="menuOrder" class="form-label">Sıra <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="menuOrder" min="0" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="form-check mt-4">
+                                        <input class="form-check-input" type="checkbox" id="menuActive" checked>
+                                        <label class="form-check-label" for="menuActive">
+                                            Aktif
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                        <button type="submit" class="btn btn-primary" id="saveMenuBtn">
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/libs/simplebar/simplebar.min.js"></script>
+    <script src="assets/libs/node-waves/waves.min.js"></script>
+    <script src="assets/libs/feather-icons/feather.min.js"></script>
+    <script src="assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
+    <script src="assets/js/plugins.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/common.js"></script>
+    <script src="assets/js/auth-helpers.js"></script>
+    <!-- Modal and Notification Utilities -->
+    <script src="assets/js/modal-utils.js"></script>
+    <script src="assets/js/notification-utils.js"></script>
+    <!-- Modular Page Loader -->
+    <script type="module" src="assets/js/page-loader.js"></script>
+
+    <script>
+        // Hybrid yaklaşım: Menü sabit, içerik dinamik
+        let currentPage = 'dashboard';
+        
+         // Sayfa yüklendiğinde
+         document.addEventListener('DOMContentLoaded', function() {
+             loadUserInfo();
+             loadMenus();
+             
+             // Mevcut URL'den sayfa adını al
+             const currentPath = window.location.pathname;
+             const page = currentPath.substring(1) || 'dashboard';
+             
+             // URL'yi güncelle
+             if (currentPath !== '/dashboard' && currentPath !== '/') {
+                 window.history.replaceState({page: page}, '', currentPath);
+             } else {
+                 window.history.replaceState({page: 'dashboard'}, '', '/dashboard');
+             }
+             
+             currentPage = page;
+             loadPageContent(page);
+         });
+
+        // İçerik yükleme fonksiyonu - Artık modüler sayfa sistemi kullanıyor
+        async function loadPageContent(page) {
+            currentPage = page;
+
+            // pageLoader global olarak yüklenene kadar bekle
+            if (typeof window.pageLoader !== 'undefined') {
+                await window.pageLoader.loadPage(page);
+            } else {
+                // Fallback: pageLoader henüz yüklenmediyse bekle
+                setTimeout(() => loadPageContent(page), 100);
+            }
+        }
+
+        // Dashboard içeriği
+        async function loadDashboardContent() {
+            try {
+                // Finans admin için redirect guard (super_admin hariç)
+                if (currentUser && currentUser.role_name === 'finans_admin') {
+                    window.location.href = '/finans-dashboard';
+                    return '<div class="alert alert-info">Finans Dashboard\'a yönlendiriliyorsunuz...</div>';
+                }
+                
+                const response = await fetch('/api/dashboard/stats');
+                const data = await response.json();
+                
+                console.log('Dashboard API yanıtı:', data);
+                
+                if (data.success && data.data) {
+                    return `
+                        <div class="row">
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card card-animate">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1 overflow-hidden">
+                                                <p class="text-uppercase fw-medium text-muted text-truncate mb-0">Toplam Kullanıcı</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-end justify-content-between mt-4">
+                                            <div>
+                                                <h4 class="fs-22 fw-semibold ff-secondary mb-4">${data.data.totalUsers || 0}</h4>
+                                            </div>
+                                            <div class="avatar-sm flex-shrink-0">
+                                                <span class="avatar-title bg-success-subtle rounded fs-3">
+                                                    <i class="ri-user-line text-success"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card card-animate">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1 overflow-hidden">
+                                                <p class="text-uppercase fw-medium text-muted text-truncate mb-0">Toplam Rol</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-end justify-content-between mt-4">
+                                            <div>
+                                                <h4 class="fs-22 fw-semibold ff-secondary mb-4">${data.data.totalRoles || 0}</h4>
+                                            </div>
+                                            <div class="avatar-sm flex-shrink-0">
+                                                <span class="avatar-title bg-info-subtle rounded fs-3">
+                                                    <i class="ri-shield-line text-info"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card card-animate">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1 overflow-hidden">
+                                                <p class="text-uppercase fw-medium text-muted text-truncate mb-0">Toplam Menü</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-end justify-content-between mt-4">
+                                            <div>
+                                                <h4 class="fs-22 fw-semibold ff-secondary mb-4">${data.data.totalMenus || 0}</h4>
+                                            </div>
+                                            <div class="avatar-sm flex-shrink-0">
+                                                <span class="avatar-title bg-warning-subtle rounded fs-3">
+                                                    <i class="ri-menu-line text-warning"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card card-animate">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1 overflow-hidden">
+                                                <p class="text-uppercase fw-medium text-muted text-truncate mb-0">Aktif Kullanıcı</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-end justify-content-between mt-4">
+                                            <div>
+                                                <h4 class="fs-22 fw-semibold ff-secondary mb-4">${data.data.activeUsers || 0}</h4>
+                                            </div>
+                                            <div class="avatar-sm flex-shrink-0">
+                                                <span class="avatar-title bg-primary-subtle rounded fs-3">
+                                                    <i class="ri-user-check-line text-primary"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    return '<div class="alert alert-warning">Dashboard verileri bulunamadı!</div>';
+                }
+            } catch (error) {
+                console.error('Dashboard content error:', error);
+            }
+            return '<div class="alert alert-danger">Dashboard verileri yüklenemedi!</div>';
+        }
+
+        // Panel Ayarları içeriği
+        async function loadPanelSettingsContent() {
+            try {
+                return `
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title mb-0">Panel Ayarları</h4>
+                                    <p class="text-muted mb-0">Panel görünümünü ve logoları yönetin</p>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <!-- Logo Ayarları -->
+                                        <div class="col-lg-6">
+                                            <div class="border rounded p-4">
+                                                <h5 class="mb-3">
+                                                    <i class="ri-image-line me-2 text-primary"></i>
+                                                    Logo Ayarları
+                                                </h5>
+                                                
+                                                <!-- Büyük Logo (Sidebar) -->
+                                                <div class="mb-4">
+                                                    <label class="form-label fw-semibold">Büyük Logo (Sidebar)</label>
+                                                    <div class="d-flex align-items-center mb-3">
+                                                        <div class="me-3">
+                                                            <img id="currentLargeLogo" src="assets/images/logo-dark.png" alt="Büyük Logo" 
+                                                                 style="max-width: 120px; max-height: 40px; border: 1px solid #e9ecef; padding: 8px; border-radius: 4px;">
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <input type="file" class="form-control" id="largeLogoInput" accept="image/*">
+                                                            <div class="form-text">
+                                                                <strong>Önerilen boyut:</strong> 120x40px<br>
+                                                                <strong>Format:</strong> PNG, JPG, SVG<br>
+                                                                <strong>Max boyut:</strong> 2MB
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Küçük Logo (Header) -->
+                                                <div class="mb-4">
+                                                    <label class="form-label fw-semibold">Küçük Logo (Header)</label>
+                                                    <div class="d-flex align-items-center mb-3">
+                                                        <div class="me-3">
+                                                            <img id="currentSmallLogo" src="assets/images/logo-sm.png" alt="Küçük Logo" 
+                                                                 style="max-width: 40px; max-height: 40px; border: 1px solid #e9ecef; padding: 8px; border-radius: 4px;">
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <input type="file" class="form-control" id="smallLogoInput" accept="image/*">
+                                                            <div class="form-text">
+                                                                <strong>Önerilen boyut:</strong> 40x40px<br>
+                                                                <strong>Format:</strong> PNG, JPG, SVG<br>
+                                                                <strong>Max boyut:</strong> 2MB
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Favicon -->
+                                                <div class="mb-4">
+                                                    <label class="form-label fw-semibold">Favicon</label>
+                                                    <div class="d-flex align-items-center mb-3">
+                                                        <div class="me-3">
+                                                            <img id="currentFavicon" src="assets/images/favicon.png?v=20250108" alt="Favicon" 
+                                                                 style="max-width: 32px; max-height: 32px; border: 1px solid #e9ecef; padding: 4px; border-radius: 4px;"
+                                                                 onerror="this.src='assets/images/favicon.png?v=20250108'">
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <input type="file" class="form-control" id="faviconInput" accept="image/*,.ico">
+                                                            <div class="form-text">
+                                                                <strong>Önerilen boyut:</strong> 32x32px<br>
+                                                                <strong>Format:</strong> ICO, PNG<br>
+                                                                <strong>Max boyut:</strong> 1MB
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <button type="button" class="btn btn-primary" id="saveLogosBtn">
+                                                    <i class="ri-save-line me-1"></i>
+                                                    Logoları Kaydet
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Önizleme -->
+                                        <div class="col-lg-6">
+                                            <div class="border rounded p-4">
+                                                <h5 class="mb-3">
+                                                    <i class="ri-eye-line me-2 text-success"></i>
+                                                    Canlı Önizleme
+                                                </h5>
+                                                
+                                                <!-- Sidebar Önizleme -->
+                                                <div class="mb-4">
+                                                    <label class="form-label fw-semibold">Sidebar Önizleme</label>
+                                                    <div class="bg-dark p-3 rounded" style="width: 200px;">
+                                                        <div class="text-white mb-2">
+                                                            <img id="previewLargeLogo" src="assets/images/logo-dark.png" alt="Logo" 
+                                                                 style="max-width: 120px; max-height: 30px;">
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Header Önizleme -->
+                                                <div class="mb-4">
+                                                    <label class="form-label fw-semibold">Header Önizleme</label>
+                                                    <div class="border p-3 rounded bg-light">
+                                                        <div class="d-flex align-items-center">
+                                                            <img id="previewSmallLogo" src="assets/images/logo-sm.png" alt="Logo" 
+                                                                 style="max-width: 30px; max-height: 30px;" class="me-2">
+                                                            <span class="fw-bold">VELZON</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Favicon Önizleme -->
+                                                <div>
+                                                    <label class="form-label fw-semibold">Favicon Önizleme</label>
+                                                    <div class="border p-3 rounded bg-light">
+                                                        <div class="d-flex align-items-center">
+                                                            <img id="previewFavicon" src="assets/images/favicon.png?v=20250108" alt="Favicon" 
+                                                                 style="max-width: 24px; max-height: 24px;" class="me-2"
+                                                                 onerror="this.src='assets/images/favicon.png?v=20250108'">
+                                                            <span>Tarayıcı sekmesi</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Metin Ayarları -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title mb-0">
+                                            <i class="ri-text me-2 text-info"></i>
+                                            Metin Ayarları
+                                        </h4>
+                                        <p class="text-muted mb-0">Sistemdeki metinleri özelleştirin</p>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="systemTitle" class="form-label fw-semibold">Sistem Başlığı</label>
+                                                    <input type="text" class="form-control" id="systemTitle" placeholder="Sistem başlığını girin">
+                                                    <div class="form-text">
+                                                        <strong>Kullanım:</strong> Tarayıcı sekmesinde görünecek başlık<br>
+                                                        <strong>Örnek:</strong> "RBUMS"
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="footerBrand" class="form-label fw-semibold">Footer Marka</label>
+                                                    <input type="text" class="form-control" id="footerBrand" placeholder="Footer marka adını girin">
+                                                    <div class="form-text">
+                                                        <strong>Kullanım:</strong> Footer'da görünecek marka adı<br>
+                                                        <strong>Örnek:</strong> "2025 © Ezoft"
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-12 text-center">
+                                                <button type="button" class="btn btn-success" id="saveTextSettingsBtn">
+                                                    <i class="ri-save-line align-bottom me-1"></i> Metin Ayarlarını Kaydet
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Panel settings content error:', error);
+                return '<div class="alert alert-danger">Panel ayarları yüklenirken hata oluştu!</div>';
+            }
+        }
+
+        // Panel Ayarları JavaScript fonksiyonları
+        function initPanelSettings() {
+            // Logo önizleme fonksiyonları
+            const largeLogoInput = document.getElementById('largeLogoInput');
+            const smallLogoInput = document.getElementById('smallLogoInput');
+            const faviconInput = document.getElementById('faviconInput');
+            
+            if (largeLogoInput) {
+                largeLogoInput.addEventListener('change', function(e) {
+                    handleLogoPreview(e, 'currentLargeLogo', 'previewLargeLogo');
+                });
+            }
+            
+            if (smallLogoInput) {
+                smallLogoInput.addEventListener('change', function(e) {
+                    handleLogoPreview(e, 'currentSmallLogo', 'previewSmallLogo');
+                });
+            }
+            
+            if (faviconInput) {
+                faviconInput.addEventListener('change', function(e) {
+                    handleLogoPreview(e, 'currentFavicon', 'previewFavicon');
+                });
+            }
+            
+            // Logo kaydetme fonksiyonu
+            const saveBtn = document.getElementById('saveLogosBtn');
+            if (saveBtn) {
+                saveBtn.addEventListener('click', saveLogos);
+            }
+            
+            // Metin ayarları kaydetme fonksiyonu
+            const saveTextBtn = document.getElementById('saveTextSettingsBtn');
+            if (saveTextBtn) {
+                saveTextBtn.addEventListener('click', saveTextSettings);
+            }
+            
+            // Mevcut metin ayarlarını yükle
+            loadCurrentTextSettings();
+        }
+
+        // Mevcut metin ayarlarını yükle
+        async function loadCurrentTextSettings() {
+            try {
+                const response = await fetch('/api/panel-settings/texts');
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    const { systemTitle, footerBrand } = result.data;
+                    
+                    // Input alanlarını güncelle
+                    const systemTitleInput = document.getElementById('systemTitle');
+                    const footerBrandInput = document.getElementById('footerBrand');
+                    
+                    if (systemTitleInput) systemTitleInput.value = systemTitle;
+                    if (footerBrandInput) footerBrandInput.value = footerBrand;
+                }
+            } catch (error) {
+                console.error('Metin ayarları yükleme hatası:', error);
+            }
+        }
+
+        function handleLogoPreview(event, currentImgId, previewImgId) {
+            const file = event.target.files[0];
+            if (file) {
+                // Dosya boyutu kontrolü
+                const maxSize = 2 * 1024 * 1024; // 2MB
+                if (file.size > maxSize) {
+                    showAlert('danger', 'Dosya boyutu çok büyük. Maksimum 2MB olmalıdır.');
+                    event.target.value = '';
+                    return;
+                }
+                
+                // Dosya tipi kontrolü
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/svg+xml', 'image/gif', 'image/x-icon'];
+                if (!allowedTypes.includes(file.type)) {
+                    showAlert('danger', 'Desteklenmeyen dosya formatı. PNG, JPG, SVG, ICO formatları kabul edilir.');
+                    event.target.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const currentImg = document.getElementById(currentImgId);
+                    const previewImg = document.getElementById(previewImgId);
+                    
+                    if (currentImg) currentImg.src = e.target.result;
+                    if (previewImg) previewImg.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        async function saveLogos() {
+            const largeLogoFile = document.getElementById('largeLogoInput')?.files[0];
+            const smallLogoFile = document.getElementById('smallLogoInput')?.files[0];
+            const faviconFile = document.getElementById('faviconInput')?.files[0];
+            
+            console.log('Logo files selected:', {
+                largeLogo: largeLogoFile?.name,
+                smallLogo: smallLogoFile?.name,
+                favicon: faviconFile?.name
+            });
+            
+            if (!largeLogoFile && !smallLogoFile && !faviconFile) {
+                showAlert('warning', 'Lütfen en az bir dosya seçin');
+                return;
+            }
+            
+            const saveBtn = document.getElementById('saveLogosBtn');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="ri-loader-4-line ri-spin me-1"></i> Kaydediliyor...';
+            
+            const formData = new FormData();
+            if (largeLogoFile) formData.append('largeLogo', largeLogoFile);
+            if (smallLogoFile) formData.append('smallLogo', smallLogoFile);
+            if (faviconFile) formData.append('favicon', faviconFile);
+            
+            console.log('FormData entries:', Array.from(formData.entries()).map(([key, value]) => ({
+                key,
+                fileName: value.name,
+                fileSize: value.size,
+                fileType: value.type
+            })));
+            
+            try {
+                const response = await fetch('/api/panel-settings/logos', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('success', 'Logolar başarıyla kaydedildi!');
+                    
+                    // Form'u temizle
+                    document.getElementById('largeLogoInput').value = '';
+                    document.getElementById('smallLogoInput').value = '';
+                    document.getElementById('faviconInput').value = '';
+                    
+                    // Sayfayı yenile (sidebar logoları güncellemek için)
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showAlert('danger', data.message || 'Kaydetme hatası');
+                }
+            } catch (error) {
+                console.error('Logo kaydetme hatası:', error);
+                showAlert('danger', 'Sunucu hatası. Lütfen tekrar deneyin.');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = originalText;
+            }
+        }
+
+        // Metin ayarları kaydetme fonksiyonu
+        async function saveTextSettings() {
+            const systemTitle = document.getElementById('systemTitle').value.trim();
+            const footerBrand = document.getElementById('footerBrand').value.trim();
+            
+            if (!systemTitle || !footerBrand) {
+                showAlert('warning', 'Lütfen tüm alanları doldurun');
+                return;
+            }
+            
+            const saveBtn = document.getElementById('saveTextSettingsBtn');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="ri-loader-4-line ri-spin me-1"></i> Kaydediliyor...';
+            
+            try {
+                const response = await fetch('/api/panel-settings/texts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        systemTitle,
+                        footerBrand
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('success', data.message || 'Metin ayarları başarıyla kaydedildi');
+                    
+                    // Sayfayı yenile (başlık ve footer güncellemek için)
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showAlert('danger', data.message || 'Kaydetme hatası');
+                }
+            } catch (error) {
+                console.error('Metin ayarları kaydetme hatası:', error);
+                showAlert('danger', 'Sunucu hatası. Lütfen tekrar deneyin.');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = originalText;
+            }
+        }
+
+        // Finans admin dashboard
+        async function loadFinansDashboardContent() {
+            try {
+                // Super admin her yere erişebilir, redirect guard kaldırıldı
+                
+                const statsRes = await fetch('/api/dashboard/finans-stats');
+                const statsData = await statsRes.json();
+                const stats = statsData.success ? statsData.data : { toplamHesap: 0, bugunIslem: 0, bakiye: 0 };
+                return `
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0 me-3"><i class="ri-bank-card-line fs-3 text-primary"></i></div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">Toplam Hesap</h6>
+                                            <h4 class="mb-0">${stats.toplamHesap || 0}</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0 me-3"><i class="ri-exchange-dollar-line fs-3 text-success"></i></div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">Bugünkü İşlem</h6>
+                                            <h4 class="mb-0">${stats.bugunIslem || 0}</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0 me-3"><i class="ri-wallet-3-line fs-3 text-warning"></i></div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">Toplam Bakiye</h6>
+                                            <h4 class="mb-0">${stats.bakiye || 0}</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (e) {
+                console.error('Finans dashboard yüklenemedi', e);
+                return '<div class="alert alert-danger">Finans dashboard yüklenemedi</div>';
+            }
+        }
+
+        // Kullanıcı yönetimi içeriği
+        async function loadUsersContent() {
+            try {
+                const response = await fetch('/api/users?page=1&limit=10&search=');
+                const data = await response.json();
+                
+                if (data.success) {
+                    let usersHtml = `
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <div class="row align-items-center">
+                                            <div class="col">
+                                                <h4 class="card-title mb-0">Kullanıcı Yönetimi</h4>
+                                            </div>
+                                            <div class="col-auto">
+                                                <button class="btn btn-primary" id="addUserBtn">
+                                                    <i class="ri-add-line me-1"></i> Yeni Kullanıcı
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Filtreler -->
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <div class="search-box">
+                                                    <input type="text" class="form-control" placeholder="Kullanıcı ara..." id="searchInput">
+                                                    <i class="ri-search-line search-icon"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Kullanıcı Tablosu -->
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-nowrap align-middle mb-0">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th scope="col">ID</th>
+                                                        <th scope="col">Ad Soyad</th>
+                                                        <th scope="col">E-posta</th>
+                                                        <th scope="col">Rol</th>
+                                                        <th scope="col">Durum</th>
+                                                        <th scope="col">Son Giriş</th>
+                                                        <th scope="col">İşlemler</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="usersTableBody">
+                    `;
+                    
+                    data.data.users.forEach(user => {
+                        usersHtml += `
+                            <tr>
+                                <td>${user.id}</td>
+                                <td>${user.name}</td>
+                                <td>${user.email}</td>
+                                <td><span class="badge bg-primary">${user.role_name || 'Rol Yok'}</span></td>
+                                <td>
+                                    <span class="badge ${user.is_active ? 'bg-success' : 'bg-danger'}">
+                                        ${user.is_active ? 'Aktif' : 'Pasif'}
+                                    </span>
+                                </td>
+                                <td>${user.last_login ? new Date(user.last_login).toLocaleString('tr-TR') : 'Hiç giriş yapmamış'}</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-soft-secondary btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="ri-more-fill align-middle"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item edit-user-btn" href="#" data-user-id="${user.id}"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Düzenle</a></li>
+                                            <li><a class="dropdown-item delete-user-btn" href="#" data-user-id="${user.id}"><i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Sil</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    
+                    usersHtml += `
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    return usersHtml;
+                }
+            } catch (error) {
+                console.error('Users content error:', error);
+            }
+            return '<div class="alert alert-danger">Kullanıcı verileri yüklenemedi!</div>';
+        }
+
+        // Rol yönetimi içeriği
+        async function loadRolesContent() {
+            try {
+                const response = await fetch('/api/roles');
+                const data = await response.json();
+                
+                if (data.success) {
+                    let rolesHtml = `
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <div class="row align-items-center">
+                                            <div class="col">
+                                                <h4 class="card-title mb-0">Rol Yönetimi</h4>
+                                            </div>
+                                            <div class="col-auto">
+                                                <button class="btn btn-primary" id="addRoleBtn">
+                                                    <i class="ri-add-line me-1"></i> Yeni Rol
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Rol Tablosu -->
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-nowrap align-middle mb-0">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th scope="col">ID</th>
+                                                        <th scope="col">Rol Adı</th>
+                                                        <th scope="col">Açıklama</th>
+                                                        <th scope="col">Durum</th>
+                                                        <th scope="col">Oluşturulma</th>
+                                                        <th scope="col">İşlemler</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="rolesTableBody">
+                    `;
+                    
+                    data.data.roles.forEach(role => {
+                        rolesHtml += `
+                            <tr>
+                                <td>${role.id}</td>
+                                <td><span class="badge bg-primary">${role.name}</span></td>
+                                <td>${role.description || '-'}</td>
+                                <td>
+                                    <span class="badge ${role.is_active ? 'bg-success' : 'bg-danger'}">
+                                        ${role.is_active ? 'Aktif' : 'Pasif'}
+                                    </span>
+                                </td>
+                                <td>${new Date(role.created_at).toLocaleString('tr-TR')}</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-soft-secondary btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="ri-more-fill align-middle"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item edit-role-btn" href="#" data-role-id="${role.id}"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Düzenle</a></li>
+                                            <li><a class="dropdown-item delete-role-btn" href="#" data-role-id="${role.id}"><i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Sil</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    
+                    rolesHtml += `
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    return rolesHtml;
+                }
+            } catch (error) {
+                console.error('Roles content error:', error);
+            }
+            return '<div class="alert alert-danger">Rol verileri yüklenemedi!</div>';
+        }
+
+        // Menü yönetimi içeriği
+        async function loadMenusContent() {
+            try {
+                const response = await fetch('/api/menus');
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Menüleri global değişkene kaydet
+                    menus = data.data.menus;
+                    
+                    // Kategorileri ve menüleri ayır
+                    const categories = data.data.menus.filter(menu => menu.is_category);
+                    const menuItems = data.data.menus.filter(menu => !menu.is_category);
+                    
+                    let menusHtml = `
+                        <div class="row">
+                            <!-- Kategori Listesi -->
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <div class="row align-items-center">
+                                            <div class="col">
+                                                <h5 class="card-title mb-0">Kategoriler</h5>
+                                            </div>
+                                            <div class="col-auto">
+                                                <button class="btn btn-info" id="addCategoryBtn">
+                                                    <i class="ri-folder-add-line align-bottom me-1"></i> Yeni Kategori
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-nowrap align-middle mb-0">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th scope="col">Sıra</th>
+                                                        <th scope="col">Kategori Adı</th>
+                                                        <th scope="col">İkon</th>
+                                                        <th scope="col">URL</th>
+                                                        <th scope="col">Durum</th>
+                                                        <th scope="col">İşlemler</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="categoriesTableBody">
+                    `;
+                    
+                    // Kategorileri göster
+                    if (categories.length === 0) {
+                        menusHtml += `
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="ri-folder-line fs-48 mb-3 d-block"></i>
+                                    <p class="mb-0">Henüz kategori eklenmemiş</p>
+                                    <small>Yeni kategori eklemek için "Yeni Kategori" butonunu kullanın</small>
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        categories.sort((a, b) => a.order_index - b.order_index).forEach(category => {
+                            menusHtml += `
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="ri-drag-move-2-line me-2 text-muted" style="cursor: move;"></i>
+                                            <span class="fw-bold">${category.order_index}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="${category.icon} me-2 text-primary"></i>
+                                            <span class="fw-bold">${category.title}</span>
+                                        </div>
+                                    </td>
+                                    <td><code>${category.icon || '-'}</code></td>
+                                    <td><code>${category.url || '#'}</code></td>
+                                    <td>
+                                        <span class="badge ${category.is_active ? 'bg-success' : 'bg-danger'}">
+                                            ${category.is_active ? 'Aktif' : 'Pasif'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-soft-secondary btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="ri-more-fill align-middle"></i>
+                                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item edit-category-btn" href="#" data-category-id="${category.id}" data-category-title="${category.title}" data-category-order="${category.order_index}"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Kategoriyi Düzenle</a></li>
+                                                <li><a class="dropdown-item delete-category-btn" href="#" data-category-id="${category.id}"><i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Kategoriyi Sil</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    }
+                    
+                    menusHtml += `
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Menü Listesi -->
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <div class="row align-items-center">
+                                            <div class="col">
+                                                <h5 class="card-title mb-0">Menüler</h5>
+                                            </div>
+                                            <div class="col-auto">
+                                                <div class="d-flex gap-1">
+                                                    <button class="btn btn-primary" id="addMenuBtn">
+                                                        <i class="ri-add-line align-bottom me-1"></i> Yeni Menü
+                                                    </button>
+                                                    <button class="btn btn-success" id="saveOrderBtn" style="display: none;">
+                                                        <i class="ri-save-line align-bottom me-1"></i> Sıralamayı Kaydet
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-nowrap align-middle mb-0">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th scope="col">Sıra</th>
+                                                        <th scope="col">Menü Adı</th>
+                                                        <th scope="col">Kategori</th>
+                                                        <th scope="col">URL</th>
+                                                        <th scope="col">İkon</th>
+                                                        <th scope="col">Durum</th>
+                                                        <th scope="col">İşlemler</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="menusTableBody">
+                    `;
+                    
+                    // Menüleri göster
+                    if (menuItems.length === 0) {
+                        menusHtml += `
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <i class="ri-menu-line fs-48 mb-3 d-block"></i>
+                                    <p class="mb-0">Henüz menü eklenmemiş</p>
+                                    <small>Yeni menü eklemek için "Yeni Menü" butonunu kullanın</small>
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        // Kategorilere göre grupla
+                        const menuCategories = {};
+                        menuItems.forEach(menu => {
+                            const categoryName = menu.category || 'Kategori Yok';
+                            if (!menuCategories[categoryName]) {
+                                menuCategories[categoryName] = [];
+                            }
+                            menuCategories[categoryName].push(menu);
+                        });
+                        
+                        // Kategorileri sırala (kategori order_index'ine göre)
+                        const sortedCategoryNames = Object.keys(menuCategories).sort((a, b) => {
+                            // Her kategorinin ilk menüsünün order_index'ini kullan
+                            const categoryA = categories.find(cat => cat.title === a || cat.category === a);
+                            const categoryB = categories.find(cat => cat.title === b || cat.category === b);
+                            return (categoryA?.order_index || 0) - (categoryB?.order_index || 0);
+                        });
+                        
+                        // Her kategori için menüleri render et
+                        sortedCategoryNames.forEach(categoryName => {
+                            const categoryMenus = menuCategories[categoryName];
+                            const categoryBadgeClass = categoryName !== 'Kategori Yok' ? 'bg-secondary' : 'bg-danger';
+                            
+                            // Kategori başlığı ekle
+                            menusHtml += `
+                                <tr class="table-info">
+                                    <td colspan="7" class="fw-bold text-primary">
+                                        <i class="ri-folder-line me-2"></i>${categoryName}
+                                    </td>
+                                </tr>
+                            `;
+                            
+                            // Kategori altındaki menüleri sıralı olarak göster
+                            categoryMenus.sort((a, b) => a.order_index - b.order_index).forEach(menu => {
+                                menusHtml += `
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="ri-drag-move-2-line me-2 text-muted" style="cursor: move;"></i>
+                                                <span>${menu.order_index}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="${menu.icon} me-2 text-secondary"></i>
+                                                <span>${menu.title}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge ${categoryBadgeClass}">${categoryName}</span>
+                                        </td>
+                                        <td><code>${menu.url || '-'}</code></td>
+                                        <td><code>${menu.icon || '-'}</code></td>
+                                        <td>
+                                            <span class="badge ${menu.is_active ? 'bg-success' : 'bg-danger'}">
+                                                ${menu.is_active ? 'Aktif' : 'Pasif'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-soft-secondary btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="ri-more-fill align-middle"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <li><a class="dropdown-item edit-menu-btn" href="#" 
+                                                        data-menu-id="${menu.id}"
+                                                        data-menu-title="${menu.title}"
+                                                        data-menu-url="${menu.url || ''}"
+                                                        data-menu-icon="${menu.icon || ''}"
+                                                        data-menu-order="${menu.order_index}"
+                                                        data-menu-category="${menu.category || ''}"
+                                                        data-menu-active="${menu.is_active}">
+                                                        <i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Menüyü Düzenle</a></li>
+                                                    <li><a class="dropdown-item delete-menu-btn" href="#" data-menu-id="${menu.id}"><i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Menüyü Sil</a></li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
+                            });
+                        });
+                    }
+                    
+                    menusHtml += `
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    return menusHtml;
+                }
+            } catch (error) {
+                console.error('Menus content error:', error);
+            }
+            return '<div class="alert alert-danger">Menü verileri yüklenemedi!</div>';
+        }
+
+         // Menü linklerine tıklama olayı
+         document.addEventListener('click', function(e) {
+             if (e.target.closest('.menu-link')) {
+                 e.preventDefault();
+                 const menuLink = e.target.closest('.menu-link');
+                 const href = menuLink.getAttribute('href');
+                 
+                 console.log('Menü linkine tıklandı:', href);
+                 
+                 if (href && href.startsWith('/')) {
+                     // URL'den sayfa adını çıkar
+                     const page = href.substring(1);
+                     if (page && page !== currentPage) {
+                         // URL'yi güncelle (tarayıcı geçmişine ekle)
+                         window.history.pushState({page: page}, '', href);
+                         
+                         // Aktif menüyü güncelle
+                         document.querySelectorAll('.menu-link').forEach(link => {
+                             link.classList.remove('active');
+                         });
+                         menuLink.classList.add('active');
+                         
+                         loadPageContent(page);
+                     }
+                 }
+             }
+         });
+
+         // Browser back/forward butonları için
+         window.addEventListener('popstate', function(event) {
+             if (event.state && event.state.page) {
+                 const page = event.state.page;
+                 currentPage = page;
+                 
+                 // Aktif menüyü güncelle
+                 document.querySelectorAll('.menu-link').forEach(link => {
+                     link.classList.remove('active');
+                     if (link.getAttribute('href') === '/' + page) {
+                         link.classList.add('active');
+                     }
+                 });
+                 
+                 loadPageContent(page);
+             } else {
+                 // Varsayılan olarak dashboard'a git
+                 window.history.pushState({page: 'dashboard'}, '', '/dashboard');
+                 loadPageContent('dashboard');
+             }
+         });
+
+         // ========== CRUD FONKSİYONLARI ==========
+         
+         // Global değişkenler
+         let currentUserId = null;
+         let currentRoleId = null;
+         let currentMenuId = null;
+         let currentCategoryId = null;
+         let roles = [];
+         let menus = [];
+
+         // Event delegation için global event listener
+         document.addEventListener('click', function(e) {
+             // Logout butonu
+             if (e.target.closest('[data-logout]')) {
+                 e.preventDefault();
+                 logout();
+                 return;
+             }
+             
+             // Kullanıcı yönetimi butonları - users.js init() fonksiyonunda tanımlı
+             // Button handler'lar page module'lerden çağrılıyor
+             
+             // Rol, Menü ve Kategori yönetimi butonları kaldırıldı
+             // Bu handler'lar page module'lerde (roles.js, menus.js) tanımlı
+         });
+
+         // Form event listener'ları
+         document.addEventListener('submit', function(e) {
+             if (e.target.id === 'userForm') {
+                 e.preventDefault();
+                 saveUser();
+             }
+             
+             if (e.target.id === 'roleForm') {
+                 e.preventDefault();
+                 saveRole();
+             }
+             
+             if (e.target.id === 'categoryForm') {
+                 e.preventDefault();
+                 saveCategory();
+             }
+             
+             if (e.target.id === 'menuForm') {
+                 e.preventDefault();
+                 saveMenu();
+             }
+         });
+
+         // ========== KULLANICI YÖNETİMİ FONKSİYONLARI ==========
+         
+        async function loadRoles() {
+             try {
+                console.log('🔄 Roller yükleniyor...');
+                const response = await fetch(`/api/roles?ts=${Date.now()}`, { cache: 'no-store' });
+                 const data = await response.json();
+
+                if (data.success) {
+                     roles = data.data.roles;
+                     console.log('📋 Roller alındı:', roles.length, 'adet');
+                    const roleSelect = document.getElementById('newUserRole');
+                     if (roleSelect) {
+                    const activeRoles = roles.filter(r => r.is_active !== false);
+                        console.log('✅ Aktif roller:', activeRoles.length, 'adet');
+                        // Sadece native select doldur (en güvenli yol)
+                        roleSelect.innerHTML = '<option value="">Rol seçin</option>';
+                        if (activeRoles.length === 0) {
+                            const opt = document.createElement('option');
+                            opt.value = '';
+                            opt.textContent = 'Aktif rol bulunamadı';
+                            roleSelect.appendChild(opt);
+                            console.warn('⚠️ Aktif rol bulunamadı');
+                        } else {
+                            activeRoles.forEach(role => {
+                                const option = document.createElement('option');
+                                option.value = role.id;
+                                option.textContent = role.name;
+                                roleSelect.appendChild(option);
+                            });
+                            console.log('✅ Rol dropdown dolduruldu:', roleSelect.options.length, 'seçenek');
+                        }
+                     } else {
+                         console.error('❌ newUserRole element bulunamadı');
+                     }
+                } else {
+                    console.error('❌ Roles load failed:', data.message);
+                    showAlert && showAlert('danger', 'Roller yüklenemedi');
+                 }
+             } catch (error) {
+                 console.error('❌ Roles load error:', error);
+                showAlert && showAlert('danger', 'Roller yüklenirken hata oluştu');
+             }
+         }
+
+         async function showUserModal(userId = null) {
+             currentUserId = userId;
+
+
+            const userModalEl = document.getElementById('userModal');
+            const modal = new bootstrap.Modal(userModalEl);
+             const modalTitle = document.getElementById('userModalLabel');
+             const statusRow = document.getElementById('userStatusRow');
+
+            // Modal tamamen gösterildiğinde verileri yükle
+            const onShown = async () => {
+                console.log('📂 Modal gösterildi, veriler yükleniyor...');
+
+                try {
+                    // Önce rolleri yükle
+                    if (typeof loadRoles === 'function') {
+                        await loadRoles();
+                        console.log('✅ Roller yüklendi');
+
+                        // Roller yüklendikten sonra kullanıcı verilerini yükle
+                        if (currentUserId) {
+                            console.log('👤 Kullanıcı verileri yükleniyor...');
+                            // Rol dropdown'ının doldurulduğundan emin ol
+                            setTimeout(async () => {
+                                await loadUserForEdit(currentUserId);
+                            }, 100);
+                        }
+                    } else {
+                        console.error('❌ loadRoles fonksiyonu bulunamadı');
+                        showAlert('danger', 'Rol yükleme fonksiyonu bulunamadı');
+                    }
+                } catch (error) {
+                    console.error('❌ Modal veri yükleme hatası:', error);
+                    showAlert('danger', 'Modal verileri yüklenirken hata oluştu');
+                }
+
+                userModalEl.removeEventListener('shown.bs.modal', onShown);
+            };
+            userModalEl.addEventListener('shown.bs.modal', onShown);
+
+             if (userId) {
+                 modalTitle.textContent = 'Kullanıcı Düzenle';
+                 statusRow.style.display = 'block';
+             } else {
+                 modalTitle.textContent = 'Yeni Kullanıcı';
+                 statusRow.style.display = 'none';
+                 document.getElementById('userForm').reset();
+                // Rol select'i temizle
+                const roleSelect = document.getElementById('newUserRole');
+                if (roleSelect) roleSelect.innerHTML = '<option value="">Rol seçin</option>';
+             }
+
+             modal.show();
+         }
+
+         async function loadUserForEdit(userId) {
+             try {
+                 console.log(`🔍 Kullanıcı verileri yükleniyor: ${userId}`);
+                 const response = await fetch(`/api/users/${userId}`);
+                 const data = await response.json();
+
+                 if (data.success) {
+                     const user = data.data.user;
+                     console.log('✅ Kullanıcı verileri yüklendi:', user);
+
+                     // Form alanlarını doldur - modal içindeki elementleri bul
+                     const modalRoot = document.getElementById('userModal');
+
+                     if (!modalRoot) {
+                         console.error('❌ userModal bulunamadı!');
+                         showAlert('danger', 'Modal bulunamadı');
+                         return;
+                     }
+
+                     const nameField = modalRoot.querySelector('input[id="userName"]');
+                     const emailField = modalRoot.querySelector('input[id="userEmail"]');
+                     const roleField = modalRoot.querySelector('select[id="newUserRole"]');
+                     const statusField = modalRoot.querySelector('input[id="userStatus"]');
+                     const passwordField = modalRoot.querySelector('input[id="userPassword"]');
+
+                     // Debug: Hangi alanlar bulundu?
+                     console.log('🔍 Form alanları:', {
+                         nameField: !!nameField,
+                         emailField: !!emailField,
+                         roleField: !!roleField,
+                         statusField: !!statusField,
+                         passwordField: !!passwordField
+                     });
+
+                     // Değerleri ata
+                     if (nameField) {
+                         nameField.value = user.name || '';
+                         console.log('✅ Name değeri atandı:', user.name);
+                     }
+                     if (emailField) {
+                         emailField.value = user.email || '';
+                         console.log('✅ Email değeri atandı:', user.email);
+                     }
+                     if (roleField) {
+                         // Rol dropdownının option'ları yüklenmiş mi?
+                         console.log('🔍 Rol dropdown option sayısı:', roleField.options.length);
+
+                         // Rol seçenekleri yüklenmemişse bekle
+                         if (roleField.options.length <= 1) {
+                             console.log('⏳ Rol seçenekleri yüklenmemiş, bekleniyor...');
+                             // Daha uzun süre bekle ve tekrar dene
+                             setTimeout(() => {
+                                 if (roleField.options.length > 1) {
+                                     roleField.value = user.role_id || '';
+                                     console.log('✅ Rol değeri atandı (gecikme ile):', user.role_id, '- Seçilen:', roleField.value);
+                                 } else {
+                                     console.warn('⚠️ Rol seçenekleri hala yüklenmemiş, tekrar denenecek...');
+                                     // Son bir deneme daha
+                                     setTimeout(() => {
+                                         if (roleField.options.length > 1) {
+                                             roleField.value = user.role_id || '';
+                                             console.log('✅ Rol değeri atandı (2. gecikme ile):', user.role_id);
+                                         } else {
+                                             console.error('❌ Rol seçenekleri yüklenemedi');
+                                             showAlert('warning', 'Rol bilgisi yüklenemedi, lütfen manuel olarak seçin');
+                                         }
+                                     }, 500);
+                                 }
+                             }, 300);
+                         } else {
+                             roleField.value = user.role_id || '';
+                             console.log('✅ Rol değeri atandı:', user.role_id, '- Seçilen:', roleField.value);
+                         }
+                     }
+                     if (statusField) {
+                         statusField.checked = user.is_active;
+                         console.log('✅ Durum değeri atandı:', user.is_active);
+                     }
+
+                     // Şifre zorunlu değil (düzenleme modunda)
+                     if (passwordField) {
+                         passwordField.required = false;
+                         passwordField.value = ''; // Temizle
+                     }
+
+                     console.log('✅ Form alanları dolduruldu');
+                 } else {
+                     console.error('❌ Kullanıcı yüklenemedi:', data.message);
+                     showAlert('danger', data.message || 'Kullanıcı yüklenemedi');
+                 }
+             } catch (error) {
+                 console.error('❌ User load error:', error);
+                 showAlert('danger', 'Kullanıcı verileri yüklenirken hata oluştu');
+             }
+         }
+
+         async function saveUser() {
+             const saveBtn = document.getElementById('saveUserBtn');
+             const spinner = saveBtn.querySelector('.spinner-border');
+             
+             saveBtn.disabled = true;
+             spinner.classList.remove('d-none');
+             
+            try {
+                const modalRoot = document.getElementById('userModal');
+                const nameEl = modalRoot?.querySelector('#userName');
+                const emailEl = modalRoot?.querySelector('#userEmail');
+                const roleEl = modalRoot?.querySelector('#newUserRole');
+                const passEl = modalRoot?.querySelector('#userPassword');
+
+                const name = (nameEl?.value || '').trim();
+                const email = (emailEl?.value || '').trim();
+                const roleId = parseInt(roleEl?.value || '');
+
+                if (!name) { showAlert('danger', 'Ad Soyad zorunludur'); throw new Error('validation'); }
+                if (!email) { showAlert('danger', 'E-posta zorunludur'); throw new Error('validation'); }
+                if (!roleId || isNaN(roleId)) { showAlert('danger', 'Lütfen bir rol seçin'); throw new Error('validation'); }
+
+                const userData = { name, email, role_id: roleId };
+                 
+                 if (!currentUserId) {
+                    const password = passEl?.value || '';
+                    if (!password) { showAlert('danger', 'Şifre zorunludur'); throw new Error('validation'); }
+                    userData.password = password;
+                 } else {
+                    userData.is_active = document.getElementById('userStatus').checked;
+                 }
+                 
+                 const url = currentUserId ? `/api/users/${currentUserId}` : '/api/users';
+                 const method = currentUserId ? 'PUT' : 'POST';
+                 
+                 const response = await fetch(url, {
+                     method: method,
+                     headers: {
+                         'Content-Type': 'application/json',
+                     },
+                     body: JSON.stringify(userData)
+                 });
+                 
+                const data = await response.json();
+
+                if (data.success) {
+                    // Modal'ı kapat
+                    const modalInstance = bootstrap.Modal.getInstance(document.getElementById('userModal'));
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+
+                    // Backdrop'u manuel temizle
+                    setTimeout(() => {
+                        const backdrops = document.querySelectorAll('.modal-backdrop');
+                        backdrops.forEach(backdrop => backdrop.remove());
+                        document.body.classList.remove('modal-open');
+                        document.body.style.overflow = '';
+                        document.body.style.paddingRight = '';
+                    }, 200);
+
+                    // Sayfayı yenile
+                    loadPageContent('users');
+                    showAlert('success', data.message);
+                } else {
+                    // Validation veya diğer hatalar
+                    console.error('Server error:', data);
+                    let errorMsg = data.message || 'İşlem başarısız';
+
+                    // Validation hatalarını göster
+                    if (data.errors && Array.isArray(data.errors)) {
+                        errorMsg += ':\n' + data.errors.join('\n');
+                    }
+
+                    // Development mode'da detaylı hata göster
+                    if (data.error) {
+                        errorMsg += '\n\nDetay: ' + data.error;
+                    }
+
+                    showAlert('danger', errorMsg);
+                 }
+             } catch (error) {
+                if (error && error.message === 'validation') {
+                    // zaten kullanıcıya gösterildi
+                } else {
+                    console.error('Save user error:', error);
+                    showAlert('danger', 'Sunucu hatası. Lütfen tekrar deneyin.');
+                }
+             } finally {
+                 saveBtn.disabled = false;
+                 spinner.classList.add('d-none');
+             }
+         }
+
+         async function editUser(userId) {
+             showUserModal(userId);
+         }
+
+         async function deleteUser(userId) {
+             showDeleteConfirmation('Bu kullanıcıyı silmek istediğinizden emin misiniz?', async () => {
+                 try {
+                     const response = await fetch(`/api/users/${userId}`, {
+                         method: 'DELETE'
+                     });
+                     
+                     const data = await response.json();
+                     
+                    if (data.success) {
+                        // Her durumda kullanıcı yönetimi sayfasını yenile
+                        loadPageContent('users');
+                        showAlert('success', data.message);
+                    } else {
+                         showAlert('danger', data.message);
+                     }
+                 } catch (error) {
+                     console.error('Delete user error:', error);
+                     showAlert('danger', 'Sunucu hatası. Lütfen tekrar deneyin.');
+                 }
+             });
+         }
+
+         // ========== ROL YÖNETİMİ FONKSİYONLARI ==========
+         
+         function showRoleModal(roleId = null) {
+             currentRoleId = roleId;
+             const modal = new bootstrap.Modal(document.getElementById('roleModal'));
+             const modalTitle = document.getElementById('roleModalLabel');
+             
+            // Menü izin alanını ilk haline getir
+            renderMenuPermissionsSkeleton();
+
+             if (roleId) {
+                 modalTitle.textContent = 'Rol Düzenle';
+                 loadRoleForEdit(roleId);
+                // Rol mevcutken menü yetkilerini de yükle
+                loadRoleMenuPermissions(roleId);
+             } else {
+                 modalTitle.textContent = 'Yeni Rol';
+                 document.getElementById('roleForm').reset();
+                 clearPermissions();
+                // Yeni rol için tüm menü listesini getir ve boş seçimle çiz
+                loadAllMenusForPermissions();
+             }
+             
+             modal.show();
+         }
+
+         async function loadRoleForEdit(roleId) {
+             try {
+                 const response = await fetch(`/api/roles/${roleId}`);
+                 const data = await response.json();
+                 
+                 if (data.success) {
+                     const role = data.data.role;
+                     document.getElementById('roleName').value = role.name;
+                     document.getElementById('roleDescription').value = role.description || '';
+                     
+                     // Yetkileri yükle
+                     clearPermissions();
+                     if (role.permissions) {
+                         Object.keys(role.permissions).forEach(module => {
+                             Object.keys(role.permissions[module]).forEach(action => {
+                                 const checkboxId = `${module}_${action}`;
+                                 const checkbox = document.getElementById(checkboxId);
+                                 if (checkbox) {
+                                     checkbox.checked = role.permissions[module][action];
+                                 }
+                             });
+                         });
+                     }
+                 }
+             } catch (error) {
+                 console.error('Role load error:', error);
+             }
+         }
+
+         function clearPermissions() {
+             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+             checkboxes.forEach(checkbox => {
+                 checkbox.checked = false;
+             });
+         }
+
+        function renderMenuPermissionsSkeleton() {
+            const container = document.getElementById('menuPermissionsContainer');
+            if (!container) return;
+            container.innerHTML = '<div class="text-muted small">Menüler yükleniyor...</div>';
+        }
+
+        async function loadAllMenusForPermissions() {
+            try {
+                const res = await fetch('/api/menus');
+                const data = await res.json();
+                if (data.success) {
+                    renderMenuPermissions(data.data.menus, []);
+                }
+            } catch (e) {
+                console.error('Menüler yüklenemedi', e);
+            }
+        }
+
+        function renderMenuPermissions(allMenus, roleMenuPerms) {
+            const containerBody = document.getElementById('menuPermsBody');
+            if (!containerBody) return;
+            const permById = new Map((roleMenuPerms || []).map(p => [p.menu_id, p]));
+            const items = allMenus.filter(m => !m.is_category).sort((a,b)=>a.order_index-b.order_index);
+            let rows = '';
+            items.forEach(m => {
+                const p = permById.get(m.id) || {};
+                const v = p.can_view ? 'checked' : '';
+                const c = p.can_create ? 'checked' : '';
+                const e = p.can_edit ? 'checked' : '';
+                const d = p.can_delete ? 'checked' : '';
+                rows += `<tr>
+                    <td>${m.category ? `<span class=\"text-secondary me-2\">[${m.category}]</span>` : ''}${m.title}</td>
+                    <td class=\"text-center\"><input class=\"form-check-input menu-perm-checkbox\" type=\"checkbox\" data-menu-id=\"${m.id}\" id=\"menu_perm_${m.id}\" ${v}></td>
+                    <td class=\"text-center\"><input class=\"form-check-input menu-perm-crud\" type=\"checkbox\" data-menu-id=\"${m.id}\" data-action=\"create\" id=\"menu_perm_create_${m.id}\" ${c}></td>
+                    <td class=\"text-center\"><input class=\"form-check-input menu-perm-crud\" type=\"checkbox\" data-menu-id=\"${m.id}\" data-action=\"edit\" id=\"menu_perm_edit_${m.id}\" ${e}></td>
+                    <td class=\"text-center\"><input class=\"form-check-input menu-perm-crud\" type=\"checkbox\" data-menu-id=\"${m.id}\" data-action=\"delete\" id=\"menu_perm_delete_${m.id}\" ${d}></td>
+                </tr>`;
+            });
+            containerBody.innerHTML = rows || `<tr><td colspan="5" class="text-muted small">Menü bulunamadı</td></tr>`;
+
+            // CRUD -> view enforce
+            document.querySelectorAll('.menu-perm-crud').forEach(cb => {
+                cb.addEventListener('change', (e) => {
+                    const id = e.target.getAttribute('data-menu-id');
+                    const viewBox = document.getElementById(`menu_perm_${id}`);
+                    if (e.target.checked && viewBox && !viewBox.checked) viewBox.checked = true;
+                });
+            });
+
+            // View kapatılınca ilgili CRUD'ları temizle
+            document.querySelectorAll('.menu-perm-checkbox').forEach(vb => {
+                vb.addEventListener('change', (e) => {
+                    const id = e.target.getAttribute('data-menu-id');
+                    if (!e.target.checked) {
+                        ['create','edit','delete'].forEach(act => {
+                            const cb = document.getElementById(`menu_perm_${act}_${id}`);
+                            if (cb) cb.checked = false;
+                        });
+                    }
+                });
+            });
+        }
+
+        async function loadRoleMenuPermissions(roleId) {
+            try {
+                const [menusRes, permsRes] = await Promise.all([
+                    fetch('/api/menus'),
+                    fetch(`/api/roles/${roleId}/menus`)
+                ]);
+                const menusData = await menusRes.json();
+                const permsData = await permsRes.json();
+                if (menusData.success) {
+                    const perms = permsData.success ? permsData.data.menuPermissions : [];
+                    renderMenuPermissions(menusData.data.menus, perms);
+                }
+            } catch (e) {
+                console.error('Rol menü yetkileri yüklenemedi', e);
+            }
+        }
+
+        function collectMenuPermissionsFromUI() {
+            const viewBoxes = document.querySelectorAll('.menu-perm-checkbox');
+            const menuPermissions = [];
+            viewBoxes.forEach(vb => {
+                const id = parseInt(vb.getAttribute('data-menu-id'));
+                const can_view = vb.checked;
+                const can_create = document.getElementById(`menu_perm_create_${id}`)?.checked || false;
+                const can_edit = document.getElementById(`menu_perm_edit_${id}`)?.checked || false;
+                const can_delete = document.getElementById(`menu_perm_delete_${id}`)?.checked || false;
+                menuPermissions.push({ menu_id: id, can_view, can_create, can_edit, can_delete });
+            });
+            return menuPermissions;
+        }
+
+        function syncMenuAndModulePermissions() {
+            const mapping = [
+                { moduleKey: 'users',    moduleViewId: 'users_view',    menuTitles: ['Kullanıcı Yönetimi'] },
+                { moduleKey: 'roles',    moduleViewId: 'roles_view',    menuTitles: ['Rol Yönetimi'] },
+                { moduleKey: 'menus',    moduleViewId: 'menus_view',    menuTitles: ['Menü Yönetimi'] },
+                { moduleKey: 'panel',    moduleViewId: 'panel_view',    menuTitles: ['Panel Ayarları'] },
+                { moduleKey: 'dashboard',moduleViewId: 'dashboard_view',menuTitles: ['Dashboard'] }
+            ];
+
+            // Modül → Menü: modül görüntüleme işaretlenince ilgili menüler de işaretlensin
+            mapping.forEach(map => {
+                const modBox = document.getElementById(map.moduleViewId);
+                if (!modBox) return;
+                const affectByView = () => {
+                    const boxes = document.querySelectorAll('.menu-perm-checkbox');
+                    boxes.forEach(b => {
+                        const label = document.querySelector(`label[for="${b.id}"]`);
+                        if (label && map.menuTitles.includes(label.textContent.trim())) {
+                            b.checked = modBox.checked;
+                        }
+                    });
+                    // Eğer görüntüleme kaldırıldıysa aynı modülün create/edit/delete yetkilerini de kaldır
+                    if (map.moduleKey !== 'dashboard') {
+                        const c = document.getElementById(`${map.moduleKey}_create`);
+                        const e = document.getElementById(`${map.moduleKey}_edit`);
+                        const d = document.getElementById(`${map.moduleKey}_delete`);
+                        const dependent = [c,e,d].filter(Boolean);
+                        if (!modBox.checked) {
+                            dependent.forEach(x => { x.checked = false; x.disabled = true; });
+                        } else {
+                            dependent.forEach(x => { x.disabled = false; });
+                        }
+                    }
+                };
+                // İlk durum için uygula
+                affectByView();
+                // Değişikliklerde uygula
+                modBox.addEventListener('change', () => {
+                    affectByView();
+                    recomputePermissionDependencies();
+                });
+            });
+
+            // Menü → Modül: bir menü işaretlenince ilgili modül görüntüleme otomatik açılsın
+            const menuBoxes = document.querySelectorAll('.menu-perm-checkbox');
+            menuBoxes.forEach(b => {
+                b.addEventListener('change', () => {
+                    const label = document.querySelector(`label[for="${b.id}"]`);
+                    if (!label) return;
+                    const title = label.textContent.trim();
+                    mapping.forEach(map => {
+                        if (!map.menuTitles.includes(title)) return;
+                        const modBox = document.getElementById(map.moduleViewId);
+                        if (!modBox) return;
+                        if (b.checked) {
+                            if (!modBox.checked) modBox.checked = true;
+                        } else {
+                            // Eğer bu modüle ait hiçbir menü seçili değilse modül görüntülemeyi de kaldır
+                            const related = Array.from(document.querySelectorAll('.menu-perm-checkbox')).filter(x => {
+                                const l = document.querySelector(`label[for="${x.id}"]`);
+                                return l && map.menuTitles.includes(l.textContent.trim());
+                            });
+                            const anyChecked = related.some(x => x.checked);
+                            if (!anyChecked) modBox.checked = false;
+                        }
+                    });
+                    recomputePermissionDependencies();
+                });
+            });
+
+            // Modül create/edit/delete → view: alt haklar işaretlenince view otomatik açılsın
+            ['users','roles','menus','panel'].forEach(key => {
+                ['create','edit','delete'].forEach(action => {
+                    const cb = document.getElementById(`${key}_${action}`);
+                    if (!cb) return;
+                    cb.addEventListener('change', () => {
+                        const view = document.getElementById(`${key}_view`);
+                        if (!view) return;
+                        if (cb.checked && !view.checked) {
+                            view.checked = true;
+                            // View açıldığında bağımlılıkları da kaldır
+                            const evt = new Event('change');
+                            view.dispatchEvent(evt);
+                        }
+                        recomputePermissionDependencies();
+                    });
+                });
+            });
+        }
+
+        // Tüm bağımlılıkları tek yerden uygula (idempotent)
+        function recomputePermissionDependencies() {
+            const modules = (window.CURRENT_MODULES && window.CURRENT_MODULES.length)
+                ? window.CURRENT_MODULES.map(m => ({
+                    key: m.key,
+                    view: `${m.key}_view`,
+                    create: m.limited ? null : `${m.key}_create`,
+                    edit: m.limited ? null : `${m.key}_edit`,
+                    del: m.limited ? null : `${m.key}_delete`,
+                    titles: m.menuTitles || [m.label]
+                }))
+                : [
+                    { key: 'users', view: 'users_view', create: 'users_create', edit: 'users_edit', del: 'users_delete', titles: ['Kullanıcı Yönetimi'] },
+                    { key: 'roles', view: 'roles_view', create: 'roles_create', edit: 'roles_edit', del: 'roles_delete', titles: ['Rol Yönetimi'] },
+                    { key: 'menus', view: 'menus_view', create: 'menus_create', edit: 'menus_edit', del: 'menus_delete', titles: ['Menü Yönetimi'] },
+                    { key: 'dashboard', view: 'dashboard_view', titles: ['Dashboard'] }
+                ];
+
+            const allMenuBoxes = Array.from(document.querySelectorAll('.menu-perm-checkbox'));
+            const titleOf = (box) => {
+                const label = document.querySelector(`label[for="${box.id}"]`);
+                return label ? label.textContent.trim() : '';
+            };
+
+            modules.forEach(m => {
+                const view = document.getElementById(m.view);
+                const create = m.create ? document.getElementById(m.create) : null;
+                const edit = m.edit ? document.getElementById(m.edit) : null;
+                const del = m.del ? document.getElementById(m.del) : null;
+
+                const relatedMenus = allMenuBoxes.filter(x => m.titles.includes(titleOf(x)));
+                const anyMenuChecked = relatedMenus.some(x => x.checked);
+
+                if (view && !view.checked) {
+                    [create, edit, del].forEach(x => { if (x) { x.checked = false; x.disabled = true; } });
+                    relatedMenus.forEach(x => { x.checked = false; });
+                } else {
+                    [create, edit, del].forEach(x => { if (x) { x.disabled = false; } });
+                }
+
+                if (anyMenuChecked && view && !view.checked) {
+                    view.checked = true;
+                }
+            });
+        }
+
+        function renderModuleGridFromMenus(allMenus) {
+            const body = document.getElementById('modulePermsBody');
+            if (!body) return;
+            const PRESENT_TITLES = new Set(allMenus.filter(m => !m.is_category).map(m => m.title));
+            window.CURRENT_MODULES = [
+                { key: 'users', label: 'Kullanıcı Yönetimi', menuTitles: ['Kullanıcı Yönetimi'] },
+                { key: 'roles', label: 'Rol Yönetimi', menuTitles: ['Rol Yönetimi'] },
+                { key: 'menus', label: 'Menü Yönetimi', menuTitles: ['Menü Yönetimi'] },
+                { key: 'dashboard', label: 'Dashboard', menuTitles: ['Dashboard'], limited: true }
+            ].filter(m => m.menuTitles.some(t => PRESENT_TITLES.has(t)));
+
+            let html = '';
+            window.CURRENT_MODULES.forEach(m => {
+                const isLimited = !!m.limited;
+                html += `<tr>
+                    <td class="fw-semibold">${m.label}</td>
+                    <td class="text-center"><input class="form-check-input" type="checkbox" id="${m.key}_view"></td>
+                    <td class="text-center">${isLimited ? '—' : `<input class=\"form-check-input\" type=\"checkbox\" id=\"${m.key}_create\">`}</td>
+                    <td class="text-center">${isLimited ? '—' : `<input class=\"form-check-input\" type=\"checkbox\" id=\"${m.key}_edit\">`}</td>
+                    <td class="text-center">${isLimited ? '—' : `<input class=\"form-check-input\" type=\"checkbox\" id=\"${m.key}_delete\">`}</td>
+                </tr>`;
+            });
+            body.innerHTML = html;
+        }
+
+         async function saveRole() {
+             const saveBtn = document.getElementById('saveRoleBtn');
+             const spinner = saveBtn.querySelector('.spinner-border');
+             
+             saveBtn.disabled = true;
+             spinner.classList.remove('d-none');
+             
+             try {
+                 // Yetkileri topla
+                 const permissions = {
+                     // Menü bazlı ayrıntılı izinler (görünürlük + CRUD)
+                     menus_actions: collectMenuPermissionsFromUI()
+                 };
+                 
+                 const roleData = {
+                     name: document.getElementById('roleName').value,
+                     description: document.getElementById('roleDescription').value,
+                     permissions: permissions
+                 };
+                 
+                 const url = currentRoleId ? `/api/roles/${currentRoleId}` : '/api/roles';
+                 const method = currentRoleId ? 'PUT' : 'POST';
+                 
+                const response = await fetch(url, {
+                     method: method,
+                     headers: {
+                         'Content-Type': 'application/json',
+                     },
+                     body: JSON.stringify(roleData)
+                 });
+                 
+                 const data = await response.json();
+                 
+                 if (data.success) {
+                    // Menü izinlerini de kaydet
+                    try {
+                        const roleIdForMenus = currentRoleId || data.data.role.id;
+                        const menuPermissions = collectMenuPermissionsFromUI();
+                        await fetch(`/api/roles/${roleIdForMenus}/menus`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ menuPermissions })
+                        });
+                    } catch (e) {
+                        console.error('Menü izinleri kaydedilemedi', e);
+                    }
+
+                    // Modal'ı kapat
+                    const modalInstance = bootstrap.Modal.getInstance(document.getElementById('roleModal'));
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+
+                    // Backdrop'u manuel temizle
+                    setTimeout(() => {
+                        const backdrops = document.querySelectorAll('.modal-backdrop');
+                        backdrops.forEach(backdrop => backdrop.remove());
+                        document.body.classList.remove('modal-open');
+                        document.body.style.overflow = '';
+                        document.body.style.paddingRight = '';
+                    }, 200);
+
+                    // Sidebar menülerini güncelle ve cache temizle
+                    if (typeof clearMenuCache === 'function') clearMenuCache();
+                    if (typeof loadMenus === 'function') loadMenus();
+
+                    // Sayfayı yenile
+                    window.reloadPage();
+                    showSuccess(data.message);
+                 } else {
+                     showError(data.message);
+                 }
+             } catch (error) {
+                 console.error('Save role error:', error);
+                 showError('Sunucu hatası. Lütfen tekrar deneyin.');
+             } finally {
+                 saveBtn.disabled = false;
+                 spinner.classList.add('d-none');
+             }
+         }
+
+         async function editRole(roleId) {
+             showRoleModal(roleId);
+         }
+
+         async function deleteRole(roleId) {
+             showDeleteConfirmation('Bu rolü silmek istediğinizden emin misiniz?', async () => {
+                 try {
+                     const response = await fetch(`/api/roles/${roleId}`, {
+                         method: 'DELETE'
+                     });
+                     
+                     const data = await response.json();
+                     
+                     if (data.success) {
+                         loadRolesContent();
+                         showAlert('success', data.message);
+                     } else {
+                         showAlert('danger', data.message);
+                     }
+                 } catch (error) {
+                     console.error('Delete role error:', error);
+                     showAlert('danger', 'Sunucu hatası. Lütfen tekrar deneyin.');
+                 }
+             });
+         }
+
+         // ========== MENÜ YÖNETİMİ FONKSİYONLARI ==========
+         
+         async function loadAllMenus() {
+             try {
+                 const response = await fetch('/api/menus');
+                 const data = await response.json();
+                 
+                 if (data.success) {
+                     menus = data.data.menus;
+                     updateParentMenuSelect();
+                     updateCategorySelect();
+                 }
+             } catch (error) {
+                 console.error('All menus load error:', error);
+             }
+         }
+
+         function updateParentMenuSelect() {
+             const select = document.getElementById('menuParent');
+             if (select) {
+                 select.innerHTML = '<option value="">Ana Menü</option>';
+                 
+                 menus.forEach(menu => {
+                     if (!menu.parent_id) {
+                         const option = document.createElement('option');
+                         option.value = menu.id;
+                         option.textContent = menu.title;
+                         select.appendChild(option);
+                     }
+                 });
+             }
+         }
+
+         function updateCategorySelect() {
+             const select = document.getElementById('menuCategory');
+             if (select) {
+                 select.innerHTML = '<option value="">Kategori Seçin</option>';
+                 
+                 // Kategorileri al
+                 const categories = menus.filter(menu => menu.is_category);
+                 categories.forEach(category => {
+                     const option = document.createElement('option');
+                     option.value = category.category;
+                     option.textContent = category.title;
+                     select.appendChild(option);
+                 });
+             }
+         }
+
+         async function showMenuModal(menuId = null) {
+             currentMenuId = menuId;
+             const modal = new bootstrap.Modal(document.getElementById('menuModal'));
+             const modalTitle = document.getElementById('menuModalLabel');
+             const menuModalEl = document.getElementById('menuModal');
+
+             // Modal tamamen gösterildiğinde verileri yükle
+             const onShown = async () => {
+                 console.log('📂 Menü modalı gösterildi, kategoriler yükleniyor...');
+
+                 try {
+                     // Önce kategorileri yükle
+                     await updateMenuCategorySelect();
+                     console.log('✅ Kategoriler yüklendi');
+
+                     if (menuId) {
+                         console.log('👤 Menü verileri yükleniyor...');
+                         await loadMenuForEdit(menuId);
+                     } else {
+                         // Yeni menü için sıra numarasını otomatik ayarla
+                         try {
+                             const response = await fetch('/api/menus');
+                             const data = await response.json();
+                             if (data.success) {
+                                 const allMenus = data.data.menus || [];
+                                 const maxOrder = Math.max(...allMenus.map(m => m.order_index || 0), 0);
+                                 document.getElementById('menuOrder').value = maxOrder + 1;
+                             }
+                         } catch (e) {
+                             console.error('Order index ayarlanamadı:', e);
+                             document.getElementById('menuOrder').value = 1;
+                         }
+                     }
+                 } catch (error) {
+                     console.error('❌ Modal veri yükleme hatası:', error);
+                     showError('Modal verileri yüklenirken hata oluştu');
+                 }
+
+                 menuModalEl.removeEventListener('shown.bs.modal', onShown);
+             };
+             menuModalEl.addEventListener('shown.bs.modal', onShown);
+
+             if (menuId) {
+                 modalTitle.textContent = 'Menü Düzenle';
+             } else {
+                 modalTitle.textContent = 'Yeni Menü';
+                 document.getElementById('menuForm').reset();
+                 document.getElementById('menuActive').checked = true;
+             }
+
+             modal.show();
+         }
+
+         function reloadAfterSuccess() {
+             // Allow toast to be visible, then hard refresh to ensure full consistency
+             setTimeout(() => {
+                 window.location.reload();
+             }, 400);
+         }
+
+         async function loadMenuForEdit(menuId) {
+             try {
+                 const response = await fetch(`/api/menus/${menuId}`);
+                 const data = await response.json();
+
+                 if (data.success) {
+                     const menu = data.data.menu;
+
+                     // Form alanlarını doldur
+                     document.getElementById('menuTitle').value = menu.title;
+                     document.getElementById('menuUrl').value = menu.url;
+                     document.getElementById('menuIcon').value = menu.icon || '';
+                     document.getElementById('menuOrder').value = menu.order_index;
+
+                     // Kategori değerini set et (dropdown zaten yüklendi)
+                     setTimeout(() => {
+                         const categorySelect = document.getElementById('menuCategory');
+                         if (categorySelect) {
+                             categorySelect.value = menu.category || '';
+                             console.log('✅ Menü kategorisi set edildi:', menu.category);
+                         }
+                     }, 100);
+
+                     // Aktif durumu için checkbox kontrol et
+                     const activeCheckbox = document.getElementById('menuActive');
+                     if (activeCheckbox) {
+                         activeCheckbox.checked = menu.is_active;
+                     }
+                 }
+             } catch (error) {
+                 console.error('Menu load error:', error);
+                 showError('Menü yüklenirken hata oluştu');
+             }
+         }
+
+         async function updateMenuCategorySelect() {
+             const select = document.getElementById('menuCategory');
+             if (!select) return;
+
+             select.innerHTML = '<option value="">Yükleniyor...</option>';
+
+             try {
+                 // Kategorileri API'den çek
+                 const response = await fetch('/api/menus');
+                 const data = await response.json();
+
+                 if (data.success) {
+                     select.innerHTML = '<option value="">Kategori Seçin</option>';
+
+                     const allMenus = data.data.menus || [];
+                     const categories = allMenus.filter(menu => menu.is_category);
+
+                     console.log('📋 Bulunan kategoriler:', categories.length);
+
+                     categories.forEach(category => {
+                         const option = document.createElement('option');
+                         option.value = category.category || category.title;
+                         option.textContent = category.title;
+                         select.appendChild(option);
+                     });
+
+                     if (categories.length === 0) {
+                         select.innerHTML = '<option value="">Kategori bulunamadı</option>';
+                     }
+                 } else {
+                     select.innerHTML = '<option value="">Kategori yüklenemedi</option>';
+                     console.error('Kategori yükleme hatası:', data.message);
+                 }
+             } catch (error) {
+                 select.innerHTML = '<option value="">Kategori yüklenemedi</option>';
+                 console.error('Kategori yükleme hatası:', error);
+             }
+         }
+
+         async function saveMenu() {
+             const saveBtn = document.getElementById('saveMenuBtn');
+             const spinner = saveBtn.querySelector('.spinner-border');
+             
+             saveBtn.disabled = true;
+             spinner.classList.remove('d-none');
+             
+             try {
+                 const menuData = {
+                     title: document.getElementById('menuTitle').value,
+                     url: document.getElementById('menuUrl').value,
+                     icon: document.getElementById('menuIcon').value,
+                     order_index: parseInt(document.getElementById('menuOrder').value),
+                     category: document.getElementById('menuCategory').value || null,
+                     is_category: false,
+                     is_active: document.getElementById('menuActive').checked
+                 };
+                 
+                 const url = currentMenuId ? `/api/menus/${currentMenuId}` : '/api/menus';
+                 const method = currentMenuId ? 'PUT' : 'POST';
+                 
+                 const response = await fetch(url, {
+                     method: method,
+                     headers: {
+                         'Content-Type': 'application/json',
+                     },
+                     body: JSON.stringify(menuData)
+                 });
+                 
+                 const data = await response.json();
+                 
+                if (data.success) {
+                    // Modal'ı kapat
+                    const modalInstance = bootstrap.Modal.getInstance(document.getElementById('menuModal'));
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+
+                    // Backdrop'u manuel temizle
+                    setTimeout(() => {
+                        const backdrops = document.querySelectorAll('.modal-backdrop');
+                        backdrops.forEach(backdrop => backdrop.remove());
+                        document.body.classList.remove('modal-open');
+                        document.body.style.overflow = '';
+                        document.body.style.paddingRight = '';
+                    }, 200);
+
+                    // Sidebar menülerini güncelle
+                    if (typeof loadMenus === 'function') {
+                        loadMenus();
+                    }
+                    // Cache'i temizle
+                    if (typeof clearMenuCache === 'function') {
+                        clearMenuCache();
+                    }
+
+                    // Sayfayı yenile
+                    window.reloadPage();
+                    showSuccess(data.message);
+                 } else {
+                     showError(data.message);
+                 }
+             } catch (error) {
+                 console.error('Save menu error:', error);
+                 showError('Sunucu hatası. Lütfen tekrar deneyin.');
+             } finally {
+                 saveBtn.disabled = false;
+                 spinner.classList.add('d-none');
+             }
+         }
+
+        async function editMenu(menuId) {
+            showMenuModal(menuId);
+        }
+
+        async function editCategory(categoryId) {
+            showCategoryModal(categoryId);
+        }
+
+         async function deleteMenu(menuId) {
+             showDeleteConfirmation('Bu menüyü silmek istediğinizden emin misiniz?', async () => {
+                 try {
+                     const response = await fetch(`/api/menus/${menuId}`, {
+                         method: 'DELETE'
+                     });
+                     
+                     const data = await response.json();
+                     
+                    if (data.success) {
+                         loadMenusContent();
+                         // Sidebar menülerini güncelle
+                         if (typeof loadMenus === 'function') {
+                             loadMenus();
+                         }
+                         // Cache'i temizle
+                         if (typeof clearMenuCache === 'function') {
+                             clearMenuCache();
+                         }
+                         showAlert('success', data.message);
+                        reloadAfterSuccess();
+                     } else {
+                         showAlert('danger', data.message);
+                     }
+                 } catch (error) {
+                     console.error('Delete menu error:', error);
+                     showAlert('danger', 'Sunucu hatası. Lütfen tekrar deneyin.');
+                 }
+             });
+         }
+
+         async function deleteCategory(categoryId) {
+             showDeleteConfirmation('Bu kategoriyi silmek istediğinizden emin misiniz?', async () => {
+                 try {
+                     const response = await fetch(`/api/menus/${categoryId}`, {
+                         method: 'DELETE'
+                     });
+                     
+                     const data = await response.json();
+                     
+                    if (data.success) {
+                         loadMenusContent();
+                         // Sidebar menülerini güncelle
+                         if (typeof loadMenus === 'function') {
+                             loadMenus();
+                         }
+                         // Cache'i temizle
+                         if (typeof clearMenuCache === 'function') {
+                             clearMenuCache();
+                         }
+                         showAlert('success', data.message);
+                        reloadAfterSuccess();
+                     } else {
+                         showAlert('danger', data.message);
+                     }
+                 } catch (error) {
+                     console.error('Delete category error:', error);
+                     showAlert('danger', 'Sunucu hatası. Lütfen tekrar deneyin.');
+                 }
+             });
+         }
+
+         // ========== KATEGORİ YÖNETİMİ FONKSİYONLARI ==========
+         
+         function showCategoryModal(categoryId = null) {
+             currentCategoryId = categoryId;
+             const modal = new bootstrap.Modal(document.getElementById('categoryModal'));
+             const modalTitle = document.getElementById('categoryModalLabel');
+             
+             if (categoryId) {
+                 modalTitle.textContent = 'Kategori Düzenle';
+                 loadCategoryForEdit(categoryId);
+             } else {
+                 modalTitle.textContent = 'Yeni Kategori';
+                 document.getElementById('categoryForm').reset();
+                 // Yeni kategori için sıra numarasını otomatik ayarla
+                 const maxOrder = Math.max(...menus.filter(m => m.is_category).map(m => m.order_index), 0);
+                 document.getElementById('categoryOrder').value = maxOrder + 1;
+             }
+             
+             modal.show();
+         }
+
+         async function loadCategoryForEdit(categoryId) {
+             try {
+                 const response = await fetch(`/api/menus/${categoryId}`);
+                 const data = await response.json();
+                 
+                 if (data.success) {
+                     const category = data.data.menu || data.data;
+                     document.getElementById('categoryTitle').value = category.title;
+                     document.getElementById('categoryOrder').value = category.order_index;
+                 }
+             } catch (error) {
+                 console.error('Kategori yükleme hatası:', error);
+                 showError('Kategori yüklenirken hata oluştu');
+             }
+         }
+
+         async function saveCategory() {
+             const saveBtn = document.getElementById('saveCategoryBtn');
+             const spinner = saveBtn.querySelector('.spinner-border');
+             
+             spinner.classList.remove('d-none');
+             saveBtn.disabled = true;
+             
+             try {
+                 const categoryData = {
+                     title: document.getElementById('categoryTitle').value,
+                     order_index: parseInt(document.getElementById('categoryOrder').value),
+                     is_category: true,
+                     category: document.getElementById('categoryTitle').value
+                 };
+                 
+                 const url = currentCategoryId ? `/api/menus/${currentCategoryId}` : '/api/menus';
+                 const method = currentCategoryId ? 'PUT' : 'POST';
+                 
+                 const response = await fetch(url, {
+                     method: method,
+                     headers: {
+                         'Content-Type': 'application/json'
+                     },
+                     body: JSON.stringify(categoryData)
+                 });
+                 
+                 const data = await response.json();
+                 
+                if (data.success) {
+                    // Modal'ı kapat
+                    const modalInstance = bootstrap.Modal.getInstance(document.getElementById('categoryModal'));
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+
+                    // Backdrop'u manuel temizle
+                    setTimeout(() => {
+                        const backdrops = document.querySelectorAll('.modal-backdrop');
+                        backdrops.forEach(backdrop => backdrop.remove());
+                        document.body.classList.remove('modal-open');
+                        document.body.style.overflow = '';
+                        document.body.style.paddingRight = '';
+                    }, 200);
+
+                    // Sidebar menülerini güncelle
+                    if (typeof loadMenus === 'function') {
+                        loadMenus();
+                    }
+                    // Cache'i temizle
+                    if (typeof clearMenuCache === 'function') {
+                        clearMenuCache();
+                    }
+
+                    // Sayfayı yenile
+                    window.reloadPage();
+                    showSuccess(data.message);
+                 } else {
+                     showError(data.message);
+                 }
+             } catch (error) {
+                 console.error('Kategori kaydetme hatası:', error);
+                 showError('Kategori kaydedilirken hata oluştu');
+             } finally {
+                 saveBtn.disabled = false;
+                 spinner.classList.add('d-none');
+             }
+         }
+
+         // ========== YARDIMCI FONKSİYONLAR ==========
+         // NOT: Bu fonksiyonlar artık yeni utility sistemine (modal-utils.js ve notification-utils.js) yönlendirilmiştir
+         // Backward compatibility için wrapper fonksiyonlar olarak kalıyor
+
+         function showDeleteConfirmation(message, callback) {
+             // Yeni Modal API'sine yönlendir
+             window.Modal.confirmDelete({ message }).then(confirmed => {
+                 if (confirmed && callback) {
+                     callback();
+                 }
+             });
+         }
+
+         function showAlert(type, message) {
+             // Yeni Notification API'sine yönlendir
+             // type: success, danger, warning, info
+             const typeMap = {
+                 'success': 'success',
+                 'danger': 'error',
+                 'warning': 'warning',
+                 'info': 'info'
+             };
+             const mappedType = typeMap[type] || 'info';
+             window.Notification[mappedType](message);
+         }
+
+         // Sayfa yüklendiğinde rolleri yükle - common.js'de zaten yapılıyor
+         // DOMContentLoaded event listener kaldırıldı (çift çağrı önlendi)
+
+         // ========== SOCKET.IO CRON JOB NOTIFICATION ==========
+         // Socket.io bağlantısı kur
+         let socket = null;
+
+         function initSocketConnection() {
+             if (typeof io !== 'undefined' && !socket) {
+                 socket = io();
+
+                 socket.on('connect', () => {
+                     console.log('✅ Socket.io connected:', socket.id);
+                 });
+
+                 socket.on('disconnect', () => {
+                     console.log('❌ Socket.io disconnected');
+                 });
+
+                 // Cron job sonucu geldiğinde modal aç
+                 socket.on('cron-job-result', (data) => {
+                     console.log('📢 Cron job result received:', data);
+
+                     if (data.jobName === 'testModalJob' && data.result && data.result.success) {
+                         showCronJobModal(data.result.message);
+                     }
+                 });
+             }
+         }
+
+         // Cron job sonuç modal'ı göster
+         function showCronJobModal(message) {
+             const modalId = 'cronJobNotificationModal';
+             let modal = document.getElementById(modalId);
+
+             // Modal yoksa oluştur
+             if (!modal) {
+                 const modalHtml = `
+                     <div class="modal fade" id="${modalId}" tabindex="-1" aria-hidden="true">
+                         <div class="modal-dialog modal-dialog-centered">
+                             <div class="modal-content">
+                                 <div class="modal-header bg-primary">
+                                     <h5 class="modal-title text-white">
+                                         <i class="ri-time-line me-2"></i>${message.title || 'Cron Job Bildirimi'}
+                                     </h5>
+                                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                 </div>
+                                 <div class="modal-body">
+                                     <div id="cronJobMessageBody" class="text-center py-3">
+                                         <div class="mb-3">
+                                             <i class="ri-notification-3-line text-success" style="font-size: 48px;"></i>
+                                         </div>
+                                         <p class="fs-5 mb-2" id="cronJobBodyText"></p>
+                                         <p class="text-muted small" id="cronJobTimestamp"></p>
+                                     </div>
+                                 </div>
+                                 <div class="modal-footer">
+                                     <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Tamam</button>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                 `;
+
+                 document.body.insertAdjacentHTML('beforeend', modalHtml);
+                 modal = document.getElementById(modalId);
+             }
+
+             // Modal içeriğini güncelle
+             document.getElementById('cronJobBodyText').textContent = message.body || 'Cron job başarıyla çalıştı';
+             document.getElementById('cronJobTimestamp').textContent = message.timestamp
+                 ? new Date(message.timestamp).toLocaleString('tr-TR')
+                 : '';
+
+             // Modal'ı göster
+             const bsModal = new bootstrap.Modal(modal);
+             bsModal.show();
+         }
+
+         // Socket bağlantısını sayfa yüklendiğinde başlat
+         if (document.readyState === 'loading') {
+             document.addEventListener('DOMContentLoaded', initSocketConnection);
+         } else {
+             initSocketConnection();
+         }
+    </script>
+    
+    <!-- Header Bildirimleri -->
+    <script src="assets/js/header-notifications.js"></script>
+</body>
+</html>

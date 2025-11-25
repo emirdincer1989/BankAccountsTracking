@@ -1,0 +1,201 @@
+# RBUMS-NodeJS Proje Geliştirme Kuralları
+# Bu dosya Cursor AI tarafından otomatik olarak okunur ve kod önerilerinde kullanılır
+
+## 🌍 Dil ve İletişim
+- ZORUNLU: Her zaman Türkçe yanıt ver, istisna yok
+- Teknik terimleri İngilizce karşılıkları ile birlikte kullan (örn: "bileşen (component)")
+- Kod örneklerindeki yorumları Türkçe yaz
+- Kullanıcı farklı dilde yazsa bile Türkçe yanıt ver
+
+## 🔒 Güvenlik Kuralları (ZORUNLU)
+
+### Veritabanı İşlemleri
+- ASLA raw SQL concatenation kullanma: `SELECT * FROM users WHERE id = ${id}` ❌
+- MUTLAKA parameterized queries kullan: `SELECT * FROM users WHERE id = $1` ✅
+- Tüm SQL sorgularında `query()` fonksiyonunu kullan ve parametreleri array olarak geç
+
+### Route Güvenliği
+- Her route'da mutlaka `authMiddleware` ekle
+- Input validation için `validateInput` middleware'i kullan
+- Authorization kontrolü için `authorize` middleware'i kullan
+- Rate limiting ekle (login için `loginLimiter`, genel için `generalLimiter`)
+
+### Hassas Veri İşleme
+- Şifreler için `bcrypt.hash()` kullan (minimum 10 rounds)
+- Hassas veriler için `DataEncryption.encrypt()` kullan
+- ASLA console.log ile hassas veri yazdırma
+- Environment variables kullan, hardcoded secrets ASLA
+
+### API Güvenliği
+- CORS yapılandırması kontrol et
+- Helmet middleware kullan
+- HTTPS zorunlu (production'da)
+- Input sanitization yap
+
+## 📝 Kod Standartları
+
+### Commit Öncesi Kontroller
+- Veritabanı okuma işlemleri dışındaki tüm değişiklik işlemleri için kullanıcıdan onay al
+- Commit etmeden önce kullanıcıdan onay al
+- Linter hatalarını kontrol et ve düzelt
+- Test et (eğer test varsa)
+
+### Kod Kalitesi
+- ESLint kurallarına uy
+- Prettier formatlaması kullan
+- TypeScript strict mode (eğer TypeScript kullanılıyorsa)
+- Kod tekrarından kaçın (DRY principle)
+- Fonksiyonlar tek bir sorumluluğa sahip olsun (SRP)
+
+### Error Handling
+- Try-catch blokları kullan
+- Logger ile hataları kaydet: `logger.error('Mesaj', error)`
+- Kullanıcıya anlamlı hata mesajları göster
+- Hassas bilgileri hata mesajlarında gösterme
+
+### Async/Await Kullanımı
+- Promise chain yerine async/await kullan
+- Promise.all() ile paralel işlemler yap
+- Error handling için try-catch kullan
+
+## 🎨 Frontend Standartları
+
+### Modal ve Bildirimler
+- `showSuccess()`, `showError()`, `showWarning()`, `showInfo()` kullan
+- `showConfirmDelete()` ile silme işlemleri için onay al
+- `Modal.confirm()` ile genel onay işlemleri yap
+- Loading state'leri için `showLoading()` ve `Notification.remove()` kullan
+
+### Event Listeners
+- Event listener'ları tekrar eklememek için `dataset.listenerAdded` kontrolü yap
+- Event delegation kullan (mümkünse)
+- Modal açıldığında event listener'ları kontrol et
+
+### DOM Manipülasyonu
+- `innerHTML` yerine `textContent` kullan (güvenlik için)
+- XSS koruması için input sanitization yap
+- Bootstrap modal'ları için `bootstrap.Modal` kullan
+
+## 🗄️ Veritabanı Standartları
+
+### Migration Sistemi
+- Yeni tablo/kolon eklerken migration dosyası oluştur
+- Migration dosyalarını `scripts/migrations/` klasörüne ekle
+- Migration numaralarını sıralı tut (001_, 002_, ...)
+- Geri alınabilir migration'lar yaz (up/down)
+
+### Query Patterns
+- SELECT: `query('SELECT * FROM table WHERE id = $1', [id])`
+- INSERT: `query('INSERT INTO table (col1, col2) VALUES ($1, $2)', [val1, val2])`
+- UPDATE: `query('UPDATE table SET col1 = $1 WHERE id = $2', [val1, id])`
+- DELETE: `query('DELETE FROM table WHERE id = $1', [id])`
+
+### Transaction Kullanımı
+- Birden fazla query için transaction kullan
+- Rollback mekanizması ekle
+- Error durumunda transaction'ı rollback et
+
+## 📚 Dokümantasyon
+
+### Kod Dokümantasyonu
+- Fonksiyonlar için JSDoc yorumları ekle
+- Complex logic için açıklayıcı yorumlar ekle
+- API endpoint'leri için route dokümantasyonu ekle
+
+### Proje Dokümantasyonu
+- Yeni özellik eklerken `docs/` klasörüne dokümantasyon ekle
+- README.md dosyasını güncel tut
+- CHANGELOG.md dosyasını güncelle
+
+## 🚀 Performans
+
+### Database Optimizasyonu
+- Gerekli index'leri ekle
+- N+1 query probleminden kaçın
+- Connection pooling kullan
+- Query sonuçlarını cache'le (mümkünse)
+
+### Frontend Optimizasyonu
+- Lazy loading kullan
+- Image optimization yap
+- Bundle size'ı kontrol et
+- Unnecessary re-render'ları önle
+
+## 🔍 Kod İnceleme Checklist
+
+Her kod değişikliğinde şunları kontrol et:
+
+### Güvenlik
+- [ ] SQL injection koruması var mı?
+- [ ] XSS koruması var mı?
+- [ ] Authentication kontrolü var mı?
+- [ ] Authorization kontrolü var mı?
+- [ ] Input validation var mı?
+- [ ] Rate limiting var mı?
+
+### Kod Kalitesi
+- [ ] Error handling var mı?
+- [ ] Logging yapılıyor mu?
+- [ ] Kod tekrarı var mı?
+- [ ] Fonksiyonlar tek sorumluluğa sahip mi?
+- [ ] İsimlendirme açıklayıcı mı?
+
+### Performans
+- [ ] Database query optimize mi?
+- [ ] Gereksiz re-render var mı?
+- [ ] Cache kullanımı uygun mu?
+- [ ] Bundle size kontrol edildi mi?
+
+### Dokümantasyon
+- [ ] Kod dokümante edildi mi?
+- [ ] API dokümantasyonu güncellendi mi?
+- [ ] README güncellendi mi?
+
+## ⚠️ Yapılmaması Gerekenler
+
+### ASLA YAPMA:
+- Raw SQL concatenation
+- Hardcoded secrets
+- Console.log ile hassas veri
+- Direct req.body kullanımı (validation olmadan)
+- HTTP bağlantıları (HTTPS kullan)
+- Şifrelenmemiş hassas veri saklama
+- Force push (git)
+- .env dosyasını commit etme
+
+## 📋 Özel Proje Kuralları
+
+### Cron Job Sistemi
+- Yeni job eklerken `jobs/` klasörüne ekle
+- Job'ı `server.js`'de register et
+- Database'e job config'i ekle
+- Dokümantasyonu `docs/CRON_JOB_SYSTEM.md`'ye ekle
+
+### Sayfa Ekleme
+- `assets/pages/` klasörüne JavaScript dosyası ekle
+- `routes/` klasörüne API route'u ekle
+- `server.js`'de route'u register et
+- Menüye ekle (veritabanından veya UI'dan)
+
+### Audit Logging
+- Kritik işlemler için audit log ekle
+- `audit_logs` tablosuna kayıt ekle
+- User ID, action, table_name, old_values, new_values kaydet
+
+## 🎯 AI Kod Önerileri İçin
+
+Cursor AI'ya kod önerirken:
+1. Mevcut kod stilini takip et
+2. Proje mimarisine uygun çözümler öner
+3. Güvenlik kurallarını her zaman uygula
+4. Türkçe yorumlar ve açıklamalar ekle
+5. Error handling ve logging ekle
+6. Dokümantasyon öner
+
+## 📞 Yardım
+
+Kurallar hakkında sorularınız için:
+- `docs/SECURITY_RULES.md` dosyasını kontrol edin
+- `docs/` klasöründeki diğer dokümantasyonları inceleyin
+- Mevcut kod örneklerini referans alın
+
