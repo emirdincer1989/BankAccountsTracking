@@ -93,6 +93,8 @@ app.use('/api/panel-settings', authMiddleware, require('./routes/panel-settings'
 app.use('/api/cron-management', authMiddleware, cronManagementRoutes);
 app.use('/api/email-management', authMiddleware, emailManagementRoutes);
 app.use('/api/notification-management', authMiddleware, notificationManagementRoutes);
+app.use('/api/institutions', authMiddleware, require('./routes/institutionRoutes'));
+app.use('/api/accounts', authMiddleware, require('./routes/accountRoutes'));
 
 // Serve HTML files
 app.get('/', (req, res) => {
@@ -190,16 +192,16 @@ const io = require('socket.io')(server, {
 // Socket.io authentication middleware
 io.use(async (socket, next) => {
     try {
-        const token = socket.handshake.auth.token || 
-                     socket.handshake.headers.cookie?.split('auth_token=')[1]?.split(';')[0];
-        
+        const token = socket.handshake.auth.token ||
+            socket.handshake.headers.cookie?.split('auth_token=')[1]?.split(';')[0];
+
         if (!token) {
             return next(new Error('Authentication token bulunamadı'));
         }
 
         const jwt = require('jsonwebtoken');
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
+
         // Kullanıcıyı veritabanından al
         const { query } = require('./config/database');
         const userResult = await query(
@@ -208,7 +210,7 @@ io.use(async (socket, next) => {
              WHERE id = $1 AND is_active = true`,
             [decoded.userId]
         );
-        
+
         if (userResult.rows.length === 0) {
             return next(new Error('Geçersiz kullanıcı'));
         }
