@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Hareketler xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://tempuri.org/">
+  <hataKodu>0</hataKodu>
+  <hataAciklama>OK</hataAciklama>
+  <IBAN>TR620001000137381604485001</IBAN>
+  <subeAdi>İZMİR ŞUBESİ</subeAdi>
+  <hareket>
+    <Hareket>
+      <islemTarihi>25/11/2025</islemTarihi>
+      <aciklama>Gönd: HEPİYİ SİGORTA ANONİM ŞİRKETİ 2025301051919 - 1 - 35EE488 DOSYA ÖDEMESİ                                       2025</aciklama>
+      <tutar>4027,11</tutar>
+      <kalanBakiye>213627,23</kalanBakiye>
+      <islemZamani>2025-11-25T16:55:33</islemZamani>
+      <islemKodu>EFT</islemKodu>
+      <islemAciklama>Gelen Eft Otomatik Aktarım</islemAciklama>
+    </Hareket>
+    <Hareket>
+      <islemTarihi>25/11/2025</islemTarihi>
+      <aciklama>Gönd: SOMPO SİGORTA ANONİM ŞİRKETİ 2025311407669 numaralı hasar dosya ödemesidir. ES 0111-QNB BANK A.Ş.</aciklama>
+      <tutar>536,58</tutar>
+      <kalanBakiye>209600,12</kalanBakiye>
+      <islemZamani>2025-11-25T14:20:12</islemZamani>
+      <islemKodu>EFT</islemKodu>
+      <islemAciklama>Gelen Eft Otomatik Aktarım</islemAciklama>
+    </Hareket>
+    <Hareket>
+      <islemTarihi>25/11/2025</islemTarihi>
+      <aciklama>Gönd: SOMPO SİGORTA ANONİM ŞİRKETİ 35TZ781 2025311439753 numaralı hasar dosya ödemes 0111-QNB BANK A.Ş.</aciklama>
+      <tutar>8901,48</tutar>
+      <kalanBakiye>209063,54</kalanBakiye>
+      <islemZamani>2025-11-25T14:19:49</islemZamani>
+      <islemKodu>EFT</islemKodu>
+      <islemAciklama>Gelen Eft Otomatik Aktarım</islemAciklama>
+    </Hareket>
+    <Hareket>
+      <islemTarihi>25/11/2025</islemTarihi>
+      <aciklama>Gönd: SOMPO SİGORTA ANONİM ŞİRKETİ 35EL371 2025311388745 numaralı hasar dosya ödemes 0111-QNB BANK A.Ş.</aciklama>
+      <tutar>9693,23</tutar>
+      <kalanBakiye>200162,06</kalanBakiye>
+      <islemZamani>2025-11-25T14:19:49</islemZamani>
+      <islemKodu>EFT</islemKodu>
+      <islemAciklama>Gelen Eft Otomatik Aktarım</islemAciklama>
+    </Hareket>
+    <Hareket>
+      <islemTarihi>25/11/2025</islemTarihi>
+      <aciklama>Gönd: SOMPO SİGORTA ANONİM ŞİRKETİ 35AVJ306 2025311401377 numaralı hasar dosya ödeme 0111-QNB BANK A.Ş.</aciklama>
+      <tutar>12497,2</tutar>
+      <kalanBakiye>190468,83</kalanBakiye>
+      <islemZamani>2025-11-25T14:19:49</islemZamani>
+      <islemKodu>EFT</islemKodu>
+      <islemAciklama>Gelen Eft Otomatik Aktarım</islemAciklama>
+    </Hareket>
+    <Hareket>
+      <islemTarihi>25/11/2025</islemTarihi>
+      <aciklama>Gönd: SOMPO SİGORTA ANONİM ŞİRKETİ 35EE490 2025311414114 numaralı hasar dosya ödemes 0111-QNB BANK A.Ş.</aciklama>
+      <tutar>7951,39</tutar>
+      <kalanBakiye>177971,63</kalanBakiye>
+      <islemZamani>2025-11-25T14:19:42</islemZamani>
+      <islemKodu>EFT</islemKodu>
+      <islemAciklama>Gelen Eft Otomatik Aktarım</islemAciklama>
+    </Hareket>
+    <Hareket>
+      <islemTarihi>24/11/2025</islemTarihi>
+      <aciklama>OTOMATIK Plaka no: 35AS2002 , 1113116455 nolu HGS tahsilatı</aciklama>
+      <tutar>-390,0</tutar>
+      <kalanBakiye>170020,24</kalanBakiye>
+      <islemZamani>2025-11-24T21:03:01</islemZamani>
+      <islemKodu>XXX</islemKodu>
+      <islemAciklama>DIGER</islemAciklama>
+    </Hareket>
+    <Hareket>
+      <islemTarihi>24/11/2025</islemTarihi>
+      <aciklama>OTOMATIK Plaka no: 35DC6469 , 1117309064 nolu HGS tahsilatı</aciklama>
+      <tutar>-390,0</tutar>
+      <kalanBakiye>170410,24</kalanBakiye>
+      <islemZamani>2025-11-24T13:01:09</islemZamani>
+      <islemKodu>XXX</islemKodu>
+      <islemAciklama>DIGER</islemAciklama>
+    </Hareket>
+    <Hareket>
+      <islemTarihi>24/11/2025</islemTarihi>
+      <aciklama>Gönd: KEMAL ÇAR Kemal Çar Adına Gönderilmiştir 0134-Denizbank A.Ş. FAST işlemi</aciklama>
+      <tutar>1000,0</tutar>
+      <kalanBakiye>170800,24</kalanBakiye>
+      <islemZamani>2025-11-24T00:16:11</islemZamani>
+      <islemKodu>EFT</islemKodu>
+      <islemAciklama>Gelen Eft Otomatik Aktarım</islemAciklama>
+    </Hareket>
+    <Hareket>
+      <islemTarihi>21/11/2025</islemTarihi>
+      <aciklama>Gönd: TAYGA PAMİR AYRIM TAYGA PAMİR AYRIM İzmir 28. İcra Dairesi 2024/8721 E. Nolu dosya kapak hesabı tüm borcu 0067-Yap</aciklama>
+      <tutar>12835,83</tutar>
+      <kalanBakiye>169800,24</kalanBakiye>
+      <islemZamani>2025-11-21T14:26:53</islemZamani>
+      <islemKodu>EFT</islemKodu>
+      <islemAciklama>Gelen Eft Otomatik Aktarım</islemAciklama>
+    </Hareket>
+    <Hareket>
+      <islemTarihi>21/11/2025</islemTarihi>
+      <aciklama>Gönd: ŞAHİN KÜÇÜKSÜSLÜ Şahin Küçüksüslü 2025/5800 Hasar Dosya No ödemesi. 0015-Türkiye Vakıflar Bankası T.A.O. FAST işle</aciklama>
+      <tutar>1850,0</tutar>
+      <kalanBakiye>156964,41</kalanBakiye>
+      <islemZamani>2025-11-21T13:52:19</islemZamani>
+      <islemKodu>EFT</islemKodu>
+      <islemAciklama>Gelen Eft Otomatik Aktarım</islemAciklama>
+    </Hareket>
+    <Hareket>
+      <islemTarihi>21/11/2025</islemTarihi>
+      <aciklama>Gönd: HALİL İBRAHİM CEYLAN, HALİL İBRAHİM CEYLAN TC:35986729874 KAZA BEDELİ YÜ 0803HOKH25001327 Referanslı Gelen Havale</aciklama>
+      <tutar>1650,0</tutar>
+      <kalanBakiye>155114,41</kalanBakiye>
+      <islemZamani>2025-11-21T12:14:40</islemZamani>
+      <islemKodu>TRF</islemKodu>
+      <islemAciklama>Havale/Virman</islemAciklama>
+    </Hareket>
+    <Hareket>
+      <islemTarihi>20/11/2025</islemTarihi>
+      <aciklama>Gönd: ANKARA ANONİM TÜRK SİGORT 1693247-133514176-1067713 ESHOT GENEL MÜDÜRLÜĞÜ-17FV200 HASAR ÖDEMESİ 0064-T.İŞ BANKASI</aciklama>
+      <tutar>4659,0</tutar>
+      <kalanBakiye>153464,41</kalanBakiye>
+      <islemZamani>2025-11-20T15:31:15</islemZamani>
+      <islemKodu>EFT</islemKodu>
+      <islemAciklama>Gelen Eft Otomatik Aktarım</islemAciklama>
+    </Hareket>
+    <Hareket>
+      <islemTarihi>20/11/2025</islemTarihi>
+      <aciklama>OTOMATIK Plaka no: 35DC6570 , 1117309065 nolu HGS tahsilatı</aciklama>
+      <tutar>-390,0</tutar>
+      <kalanBakiye>148805,41</kalanBakiye>
+      <islemZamani>2025-11-20T12:14:44</islemZamani>
+      <islemKodu>XXX</islemKodu>
+      <islemAciklama>DIGER</islemAciklama>
+    </Hareket>
+    <Hareket>
+      <islemTarihi>20/11/2025</islemTarihi>
+      <aciklama>Gönd: MEHMET KOCAÇAM, MEHMET KOCAÇAM 0145HOKH25001976 Referanslı Gelen Havale</aciklama>
+      <tutar>2560,0</tutar>
+      <kalanBakiye>149195,41</kalanBakiye>
+      <islemZamani>2025-11-20T10:09:52</islemZamani>
+      <islemKodu>TRF</islemKodu>
+      <islemAciklama>Havale/Virman</islemAciklama>
+    </Hareket>
+    <Hareket>
+      <islemTarihi>20/11/2025</islemTarihi>
+      <aciklama>Gönd: Emniyet Ge.OD.HES20251120/153114110 S.GN.EMR Talimat No: 153114110;35-İZMİR;Karşıyaka 2.Sulh Ceza Hakimliğinin  20</aciklama>
+      <tutar>993,0</tutar>
+      <kalanBakiye>146635,41</kalanBakiye>
+      <islemZamani>2025-11-20T08:53:02</islemZamani>
+      <islemKodu>EFT</islemKodu>
+      <islemAciklama>Gelen Eft Otomatik Aktarım</islemAciklama>
+    </Hareket>
+  </hareket>
+</Hareketler>

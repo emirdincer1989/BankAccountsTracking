@@ -1,57 +1,86 @@
-# Halkbank Entegrasyon Analizi
+# Halkbank Entegrasyon Analizi (Güncel)
 
-Bu döküman, Halkbank Ortak Hesap Ekstre Web Servisi (WCF) üzerinde yapılan teknik analiz ve testler sonucunda oluşturulmuştur.
+Bu döküman, Halkbank Ortak Hesap Ekstre Web Servisi (SOAP 1.1) ile yapılan başarılı canlı testler ve alınan gerçek veriler ışığında güncellenmiştir.
 
 ## 1. Servis Bilgileri
 - **WSDL URL:** `https://webservice.halkbank.com.tr/HesapEkstreOrtakWS/HesapEkstreOrtak.svc?wsdl`
-- **Endpoint URL:** `https://webservice.halkbank.com.tr/HesapEkstreOrtakWS/HesapEkstreOrtak.svc/Basic` (BasicHttpBinding)
+- **Endpoint URL:** `https://webservice.halkbank.com.tr/HesapEkstreOrtakWS/HesapEkstreOrtak.svc/Basic`
 - **Protokol:** SOAP 1.1
 - **Güvenlik:** WS-Security (UsernameToken)
-- **Erişim Yöntemi:** Raw HTTPS (Node.js `https` modülü) - SoapUI ile birebir uyumlu XML yapısı kullanılarak.
+- **Erişim Yöntemi:** Raw HTTPS (Node.js `https` modülü)
 
-## 2. Kritik Bulgular ve Çözümler
+## 2. İstek Yapısı (Request)
 
-### 2.1. Endpoint Seçimi
-WSDL dosyasında birden fazla endpoint tanımlıdır. Testler sonucunda `/Basic` ile biten endpoint'in (`BasicHttpBinding_IHesapEkstreOrtak`) çalıştığı tespit edilmiştir.
+### 2.1. Metot: `EkstreSorgulama`
+Hesap hareketlerini sorgulamak için kullanılır.
 
-### 2.2. Metot İsmi
-Başlangıçta düşünülen `EkstreSorgulamaBasic` yerine, SoapUI analizleri sonucunda **`EkstreSorgulama`** metodunun kullanılması gerektiği anlaşılmıştır.
+**Örnek SOAP Envelope:**
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/" xmlns:hes="http://schemas.datacontract.org/2004/07/HesapEkstreOrtakWS.Request">
+   <soapenv:Header>
+      <wsse:Security ...>
+         <wsse:UsernameToken ...>
+            <wsse:Username>14876182EPDUSR</wsse:Username>
+            <wsse:Password ...>***</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <tem:EkstreSorgulama>
+         <tem:request>
+            <hes:BaslangicTarihi>2025-11-20</hes:BaslangicTarihi>
+            <hes:BitisTarihi>2025-11-27</hes:BitisTarihi>
+            <hes:HesapNo>45000012</hes:HesapNo>
+            <hes:SubeKodu>425</hes:SubeKodu>
+         </tem:request>
+      </tem:EkstreSorgulama>
+   </soapenv:Body>
+</soapenv:Envelope>
+```
 
-### 2.3. Namespace
-Parametreler için `http://schemas.datacontract.org/2004/07/HesapEkstreOrtakWS.Request` namespace'i kullanılmalıdır.
+## 3. Cevap Yapısı (Response)
 
-## 3. Kritik Metodlar
+**Başarılı Yanıt Örneği (Özet):**
+```xml
+<EkstreSorgulamaResponse>
+  <EkstreSorgulamaResult>
+    <HataKodu>0</HataKodu>
+    <Hesaplar>
+      <Hesap>
+        <HesapNo>9425-14876182-45000012</HesapNo>
+        <Bakiye>+110283,89</Bakiye>
+        <Hareketler>
+          <Hareket>
+            <Tarih>20/11/2025</Tarih>
+            <Saat>11:04:56</Saat>
+            <HareketTutari>+10818,96</HareketTutari> <!-- İşaretli Tutar -->
+            <Aciklama>... HASAR ODEMESI ...</Aciklama>
+            <Bakiye>+119630,50</Bakiye>
+            <ReferansNo>0040139</ReferansNo>
+          </Hareket>
+          <Hareket>
+            <HareketTutari>-38440,03</HareketTutari> <!-- Negatif Tutar (Çıkış) -->
+            <!-- ... -->
+          </Hareket>
+        </Hareketler>
+      </Hesap>
+    </Hesaplar>
+  </EkstreSorgulamaResult>
+</EkstreSorgulamaResponse>
+```
 
-### 3.1. EkstreSorgulama
-Hesap hareketlerini ve bakiyelerini sorgulamak için kullanılan ana metoddur.
+## 4. Veri Dönüşümü (Mapping)
 
-**Giriş Parametreleri (`HesapEkstreRequest`):**
-- `BaslangicTarihi` (String: yyyy-MM-dd)
-- `BitisTarihi` (String: yyyy-MM-dd)
-- `HesapNo` (String, Opsiyonel) - Boş bırakılırsa tüm hesaplar gelir.
-- `SubeKodu` (String, Opsiyonel) - Bilinmiyorsa `0` gönderilebilir veya tag hiç gönderilmeyebilir.
+| XML Alanı | UnifiedTransaction Alanı | Notlar |
+|-----------|--------------------------|--------|
+| `ReferansNo` | `bankRefNo` | Benzersiz ID |
+| `Tarih` + `Saat` | `transactionDate` | Birleştirilip ISO formatına çevrilir. |
+| `HareketTutari` | `amount` | İşaret temizlenir, mutlak değer alınır. |
+| `HareketTutari` (İşaret) | `direction` | `+` -> `INCOMING`, `-` -> `OUTGOING` |
+| `Aciklama` | `description` | |
+| `Bakiye` | `balanceAfter` | |
 
-**Çıkış Yapısı (`HesapEkstreResponse`):**
-- `Hesaplar` dizisi içinde `Hesap` objeleri döner.
-- Her `Hesap` objesi içinde `Hareketler` dizisi bulunur.
-
-### 3.2. Hesap Detayı (`Hesap`)
-- `HesapNo`, `IbanNo`
-- `Bakiye`, `KullanilabilirBakiye`
-- `HesapCinsi` (Döviz Tipi)
-
-### 3.3. Hareket Detayı (`Hareket`)
-- `HareketTutari`: İşlem tutarı. (Pozitif/Negatif olabilir).
-- `Bakiye`: İşlem sonrası bakiye.
-- `Tarih` ve `Saat`: Ayrı alanlar olarak gelir.
-- `Aciklama`, `EkstreAciklama`
-- `KarsiHesapIBAN`: Karşı taraf bilgisi.
-
-## 4. Entegrasyon Stratejisi
-
-1.  **Kimlik Doğrulama:** Halkbank, kullanıcı adı ve şifreyi **SOAP Header (WS-Security)** içinde bekler.
-2.  **Hesap Keşfi:** `EkstreSorgulama` metodu `HesapNo` parametresi boş gönderilerek çağrılır ve tüm hesaplar keşfedilir.
-3.  **Veri Dönüşümü:**
-    - `HareketTutari` > 0 ise `INCOMING` (Giriş/Alacak)
-    - `HareketTutari` < 0 ise `OUTGOING` (Çıkış/Borç)
-    - Tarih formatı `dd.MM.yyyy` veya `yyyy-MM-dd` gelebilir, kontrol edilmelidir.
+## 5. Kritik Bulgular
+1.  **Hesap ve Şube Kodu:** Sorguda `HesapNo` ve `SubeKodu` gönderilmesi zorunludur, aksi takdirde hata alınabilir.
+2.  **Ondalık Ayracı:** Gelen veride tutarlar virgül (`,`) ile ayrılmıştır (Örn: `+10818,96`).
+3.  **Namespace:** `http://schemas.datacontract.org/2004/07/HesapEkstreOrtakWS.Request` namespace'i parametreler için kritiktir.

@@ -1,11 +1,16 @@
 const https = require('https');
 const querystring = require('querystring');
+const fs = require('fs');
 
 // --- AYARLAR ---
 // HTTP POST için endpoint sonuna metod adı eklenir
 const API_URL = "https://hesap.ziraatbank.com.tr/HEK_NKYWS/HesapHareketleri.asmx/SorgulaDetayWS";
 
 function parseResponse(xml) {
+    // XML'i dosyaya kaydet
+    fs.writeFileSync('ziraat_response.xml', xml);
+    console.log('✅ Ham XML yanıtı ziraat_response.xml dosyasına kaydedildi.');
+
     const extract = (tag, content) => {
         // Namespace prefix'lerini (örn: <tns:tutar>) yok sayan regex
         const regex = new RegExp(`<[^:]*${tag}[^>]*>(.*?)</[^:]*${tag}>`, 'g');
@@ -31,15 +36,18 @@ function parseResponse(xml) {
 
     // Hareketleri bul
     const tarihler = extract('islemTarihi', xml);
-    const tutarlar = extract('tutar', xml); // islemTutari -> tutar
+    const tutarlar = extract('tutar', xml);
     const aciklamalar = extract('aciklama', xml);
-    const borcAlacak = extract('borcAlacakBilgisi', xml);
-    const bakiyeler = extract('kalanBakiye', xml);
+    // borcAlacakBilgisi yok, tutardan anlayacağız
 
     if (tarihler.length > 0) {
         console.log(`${tarihler.length} hareket bulundu:`);
         for (let i = 0; i < Math.min(tarihler.length, 10); i++) {
-            console.log(`${tarihler[i]} | ${tutarlar[i]} TL | ${borcAlacak[i]} | ${aciklamalar[i]}`);
+            let rawAmount = tutarlar[i] || "0";
+            const isNegative = rawAmount.includes('-');
+            const direction = isNegative ? 'OUTGOING (Borç)' : 'INCOMING (Alacak)';
+
+            console.log(`${tarihler[i]} | ${rawAmount} TL | ${direction} | ${aciklamalar[i]}`);
         }
     } else {
         console.log('Hareket bulunamadı veya XML parse edilemedi.');

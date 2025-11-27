@@ -1,5 +1,6 @@
 const https = require('https');
 const url = require('url');
+const fs = require('fs');
 
 // --- AYARLAR ---
 const WSDL_URL = "https://vbservice.vakifbank.com.tr/HesapHareketleri.OnlineEkstre/SOnlineEkstreServis.svc";
@@ -67,6 +68,10 @@ async function sendSoapRequest(xml) {
 
 // Basit XML Parser (Regex ile - Bağımlılık olmasın diye)
 function parseResponse(xml) {
+    // XML'i dosyaya kaydet
+    fs.writeFileSync('vakifbank_response.xml', xml);
+    console.log('✅ Ham XML yanıtı vakifbank_response.xml dosyasına kaydedildi.');
+
     const extract = (tag, content) => {
         const regex = new RegExp(`<[^:]+:${tag}[^>]*>(.*?)</[^:]+:${tag}>`, 'g');
         const matches = [];
@@ -102,11 +107,21 @@ async function test() {
     // Tarih formatı YYYY-MM-DD olmalı
     const today = new Date().toISOString().split('T')[0];
 
+    // Son 1 haftalık veri
+    const lastWeek = new Date();
+    lastWeek.setDate(lastWeek.getDate() - 7);
+    const startDate = lastWeek.toISOString().split('T')[0];
+
     console.log('--- VAKIFBANK TEST (RAW HTTPS) ---');
     console.log(`Müşteri: ${musteriNo}, Kullanıcı: ${kullanici}`);
-    console.log(`Tarih: ${today}`);
+    console.log(`Tarih: ${startDate} - ${today}`);
 
-    const xml = createSoapEnvelope(musteriNo, kullanici, sifre, hesapNo, today, today);
+    const xml = createSoapEnvelope(musteriNo, kullanici, sifre, hesapNo, startDate, today);
+
+    // DEBUG: Gönderilen XML'i görelim
+    console.log('\n--- GÖNDERİLEN XML ---');
+    console.log(xml);
+    console.log('----------------------\n');
 
     try {
         const response = await sendSoapRequest(xml);

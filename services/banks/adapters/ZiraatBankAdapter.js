@@ -115,39 +115,40 @@ class ZiraatBankAdapter extends BaseBankAdapter {
         const tarihler = this._extractTag('islemTarihi', xml);
         const tutarlar = this._extractTag('tutar', xml);
         const aciklamalar = this._extractTag('aciklama', xml);
-        const borcAlacaklar = this._extractTag('borcAlacakBilgisi', xml);
+        // borcAlacakBilgisi etiketi gelmiyor, tutar işaretinden anlayacağız
         const bakiyeler = this._extractTag('kalanBakiye', xml);
-        const referanslar = this._extractTag('muhasebeReferansi', xml);
+        // muhasebeReferansi yerine islemKodu veya benzersiz bir ID üretimi
+        const islemKodlari = this._extractTag('islemKodu', xml);
 
         for (let i = 0; i < tarihler.length; i++) {
-            // Tarih formatı: dd/MM/yyyy (Test çıktısında böyle göründü)
-            // ISO formatına çevirelim
+            // Tarih formatı: dd/MM/yyyy
             const [day, month, year] = (tarihler[i] || "").split('/');
             const isoDate = `${year}-${month}-${day}T00:00:00.000Z`;
 
-            // Tutar temizle
+            // Tutar temizle ve Yön Belirle
             let rawAmount = tutarlar[i] || "0";
-            rawAmount = rawAmount.replace(',', '.'); // Virgül varsa noktaya çevir
+            // Örn: "-390,0" veya "4027,11"
+            const isNegative = rawAmount.includes('-');
+
+            // İşaretleri ve binlik ayraçlarını temizle, virgülü noktaya çevir
+            rawAmount = rawAmount.replace('-', '').replace('+', '').replace('.', '').replace(',', '.');
             const amount = parseFloat(rawAmount);
 
-            // Borç/Alacak
-            // A: Alacak (Giriş), B: Borç (Çıkış) varsayımı
-            const isIncoming = borcAlacaklar[i] === 'A' || borcAlacaklar[i] === 'ALACAK';
-
             transactions.push(new UnifiedTransaction({
-                bankRefNo: referanslar[i] || `ZRT-${Date.now()}-${i}`,
+                bankRefNo: `ZRT-${Date.now()}-${i}`, // Benzersiz ID
                 transactionDate: new Date(isoDate),
                 amount: amount,
                 currency: 'TRY',
-                direction: isIncoming ? 'INCOMING' : 'OUTGOING',
+                direction: isNegative ? 'OUTGOING' : 'INCOMING',
                 description: aciklamalar[i] || '',
                 senderIban: null,
                 receiverIban: null,
-                balanceAfter: parseFloat((bakiyeler[i] || "0").replace(',', '.')),
+                balanceAfter: parseFloat((bakiyeler[i] || "0").replace('.', '').replace(',', '.')),
                 rawResponse: JSON.stringify({
                     tarih: tarihler[i],
                     tutar: tutarlar[i],
-                    aciklama: aciklamalar[i]
+                    aciklama: aciklamalar[i],
+                    islemKodu: islemKodlari[i]
                 })
             }));
         }

@@ -1,68 +1,87 @@
-# Vakıfbank Entegrasyon Analizi
+# Vakıfbank Entegrasyon Analizi (Güncel)
 
-Bu döküman, Vakıfbank Online Ekstre Servisi (SOAP) üzerinde yapılan teknik analiz ve testler sonucunda oluşturulmuştur.
+Bu döküman, Vakıfbank Online Ekstre Servisi (SOAP 1.2) ile yapılan başarılı canlı testler ve alınan gerçek veriler ışığında güncellenmiştir.
 
 ## 1. Servis Bilgileri
 - **WSDL URL:** `https://vbservice.vakifbank.com.tr/HesapHareketleri.OnlineEkstre/SOnlineEkstreServis.svc?wsdl`
-- **Protokol:** SOAP 1.2 (Zorunlu)
-- **Servis Adı:** `SOnlineEkstreServis`
-- **Erişim Yöntemi:** Raw HTTPS (Node.js `https` modülü) - `node-soap` kütüphanesi ile yaşanan uyumluluk ve WAF sorunları nedeniyle.
+- **Endpoint URL:** `https://vbservice.vakifbank.com.tr/HesapHareketleri.OnlineEkstre/SOnlineEkstreServis.svc`
+- **Protokol:** SOAP 1.2
+- **Erişim Yöntemi:** Raw HTTPS (Node.js `https` modülü)
+- **User-Agent:** `VakifBank-Client/1.0` (WAF engellemesini aşmak için gereklidir)
 
-## 2. Kritik Bulgular ve Çözümler
+## 2. İstek Yapısı (Request)
 
-### 2.1. WAF ve User-Agent Engellemesi
-Vakıfbank güvenlik duvarı (WAF), standart Node.js veya SOAP istemcilerini engelleyerek `Request Rejected` hatası döndürmektedir.
-**Çözüm:** İstek başlıklarına (Header) tarayıcı benzeri bir `User-Agent` eklenmelidir.
-Örn: `User-Agent: Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)`
+### 2.1. Metot: `GetirHareket`
+Hesap hareketlerini sorgulamak için kullanılır.
 
-### 2.2. SOAP Sürümü
-Servis kesinlikle **SOAP 1.2** formatında istek beklemektedir. `Content-Type: application/soap+xml; charset=utf-8` başlığı zorunludur.
+**Örnek SOAP Envelope:**
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+               xmlns:peak="Peak.Integration.ExternalInbound.Ekstre"
+               xmlns:peak1="http://schemas.datacontract.org/2004/07/Peak.Integration.ExternalInbound.Ekstre.DataTransferObjects"
+               xmlns:wsa="http://www.w3.org/2005/08/addressing">
+  <soap:Header>
+    <wsa:Action>Peak.Integration.ExternalInbound.Ekstre/ISOnlineEkstreServis/GetirHareket</wsa:Action>
+    <wsa:To>https://vbservice.vakifbank.com.tr/HesapHareketleri.OnlineEkstre/SOnlineEkstreServis.svc</wsa:To>
+  </soap:Header>
+  <soap:Body>
+    <peak:GetirHareket>
+      <peak:sorgu>
+        <peak1:MusteriNo>00158007298593148</peak1:MusteriNo>
+        <peak1:KurumKullanici>ufukbayraktutan</peak1:KurumKullanici>
+        <peak1:Sifre>***</peak1:Sifre>
+        <peak1:SorguBaslangicTarihi>2025-11-20 00:00</peak1:SorguBaslangicTarihi>
+        <peak1:SorguBitisTarihi>2025-11-27 23:59</peak1:SorguBitisTarihi>
+        <peak1:HesapNo>00158000046781438</peak1:HesapNo>
+        <!-- Diğer alanlar boş bırakılabilir -->
+      </peak:sorgu>
+    </peak:GetirHareket>
+  </soap:Body>
+</soap:Envelope>
+```
 
-## 3. Kritik Metodlar
+## 3. Cevap Yapısı (Response)
 
-### 3.1. GetirHareket
-Hesap hareketlerini detaylı olarak çeken ana metoddur.
+**Başarılı Yanıt Örneği (Özet):**
+```xml
+<GetirHareketResponse>
+  <GetirHareketResult>
+    <IslemKodu>VBB0001</IslemKodu>
+    <IslemAciklamasi>Başarılı</IslemAciklamasi>
+    <Hesaplar>
+      <DtoEkstreHesap>
+        <HesapNo>00158000046781438</HesapNo>
+        <CariBakiye>11088909.54</CariBakiye>
+        <Hareketler>
+          <DtoEkstreHareket>
+            <IslemTarihi>2025-11-20 02:06:26</IslemTarihi>
+            <IslemNo>2025016446945146</IslemNo>
+            <Tutar>6194545.01</Tutar> <!-- Mutlak Değer -->
+            <BorcAlacak>A</BorcAlacak> <!-- A: Alacak (Giriş), B: Borç (Çıkış) -->
+            <Aciklama>... virman yapılmıştır.</Aciklama>
+            <IslemSonrasıBakiye>6194545.01</IslemSonrasıBakiye>
+          </DtoEkstreHareket>
+          <!-- Diğer hareketler... -->
+        </Hareketler>
+      </DtoEkstreHesap>
+    </Hesaplar>
+  </GetirHareketResult>
+</GetirHareketResponse>
+```
 
-**Giriş Parametreleri (`DtoEkstreSorgu`):**
+## 4. Veri Dönüşümü (Mapping)
 
-| Parametre | Tip | Zorunluluk | Açıklama |
-|-----------|-----|------------|----------|
-| `MusteriNo` | string | **Evet** | Banka müşteri numarası |
-| `KurumKullanici` | string | **Evet** | API kullanıcı adı |
-| `Sifre` | string | **Evet** | API şifresi |
-| `SorguBaslangicTarihi` | string | **Evet** | Format: `yyyy-MM-dd` |
-| `SorguBitisTarihi` | string | **Evet** | Format: `yyyy-MM-dd` |
-| `HesapNo` | string | **Evet*** | Sorgulanacak hesap numarası. |
+| XML Alanı | UnifiedTransaction Alanı | Notlar |
+|-----------|--------------------------|--------|
+| `IslemNo` | `bankRefNo` | Benzersiz ID |
+| `IslemTarihi` | `transactionDate` | Format: `YYYY-MM-DD HH:mm:ss` |
+| `Tutar` | `amount` | Mutlak değer olarak gelir. |
+| `BorcAlacak` | `direction` | `A` -> `INCOMING`, `B` -> `OUTGOING` |
+| `Aciklama` | `description` | |
+| `IslemSonrasıBakiye` | `balanceAfter` | |
 
-> **⚠️ Önemli Not:** WSDL şemasında `HesapNo` alanı opsiyonel görünse de, boş bırakıldığında sağlıklı veri dönmemektedir. Her hesap için ayrı sorgu atılmalıdır.
-
-**Çıkış Yapısı (`DtoEkstreCevap`):**
-Dönen cevap içinde `Hesaplar` dizisi (`ArrayOfDtoEkstreHesap`) bulunur.
-
-### 3.2. DtoEkstreHesap (Hesap Detayı)
-| Alan | Tip | Açıklama |
-|------|-----|----------|
-| `HesapNo` | string | Hesap numarası |
-| `HesapNoIban` | string | IBAN |
-| `DovizTipi` | string | TRY, USD, EUR vb. |
-| `CariBakiye` | decimal | Güncel bakiye |
-| `Hareketler` | Array | Hareket listesi (`ArrayOfDtoEkstreHareket`) |
-
-### 3.3. DtoEkstreHareket (İşlem Detayı)
-| Alan | Tip | Açıklama |
-|------|-----|----------|
-| `IslemNo` / `Id` | string/long | Benzersiz işlem numarası (Unique Key) |
-| `IslemTarihi` | string | İşlem tarihi |
-| `Tutar` | decimal | İşlem tutarı (Mutlak değer) |
-| `BorcAlacak` | string | `A` (Alacak/Giriş) veya `B` (Borç/Çıkış) |
-| `Aciklama` | string | İşlem açıklaması |
-| `IslemSonrasıBakiye` | decimal | İşlemden sonraki bakiye |
-
-## 4. Entegrasyon Stratejisi
-Vakıfbank entegrasyonunda aşağıdaki akış izlenecektir:
-
-1.  **Raw HTTPS İstemcisi:** `node-soap` yerine, XML zarfını (Envelope) manuel oluşturan ve `https` modülü ile gönderen özel bir adaptör yapısı kullanılacaktır.
-2.  **Hesap Tanımlama:** Kullanıcı sisteme Vakıfbank hesaplarını eklerken `HesapNo` bilgisini girmek zorundadır.
-3.  **Transaction Mapping:**
-    - `BorcAlacak == 'A'` veya `'ALACAK'` -> `Direction: INCOMING`
-    - `BorcAlacak == 'B'` veya `'BORC'` -> `Direction: OUTGOING`
+## 5. Kritik Bulgular
+1.  **Müşteri No:** XML içinde `MusteriNo` alanı boş gönderilmemelidir, aksi takdirde `VBH0005` hatası alınır.
+2.  **Tarih Formatı:** Sorgu parametrelerinde `YYYY-MM-DD HH:mm` formatı kullanılmalıdır.
+3.  **Ondalık Ayracı:** Gelen veride tutarlar nokta (`.`) ile ayrılmıştır (Örn: `6194545.01`).
