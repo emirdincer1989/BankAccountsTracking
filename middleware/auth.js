@@ -4,9 +4,9 @@ const { logger } = require('../utils/logger');
 
 const authMiddleware = async (req, res, next) => {
     try {
-        const token = req.header('Authorization')?.replace('Bearer ', '') || 
-                     req.cookies?.auth_token;
-        
+        const token = req.header('Authorization')?.replace('Bearer ', '') ||
+            req.cookies?.auth_token;
+
         if (!token) {
             return res.status(401).json({
                 success: false,
@@ -15,7 +15,7 @@ const authMiddleware = async (req, res, next) => {
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
+
         // Kullanıcının aktif olup olmadığını kontrol et
         const userResult = await query(
             `SELECT u.id, u.email, u.name, u.role_id, u.is_active, r.name as role_name, r.permissions
@@ -24,7 +24,7 @@ const authMiddleware = async (req, res, next) => {
              WHERE u.id = $1`,
             [decoded.userId]
         );
-        
+
         if (userResult.rows.length === 0 || !userResult.rows[0].is_active) {
             return res.status(401).json({
                 success: false,
@@ -33,7 +33,7 @@ const authMiddleware = async (req, res, next) => {
         }
 
         const user = userResult.rows[0];
-        user.permissions = typeof user.permissions === 'string' ? 
+        user.permissions = typeof user.permissions === 'string' ?
             JSON.parse(user.permissions) : user.permissions;
 
         req.user = user;
@@ -79,9 +79,30 @@ const authorize = (permissions) => {
     };
 };
 
-module.exports = { 
-    authMiddleware, 
-    authorize
+const authorizeRoles = (...allowedRoles) => {
+    return (req, res, next) => {
+        if (!req.user) {
+            return res.status(401).json({
+                success: false,
+                message: 'Authentication gerekli'
+            });
+        }
+
+        if (allowedRoles.includes(req.user.role_name)) {
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: 'Bu işlem için yetkiniz yok'
+        });
+    };
+};
+
+module.exports = {
+    authMiddleware,
+    authorize,
+    authorizeRoles
 };
 
 

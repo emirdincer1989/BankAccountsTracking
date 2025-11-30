@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const AccountController = require('../controllers/AccountController');
-const { authenticateToken, authorizeRoles } = require('../middleware/auth');
+const { authMiddleware, authorizeRoles } = require('../middleware/auth');
 
 // Yeni hesap ekle (Admin veya Kurum Yöneticisi)
-router.post('/', authenticateToken, authorizeRoles('admin', 'super_admin', 'institution_manager'), AccountController.create);
+router.post('/', authMiddleware, authorizeRoles('admin', 'super_admin', 'institution_manager'), AccountController.create);
 
 // Manuel senkronizasyon tetikle
-router.post('/:id/sync', authenticateToken, AccountController.sync);
+router.post('/:id/sync', authMiddleware, AccountController.sync);
 
 // Kuruma ait hesapları getir
-router.get('/institution/:institutionId', authenticateToken, AccountController.listByInstitution);
+router.get('/institution/:institutionId', authMiddleware, AccountController.listByInstitution);
 
 module.exports = router;
