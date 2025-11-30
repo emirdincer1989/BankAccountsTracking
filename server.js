@@ -170,6 +170,9 @@ async function initCronJobs() {
                 cronManager.registerJob(jobConfig, testModalJob);
             } else if (jobConfig.name === 'emailQueueProcessor') {
                 cronManager.registerJob(jobConfig, emailQueueProcessor);
+            } else if (jobConfig.name === 'bankSyncJob') {
+                const scheduleBankSync = require('./jobs/scheduleBankSync');
+                cronManager.registerJob(jobConfig, scheduleBankSync);
             }
             // Yeni job'lar buraya eklenebilir
         }
@@ -255,6 +258,10 @@ server.listen(PORT, async () => {
 
     // Cron Manager'ı başlat
     await initCronJobs();
+
+    // BullMQ Worker'ları başlat
+    const { initWorkers } = require('./services/queue/QueueManager');
+    initWorkers();
 });
 
 module.exports = app;
