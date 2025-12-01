@@ -242,7 +242,7 @@ async function runMigrations(options = {}) {
             process.exit(1);
         } else {
             console.log('🎉 Tüm migration\'lar başarıyla tamamlandı!\n');
-            
+
             // Seed dosyası varsa ve --with-seed flag'i varsa çalıştır
             if (options.withSeed) {
                 const seedPath = path.join(__dirname, 'seed.js');
@@ -274,7 +274,10 @@ if (require.main === module) {
     if (args.includes('--status')) {
         showStatus()
             .then(() => process.exit(0))
-            .catch(() => process.exit(1));
+            .catch((err) => {
+                console.error('❌ Hata:', err);
+                process.exit(1);
+            });
     } else if (args.includes('--force')) {
         const forceIndex = args.indexOf('--force');
         const migrationNumber = args[forceIndex + 1];
@@ -285,12 +288,18 @@ if (require.main === module) {
         const withSeed = args.includes('--with-seed');
         runMigrations({ force: migrationNumber, withSeed })
             .then(() => process.exit(0))
-            .catch(() => process.exit(1));
+            .catch((err) => {
+                console.error('❌ Hata:', err);
+                process.exit(1);
+            });
     } else {
         const withSeed = args.includes('--with-seed');
         runMigrations({ withSeed })
             .then(() => process.exit(0))
-            .catch(() => process.exit(1));
+            .catch((err) => {
+                console.error('❌ Hata:', err);
+                process.exit(1);
+            });
     }
 }
 
