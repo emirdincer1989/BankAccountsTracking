@@ -43,6 +43,7 @@ class TransactionController {
                 min_amount: req.query.min_amount,
                 max_amount: req.query.max_amount,
                 search_text: req.query.search_text,
+                type: req.query.type,
                 limit: req.query.limit || 20,
                 offset: req.query.offset || 0
             };

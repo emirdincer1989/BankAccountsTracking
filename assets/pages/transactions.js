@@ -12,55 +12,58 @@ let currentFilters = {
 export async function loadContent() {
     const html = `
         <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header border-0">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <h4 class="card-title mb-0">Hesap Hareketleri</h4>
-                        </div>
-                    </div>
-                        <div class="row g-4">
-                            <div class="col-sm-auto">
-                                <div class="d-flex justify-content-sm-end">
-                                    <div class="search-box ms-2">
-                                        <input type="text" class="form-control" id="searchTransaction" placeholder="Açıklama ara...">
+            <div class="col-lg-12">
+                <div class="card" id="contactList">
+                    <div class="card-header">
+                        <div class="row align-items-center g-3">
+                            <div class="col-md-3">
+                                <h5 class="card-title mb-0">Hesap Hareketleri</h5>
+                            </div>
+                            <div class="col-md-auto ms-auto">
+                                <div class="d-flex gap-2">
+                                    <div class="search-box">
+                                        <input type="text" class="form-control search" id="searchTransaction" placeholder="Açıklama ara...">
                                         <i class="ri-search-line search-icon"></i>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="col-sm">
-                                <div class="d-flex justify-content-sm-end gap-2">
-                                    <select class="form-select w-auto" id="filterAccount">
-                                        <option value="">Tüm Hesaplar</option>
-                                        <!-- Hesaplar JS ile dolacak -->
-                                    </select>
-                                    <input type="date" class="form-control w-auto" id="filterStartDate" placeholder="Başlangıç">
-                                    <input type="date" class="form-control w-auto" id="filterEndDate" placeholder="Bitiş">
-                                    <button type="button" class="btn btn-primary" onclick="applyFilters()">
-                                        <i class="ri-filter-2-line align-bottom me-1"></i> Filtrele
-                                    </button>
-                                    <button type="button" class="btn btn-soft-secondary" onclick="resetFilters()">
-                                        <i class="ri-refresh-line align-bottom"></i>
-                                    </button>
+                                    <div class="d-flex gap-2">
+                                        <select class="form-select w-auto" id="filterAccount">
+                                            <option value="">Tüm Hesaplar</option>
+                                        </select>
+                                        <select class="form-select w-auto" id="filterType">
+                                            <option value="">Tüm İşlemler</option>
+                                            <option value="income">Gelir</option>
+                                            <option value="expense">Gider</option>
+                                        </select>
+                                        <input type="date" class="form-control w-auto" id="filterStartDate">
+                                        <input type="date" class="form-control w-auto" id="filterEndDate">
+                                        <button type="button" class="btn btn-primary" onclick="applyFilters()">
+                                            <i class="ri-filter-2-line align-bottom me-1"></i> Filtrele
+                                        </button>
+                                        <button type="button" class="btn btn-soft-secondary" onclick="resetFilters()">
+                                            <i class="ri-refresh-line align-bottom"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive table-card mb-1">
+                        <div class="table-responsive table-card">
                             <table class="table align-middle table-nowrap" id="transactionTable">
                                 <thead class="table-light text-muted">
                                     <tr>
-                                        <th>Tarih</th>
-                                        <th>Banka / Hesap</th>
-                                        <th>Açıklama</th>
-                                        <th>Tutar</th>
-                                        <th>Detay</th>
+                                        <th class="sort" data-sort="date" scope="col">Tarih</th>
+                                        <th class="sort" data-sort="status" scope="col" style="width: 50px;">Drm</th>
+                                        <th class="sort" data-sort="institution" scope="col">Kurum</th>
+                                        <th class="sort" data-sort="bank" scope="col">Banka / Hesap</th>
+                                        <th class="sort" data-sort="counterparty" scope="col">Karşı Taraf</th>
+                                        <th class="sort" data-sort="description" scope="col">Açıklama</th>
+                                        <th class="sort" data-sort="amount" scope="col">Tutar</th>
                                     </tr>
                                 </thead>
-                                <tbody id="transactionTableBody">
+                                <tbody class="list form-check-all" id="transactionTableBody">
                                     <tr>
-                                        <td colspan="5" class="text-center py-4">
+                                        <td colspan="7" class="text-center py-4">
                                             <div class="spinner-border text-primary" role="status">
                                                 <span class="visually-hidden">Yükleniyor...</span>
                                             </div>
@@ -163,7 +166,7 @@ async function loadAccounts(selectedId) {
 
 async function loadTransactions() {
     const tbody = document.getElementById('transactionTableBody');
-    tbody.innerHTML = '<tr><td colspan="5" class="text-center"><div class="spinner-border spinner-border-sm text-primary"></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center"><div class="spinner-border spinner-border-sm text-primary"></div></td></tr>';
 
     try {
         // Query string oluştur
@@ -182,11 +185,11 @@ async function loadTransactions() {
             renderTable();
             updatePagination(data.pagination);
         } else {
-            tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">${data.message}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">${data.message}</td></tr>`;
         }
     } catch (error) {
         console.error('API Hatası:', error);
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Bağlantı hatası.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Bağlantı hatası.</td></tr>';
     }
 }
 
@@ -194,12 +197,15 @@ function renderTable() {
     const tbody = document.getElementById('transactionTableBody');
 
     if (transactions.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center">Kayıt bulunamadı.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center">Kayıt bulunamadı.</td></tr>';
         return;
     }
 
     tbody.innerHTML = transactions.map(tx => {
-        const date = new Date(tx.date).toLocaleDateString('tr-TR');
+        const dateObj = new Date(tx.date);
+        const date = dateObj.toLocaleDateString('tr-TR');
+        const time = dateObj.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+
         const amount = new Intl.NumberFormat('tr-TR', {
             style: 'currency',
             currency: 'TRY'
@@ -207,12 +213,27 @@ function renderTable() {
 
         const isPositive = tx.amount > 0;
         const amountClass = isPositive ? 'text-success' : 'text-danger';
-        const amountIcon = isPositive ? 'ri-arrow-up-circle-line' : 'ri-arrow-down-circle-line';
+        // Icons from the theme example: 
+        // Income: ri-arrow-left-down-fill (Green)
+        // Expense: ri-arrow-right-up-fill (Red)
+        const amountIcon = isPositive ? 'ri-arrow-left-down-fill' : 'ri-arrow-right-up-fill';
+        const iconBgClass = isPositive ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger';
+
+        // Kurum adı (veritabanından geliyorsa)
+        const institutionName = tx.institution_name || '-';
 
         return `
         <tr>
-            <td>${date}</td>
+            <td class="date">${date} <small class="text-muted">${time}</small></td>
             <td>
+                <div class="avatar-xs">
+                    <div class="avatar-title ${iconBgClass} rounded-circle fs-16">
+                        <i class="${amountIcon}"></i>
+                    </div>
+                </div>
+            </td>
+            <td class="institution">${institutionName}</td>
+            <td class="bank_account">
                 <div class="d-flex align-items-center">
                     <div class="flex-grow-1">
                         <h6 class="mb-0">${tx.bank_name}</h6>
@@ -220,14 +241,12 @@ function renderTable() {
                     </div>
                 </div>
             </td>
-            <td>${tx.description}</td>
-            <td class="${amountClass}">
-                <i class="${amountIcon} align-middle me-1"></i>${amount}
+            <td class="counterparty">${tx.sender_receiver || '-'}</td>
+            <td class="description" style="max-width: 300px; white-space: normal; word-wrap: break-word;">
+                ${tx.description}
             </td>
-            <td>
-                <button class="btn btn-sm btn-soft-info" onclick="alert('Detaylar yakında...')">
-                    <i class="ri-eye-line"></i>
-                </button>
+            <td class="amount ${amountClass} fw-bold">
+                ${amount}
             </td>
         </tr>
     `}).join('');
@@ -236,12 +255,40 @@ function renderTable() {
 function updatePagination(pagination) {
     const prevBtn = document.getElementById('prevPageBtn');
     const nextBtn = document.getElementById('nextPageBtn');
+    const paginationList = document.querySelector('.pagination.listjs-pagination');
 
     if (pagination.page <= 1) prevBtn.classList.add('disabled');
     else prevBtn.classList.remove('disabled');
 
     if (pagination.page >= pagination.totalPages) nextBtn.classList.add('disabled');
     else nextBtn.classList.remove('disabled');
+
+    // Render page numbers
+    paginationList.innerHTML = '';
+
+    const totalPages = pagination.totalPages;
+    const currentPage = pagination.page;
+
+    // Simple pagination logic: show all if <= 7 pages, otherwise show range
+    // For now, let's keep it simple and show up to 5 pages around current
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + 4);
+
+    if (endPage - startPage < 4) {
+        startPage = Math.max(1, endPage - 4);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        const li = document.createElement('li');
+        li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+        li.innerHTML = `<a class="page-link" href="javascript:void(0);" onclick="goToPage(${i})">${i}</a>`;
+        paginationList.appendChild(li);
+    }
+}
+
+window.goToPage = function (page) {
+    currentFilters.offset = (page - 1) * currentFilters.limit;
+    loadTransactions();
 }
 
 function changePage(direction) {
@@ -252,6 +299,7 @@ function changePage(direction) {
 
 function applyFilters() {
     currentFilters.account_id = document.getElementById('filterAccount').value;
+    currentFilters.type = document.getElementById('filterType').value;
     currentFilters.start_date = document.getElementById('filterStartDate').value;
     currentFilters.end_date = document.getElementById('filterEndDate').value;
     currentFilters.search_text = document.getElementById('searchTransaction').value;
@@ -261,6 +309,7 @@ function applyFilters() {
 
 function resetFilters() {
     document.getElementById('filterAccount').value = '';
+    document.getElementById('filterType').value = '';
     document.getElementById('filterStartDate').value = '';
     document.getElementById('filterEndDate').value = '';
     document.getElementById('searchTransaction').value = '';

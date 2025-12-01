@@ -18,13 +18,13 @@ const { syncRolePermissions } = require('../utils/roleSync');
 const seedData = async () => {
     try {
         logger.info('🌱 Veritabanı seed işlemi başlatılıyor...');
-        
+
         // Bağlantı testi
         await testConnection();
-        
+
         // 1. Rolleri oluştur
         logger.info('📊 Roller oluşturuluyor...');
-        
+
         const roles = [
             {
                 name: 'super_admin',
@@ -38,14 +38,14 @@ const seedData = async () => {
                 }
             }
         ];
-        
+
         const roleIds = {};
         for (const role of roles) {
             const result = await query(
                 'INSERT INTO roles (name, description, permissions) VALUES ($1, $2, $3) ON CONFLICT (name) DO NOTHING RETURNING id',
                 [role.name, role.description, JSON.stringify(role.permissions)]
             );
-            
+
             if (result.rows.length > 0) {
                 roleIds[role.name] = result.rows[0].id;
                 logger.info(`✅ Rol oluşturuldu: ${role.name}`);
@@ -58,10 +58,10 @@ const seedData = async () => {
                 }
             }
         }
-        
+
         // 2. Süper admin kullanıcısı oluştur
         logger.info('👤 Süper admin kullanıcısı oluşturuluyor...');
-        
+
         const superAdminPassword = await DataEncryption.hashPassword('admin123!');
         const superAdminResult = await query(
             'INSERT INTO users (email, password, name, role_id) VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING RETURNING id',
@@ -73,7 +73,7 @@ const seedData = async () => {
         } else {
             logger.info('ℹ️ Süper admin kullanıcısı zaten mevcut');
         }
-        
+
         // 3. Menüleri oluştur
         logger.info('📋 Menüler oluşturuluyor...');
 
@@ -93,7 +93,14 @@ const seedData = async () => {
             { title: 'Mail Yönetimi', url: '/email-settings', icon: 'ri-mail-settings-line', category: 'Admin İşlemleri', is_category: false, order_index: 6, category_order_index: 0, menu_order_index: 0 },
             { title: 'Mail Gönder', url: '/email-send', icon: 'ri-mail-send-line', category: 'Admin İşlemleri', is_category: false, order_index: 7, category_order_index: 0, menu_order_index: 0 },
             { title: 'Bildirimler', url: '/notifications', icon: 'ri-notification-2-line', category: 'Admin İşlemleri', is_category: false, order_index: 8, category_order_index: 0, menu_order_index: 0 },
-            { title: 'Bildirim Gönder', url: '/notification-send', icon: 'ri-notification-2-fill', category: 'Admin İşlemleri', is_category: false, order_index: 9, category_order_index: 0, menu_order_index: 0 }
+            { title: 'Bildirim Gönder', url: '/notification-send', icon: 'ri-notification-2-fill', category: 'Admin İşlemleri', is_category: false, order_index: 9, category_order_index: 0, menu_order_index: 0 },
+
+            // Finans Menüleri
+            { title: 'Finans', url: '#', icon: null, category: 'Finans', is_category: true, order_index: 2, category_order_index: 0, menu_order_index: 0 },
+            { title: 'Banka Hesaplarım', url: '/accounts-view', icon: 'ri-bank-card-line', category: 'Finans', is_category: false, order_index: 1, category_order_index: 2, menu_order_index: 1 },
+            { title: 'Hesap Hareketleri', url: '/transactions', icon: 'ri-exchange-dollar-line', category: 'Finans', is_category: false, order_index: 2, category_order_index: 2, menu_order_index: 2 },
+            { title: 'Finansal Raporlar', url: '/reports', icon: 'ri-pie-chart-line', category: 'Finans', is_category: false, order_index: 3, category_order_index: 2, menu_order_index: 3 },
+            { title: 'Banka Ayarları', url: '/bank-settings', icon: 'ri-settings-3-line', category: 'Finans', is_category: false, order_index: 4, category_order_index: 2, menu_order_index: 4 }
         ];
 
         const menuIds = {};
@@ -115,7 +122,7 @@ const seedData = async () => {
                 }
             }
         }
-        
+
         // 4. Rol-Menü ilişkilerini oluştur
         logger.info('🔗 Rol-Menü ilişkileri oluşturuluyor...');
 
@@ -130,7 +137,12 @@ const seedData = async () => {
             { title: 'Mail Yönetimi', can_view: true, can_create: true, can_edit: true, can_delete: true },
             { title: 'Mail Gönder', can_view: true, can_create: true, can_edit: true, can_delete: true },
             { title: 'Bildirimler', can_view: true, can_create: true, can_edit: true, can_delete: true },
-            { title: 'Bildirim Gönder', can_view: true, can_create: true, can_edit: true, can_delete: true }
+            { title: 'Bildirim Gönder', can_view: true, can_create: true, can_edit: true, can_delete: true },
+            // Finans Yetkileri
+            { title: 'Banka Hesaplarım', can_view: true, can_create: true, can_edit: true, can_delete: true },
+            { title: 'Hesap Hareketleri', can_view: true, can_create: true, can_edit: true, can_delete: true },
+            { title: 'Finansal Raporlar', can_view: true, can_create: true, can_edit: true, can_delete: true },
+            { title: 'Banka Ayarları', can_view: true, can_create: true, can_edit: true, can_delete: true }
         ];
 
         for (const perm of menuPermissions) {
@@ -143,12 +155,12 @@ const seedData = async () => {
                 logger.info(`   ✅ ${perm.title} yetkileri eklendi`);
             }
         }
-        
+
         logger.info('✅ Rol-Menü ilişkileri oluşturuldu');
-        
+
         // 5. Cron job'ları oluştur
         logger.info('⏰ Cron job\'lar oluşturuluyor...');
-        
+
         const cronJobs = [
             {
                 name: 'testModalJob',
@@ -165,22 +177,30 @@ const seedData = async () => {
                 schedule: '* * * * *',
                 is_enabled: false,
                 config: {}
+            },
+            {
+                name: 'bankSyncJob',
+                title: 'Banka Hesap Senkronizasyonu',
+                description: 'Tüm aktif banka hesaplarını tarar ve hareketleri günceller (Queue kullanır).',
+                schedule: '*/30 * * * *',
+                is_enabled: true,
+                config: {}
             }
         ];
-        
+
         for (const job of cronJobs) {
             const result = await query(
                 'INSERT INTO cron_jobs (name, title, description, schedule, is_enabled, config) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (name) DO NOTHING RETURNING id',
                 [job.name, job.title, job.description, job.schedule, job.is_enabled, JSON.stringify(job.config)]
             );
-            
+
             if (result.rows.length > 0) {
                 logger.info(`✅ Cron job oluşturuldu: ${job.name} (disabled)`);
             } else {
                 logger.info(`ℹ️ Cron job zaten mevcut: ${job.name}`);
             }
         }
-        
+
         logger.info('✅ Tüm seed işlemleri başarıyla tamamlandı!');
         logger.info('');
         logger.info('🎯 Varsayılan Giriş Bilgileri:');
@@ -195,7 +215,7 @@ const seedData = async () => {
         logger.info('   ✅ 10 rol-menü ilişkisi');
         logger.info('   ✅ 2 cron job (testModalJob, emailQueueProcessor) - disabled');
         logger.info('');
-        
+
     } catch (error) {
         logger.error('❌ Seed hatası:', error);
         process.exit(1);

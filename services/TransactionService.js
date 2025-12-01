@@ -77,6 +77,12 @@ class TransactionService {
             params.push(`%${search_text}%`);
         }
 
+        if (filters.type === 'income') {
+            query += ` AND t.amount > 0`;
+        } else if (filters.type === 'expense') {
+            query += ` AND t.amount < 0`;
+        }
+
         // 3. Sorting & Pagination
         query += ` ORDER BY t.date DESC, t.created_at DESC`;
 
@@ -112,6 +118,12 @@ class TransactionService {
         if (min_amount) countQuery += ` AND t.amount >= $${++countParamIdx}`;
         if (max_amount) countQuery += ` AND t.amount <= $${++countParamIdx}`;
         if (search_text) countQuery += ` AND t.description ILIKE $${++countParamIdx}`;
+
+        if (filters.type === 'income') {
+            countQuery += ` AND t.amount > 0`;
+        } else if (filters.type === 'expense') {
+            countQuery += ` AND t.amount < 0`;
+        }
 
         const countResult = await pool.query(countQuery, countParams);
         const total = parseInt(countResult.rows[0].total);
