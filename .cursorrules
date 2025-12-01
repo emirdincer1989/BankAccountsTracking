@@ -29,6 +29,7 @@
 ### API Güvenliği
 - CORS yapılandırması kontrol et
 - Helmet middleware kullan
+- **CSP (Content Security Policy)**: Inline event handler'lar (onclick vb.) kullanılıyorsa `scriptSrcAttr: ["'unsafe-inline'"]` ekle.
 - HTTPS zorunlu (production'da)
 - Input sanitization yap
 
@@ -60,16 +61,31 @@
 
 ## 🎨 Frontend Standartları
 
+### Sayfa Yapısı
+- **Sayfa Başlıkları**: Sayfa modüllerinde (`assets/pages/*.js`) `page-title-box` div'ini TEKRAR EKLEME. Bu alan ana layout (`hybrid-layout.html`) tarafından yönetilir.
+- **Dinamik İçerik**: Sayfa içeriği `loadContent()` fonksiyonu ile döndürülür.
+
 ### Modal ve Bildirimler
-- `showSuccess()`, `showError()`, `showWarning()`, `showInfo()` kullan
-- `showConfirmDelete()` ile silme işlemleri için onay al
-- `Modal.confirm()` ile genel onay işlemleri yap
-- Loading state'leri için `showLoading()` ve `Notification.remove()` kullan
+- **Modallar**: `assets/js/modal-utils.js` kullan.
+  - `window.Modal.confirm()` veya `window.showConfirm()`
+  - `window.Modal.alert()` veya `window.showAlert()`
+  - Özel modallar için `window.Modal.custom()` veya Bootstrap modal yapısını kullan.
+- **Bildirimler**: `assets/js/notification-utils.js` kullan.
+  - `window.showSuccess('Mesaj')`
+  - `window.showError('Hata')`
+  - `window.showWarning('Uyarı')`
+  - `window.showInfo('Bilgi')`
+- **Alert/Confirm**: Tarayıcının varsayılan `alert()` ve `confirm()` fonksiyonlarını KULLANMA.
 
 ### Event Listeners
 - Event listener'ları tekrar eklememek için `dataset.listenerAdded` kontrolü yap
 - Event delegation kullan (mümkünse)
 - Modal açıldığında event listener'ları kontrol et
+- Inline event handler'lar (onclick) yerine `addEventListener` tercih et (CSP uyumluluğu için). Eğer inline kullanılacaksa CSP ayarını kontrol et.
+
+### Görsel Tasarım ve Erişilebilirlik
+- **Kontrast**: Koyu renkli arka planlarda (örn. `.active` sınıfı, butonlar, başlıklar) MUTLAKA beyaz (`text-white`) veya çok açık renk yazı kullan. Okunabilirliği her zaman kontrol et.
+- **Renk Paleti**: Göz yormayan, modern renkler kullan.
 
 ### DOM Manipülasyonu
 - `innerHTML` yerine `textContent` kullan (güvenlik için)
@@ -132,6 +148,7 @@ Her kod değişikliğinde şunları kontrol et:
 - [ ] Authorization kontrolü var mı?
 - [ ] Input validation var mı?
 - [ ] Rate limiting var mı?
+- [ ] CSP uyumlu mu?
 
 ### Kod Kalitesi
 - [ ] Error handling var mı?
@@ -162,6 +179,8 @@ Her kod değişikliğinde şunları kontrol et:
 - Şifrelenmemiş hassas veri saklama
 - Force push (git)
 - .env dosyasını commit etme
+- Sayfa başlıklarını tekrar ekleme (Layout yönetir)
+- Varsayılan alert/confirm kullanma (Custom modal kullan)
 
 ## 📋 Özel Proje Kuralları
 
@@ -198,4 +217,3 @@ Kurallar hakkında sorularınız için:
 - `docs/SECURITY_RULES.md` dosyasını kontrol edin
 - `docs/` klasöründeki diğer dokümantasyonları inceleyin
 - Mevcut kod örneklerini referans alın
-

@@ -12,6 +12,12 @@ router.post('/', authMiddleware, authorizeRoles('admin', 'super_admin'), Institu
 // Kurum güncelle (Sadece Admin)
 router.put('/:id', authMiddleware, authorizeRoles('admin', 'super_admin'), InstitutionController.update);
 
+// Kurum yetkililerini getir
+router.get('/:id/users', authMiddleware, authorizeRoles('admin', 'super_admin'), InstitutionController.getUsers);
+
+// Kurum yetkililerini güncelle
+router.put('/:id/users', authMiddleware, authorizeRoles('admin', 'super_admin'), InstitutionController.updateUsers);
+
 // Kurum sil (Sadece Admin)
 router.delete('/:id', authMiddleware, authorizeRoles('admin', 'super_admin'), InstitutionController.delete);
 

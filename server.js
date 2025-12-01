@@ -35,6 +35,7 @@ app.use(helmet({
             defaultSrc: ["'self'"],
             styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com"],
             scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"],
+            scriptSrcAttr: ["'unsafe-inline'"],
             imgSrc: ["'self'", "data:", "https:"],
             fontSrc: ["'self'", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com"],
             connectSrc: ["'self'", "https://cdn.lordicon.com", "https://cdn.jsdelivr.net"],
@@ -95,6 +96,8 @@ app.use('/api/email-management', authMiddleware, emailManagementRoutes);
 app.use('/api/notification-management', authMiddleware, notificationManagementRoutes);
 app.use('/api/institutions', authMiddleware, require('./routes/institutionRoutes'));
 app.use('/api/accounts', authMiddleware, require('./routes/accountRoutes'));
+app.use('/api/transactions', authMiddleware, require('./routes/transactionRoutes'));
+app.use('/api/reports', authMiddleware, require('./routes/reportRoutes'));
 
 // Serve HTML files
 app.get('/', (req, res) => {

@@ -44,6 +44,25 @@ class InstitutionController {
             next(error);
         }
     }
+
+    async getUsers(req, res, next) {
+        try {
+            const users = await InstitutionService.getInstitutionUsers(req.params.id);
+            res.json({ success: true, data: users });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async updateUsers(req, res, next) {
+        try {
+            // req.body.userIds array'i bekliyoruz
+            await InstitutionService.updateInstitutionUsers(req.params.id, req.body.userIds);
+            res.json({ success: true, message: 'Kurum yetkilileri güncellendi.' });
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new InstitutionController();

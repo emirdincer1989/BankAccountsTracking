@@ -18,10 +18,13 @@ const authMiddleware = async (req, res, next) => {
 
         // Kullanıcının aktif olup olmadığını kontrol et
         const userResult = await query(
-            `SELECT u.id, u.email, u.name, u.role_id, u.is_active, r.name as role_name, r.permissions
+            `SELECT u.id, u.email, u.name, u.role_id, u.is_active, r.name as role_name, r.permissions,
+             ARRAY_AGG(ui.institution_id) FILTER (WHERE ui.institution_id IS NOT NULL) as institution_ids
              FROM users u 
              LEFT JOIN roles r ON u.role_id = r.id 
-             WHERE u.id = $1`,
+             LEFT JOIN user_institutions ui ON u.id = ui.user_id
+             WHERE u.id = $1
+             GROUP BY u.id, r.name, r.permissions`,
             [decoded.userId]
         );
 

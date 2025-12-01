@@ -10,7 +10,28 @@ const connection = {
 };
 
 // 1. Queue Definition
-const bankSyncQueue = new Queue('bank-sync', { connection });
+let bankSyncQueue;
+
+try {
+    bankSyncQueue = new Queue('bank-sync', {
+        connection: {
+            ...connection,
+            // Retry strategy: wait 1s, then 2s, etc. max 10s.
+            retryStrategy: (times) => Math.min(times * 1000, 10000)
+        }
+    });
+
+    bankSyncQueue.on('error', (err) => {
+        logger.error('🔴 Redis Queue Error:', err.message);
+    });
+} catch (error) {
+    logger.error('❌ Failed to create Queue:', error.message);
+    // Fallback Mock Queue
+    bankSyncQueue = {
+        add: async () => { logger.warn('⚠️ Redis unavailable. Job skipped.'); },
+        on: () => { }
+    };
+}
 
 // 2. Worker Processor
 const bankSyncProcessor = async (job) => {
@@ -31,24 +52,32 @@ const bankSyncProcessor = async (job) => {
 let worker;
 
 const initWorkers = () => {
-    worker = new Worker('bank-sync', bankSyncProcessor, {
-        connection,
-        concurrency: 5, // Aynı anda 5 hesap taranabilir
-        limiter: {
-            max: 10,
-            duration: 1000 // Saniyede max 10 işlem (Rate limiting)
-        }
-    });
+    try {
+        worker = new Worker('bank-sync', bankSyncProcessor, {
+            connection,
+            concurrency: 5, // Aynı anda 5 hesap taranabilir
+            limiter: {
+                max: 10,
+                duration: 1000 // Saniyede max 10 işlem (Rate limiting)
+            }
+        });
 
-    worker.on('completed', (job) => {
-        logger.info(`Job ${job.id} completed!`);
-    });
+        worker.on('completed', (job) => {
+            logger.info(`Job ${job.id} completed!`);
+        });
 
-    worker.on('failed', (job, err) => {
-        logger.error(`Job ${job.id} failed with ${err.message}`);
-    });
+        worker.on('failed', (job, err) => {
+            logger.error(`Job ${job.id} failed with ${err.message}`);
+        });
 
-    logger.info('🚀 BullMQ Worker initialized: bank-sync');
+        worker.on('error', (err) => {
+            logger.error('🔴 Redis Worker Error:', err.message);
+        });
+
+        logger.info('🚀 BullMQ Worker initialized: bank-sync');
+    } catch (error) {
+        logger.error('❌ Failed to initialize Worker:', error.message);
+    }
 };
 
 module.exports = {

@@ -6,16 +6,17 @@ async function loadUserInfo() {
     try {
         const response = await fetch('/api/auth/me');
         const data = await response.json();
-        
+
         if (data.success) {
             currentUser = data.data.user;
-            
+            window.currentUser = currentUser; // Global değişkene ata
+
             // User dropdown'daki bilgileri güncelle
             const userNameText = document.querySelector('.user-name-text');
             const userNameSubText = document.querySelector('.user-name-sub-text');
             if (userNameText) userNameText.textContent = currentUser.name;
             if (userNameSubText) userNameSubText.textContent = currentUser.role_name;
-            
+
             return currentUser;
         } else {
             const base = (window.APP_CONFIG && window.APP_CONFIG.BASE_PATH) || '';
@@ -43,20 +44,20 @@ const MENU_CACHE_DURATION = 5 * 60 * 1000; // 5 dakika
 async function loadMenus() {
     try {
         console.log('Menüler yükleniyor...');
-        
+
         // Not: Finans admin redirect kaldırıldı (şablonla ilgili değil)
-        
+
         // Farklı sayfalarda farklı sidebar yapıları olabilir, hepsini dene
-        const navbar = document.getElementById('navbar-nav') || 
-                      document.querySelector('.navbar-nav') ||
-                      document.querySelector('#sidebar-menu') ||
-                      document.querySelector('.sidebar-menu');
-        
+        const navbar = document.getElementById('navbar-nav') ||
+            document.querySelector('.navbar-nav') ||
+            document.querySelector('#sidebar-menu') ||
+            document.querySelector('.sidebar-menu');
+
         if (!navbar) {
             console.error('Sidebar menü container bulunamadı!');
             return;
         }
-        
+
         // Cache kontrolü
         const now = Date.now();
         if (menuCache && menuCacheTimestamp && (now - menuCacheTimestamp) < MENU_CACHE_DURATION) {
@@ -64,7 +65,7 @@ async function loadMenus() {
             renderMenus(navbar, menuCache);
             return;
         }
-        
+
         // Loading state göster (sadece cache yoksa)
         navbar.innerHTML = `
             <li class="nav-item">
@@ -77,10 +78,10 @@ async function loadMenus() {
             </li>
         `;
         navbar.style.display = 'block';
-        
+
         const response = await fetch('/api/dashboard/user-menu');
         const data = await response.json();
-        
+
         console.log('Menü API yanıtı:', data);
         console.log('API yanıtı detayları:', {
             success: data.success,
@@ -90,12 +91,12 @@ async function loadMenus() {
             menusType: typeof data.data?.menus,
             isArray: Array.isArray(data.data?.menus)
         });
-        
+
         if (data.success) {
             // Cache'e kaydet
             menuCache = data.data?.menus;
             menuCacheTimestamp = now;
-            
+
             console.log('Menüler cache\'e kaydedildi:', menuCache);
             renderMenus(navbar, data.data?.menus);
         } else {
@@ -103,18 +104,18 @@ async function loadMenus() {
         }
     } catch (error) {
         console.error('Menu load error:', error);
-        
+
         // Hata durumunda da loading state'i kaldır
-        const navbar = document.getElementById('navbar-nav') || 
-                      document.querySelector('.navbar-nav') ||
-                      document.querySelector('#sidebar-menu') ||
-                      document.querySelector('.sidebar-menu');
-        
+        const navbar = document.getElementById('navbar-nav') ||
+            document.querySelector('.navbar-nav') ||
+            document.querySelector('#sidebar-menu') ||
+            document.querySelector('.sidebar-menu');
+
         if (navbar) {
             let errorMessage = 'Menü yüklenemedi';
             let errorIcon = 'ri-error-warning-line';
             let errorClass = 'text-danger';
-            
+
             // Hata türüne göre farklı mesajlar
             if (error.message.includes('API yanıtı başarısız')) {
                 errorMessage = 'Sunucu hatası - menüler yüklenemedi';
@@ -127,7 +128,7 @@ async function loadMenus() {
                 errorIcon = 'ri-shield-cross-line';
                 errorClass = 'text-warning';
             }
-            
+
             navbar.innerHTML = `
                 <li class="nav-item">
                     <div class="nav-link ${errorClass}">
@@ -152,9 +153,9 @@ async function loadMenus() {
 function renderMenus(navbar, menus) {
     navbar.innerHTML = '';
     navbar.style.display = 'block';
-    
+
     console.log('Menüler işleniyor:', menus);
-    
+
     // Menüler undefined veya array değilse hata göster
     if (!menus || !Array.isArray(menus)) {
         console.error('Menüler undefined veya array değil:', menus);
@@ -168,7 +169,7 @@ function renderMenus(navbar, menus) {
         `;
         return;
     }
-    
+
     // Boş menü listesi kontrolü
     if (menus.length === 0) {
         console.log('Menü listesi boş');
@@ -182,7 +183,7 @@ function renderMenus(navbar, menus) {
         `;
         return;
     }
-    
+
     // Kategorilere göre grupla
     const categories = {};
     menus.forEach(menu => {
@@ -191,26 +192,26 @@ function renderMenus(navbar, menus) {
         }
         categories[menu.category].push(menu);
     });
-    
+
     // Kategorileri order_index'e göre sırala
     const sortedCategoryNames = Object.keys(categories).sort((a, b) => {
         // Kategori adına göre sabit sıralama (Ana Menu -> Admin Islemleri -> Finansal Islemler)
         const categoryOrder = {
             'Ana Menu': 0,
-            'Admin Islemleri': 1, 
+            'Admin Islemleri': 1,
             'Finansal Islemler': 2
         };
-        
+
         const orderA = categoryOrder[a] !== undefined ? categoryOrder[a] : 999;
         const orderB = categoryOrder[b] !== undefined ? categoryOrder[b] : 999;
-        
+
         return orderA - orderB;
     });
-    
+
     // Her kategori için menüleri render et
     sortedCategoryNames.forEach(categoryName => {
         const categoryMenus = categories[categoryName];
-        
+
         // Kategori başlığı (eğer kategori adı varsa)
         if (categoryName && categoryName !== 'null' && categoryName !== 'undefined') {
             const categoryLi = document.createElement('li');
@@ -218,7 +219,7 @@ function renderMenus(navbar, menus) {
             categoryLi.innerHTML = `<span data-key="t-${categoryName.toLowerCase()}">${categoryName}</span>`;
             navbar.appendChild(categoryLi);
         }
-        
+
         // Kategori altındaki menüleri sıralı olarak göster
         categoryMenus
             .sort((a, b) => a.order_index - b.order_index)
@@ -238,7 +239,7 @@ function renderMenus(navbar, menus) {
                 }
             });
     });
-    
+
     console.log('Menüler başarıyla render edildi. Toplam menü sayısı:', navbar.children.length);
 }
 
@@ -256,9 +257,9 @@ async function logout() {
         try {
             localStorage.removeItem('auth_token');
             sessionStorage.removeItem('auth_token');
-            
+
             // Tüm cookie'leri silmeye çalış (yalnızca current domain ve path için)
-            document.cookie.split(';').forEach(function(c) {
+            document.cookie.split(';').forEach(function (c) {
                 const [name] = c.trim().split('=');
                 if (!name) return;
                 document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
@@ -266,7 +267,7 @@ async function logout() {
         } catch (e) {
             console.warn('Client-side token temizleme hatası:', e);
         }
-        
+
         // Backend'e logout isteği gönder
         const response = await fetch('/api/auth/logout', {
             method: 'POST',
@@ -274,7 +275,7 @@ async function logout() {
                 'Content-Type': 'application/json'
             }
         });
-        
+
         // Çıkış başarılı olsun ya da olmasın, login sayfasına yönlendir
         const base = (window.APP_CONFIG && window.APP_CONFIG.BASE_PATH) || '';
         window.location.href = `${base}/`;
@@ -286,13 +287,13 @@ async function logout() {
 }
 
 // Sayfa yüklendiğinde ortak işlemleri yap
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     loadUserInfo();
     loadMenus();
 });
 
 // Logout butonuna tıklama event listener'ı
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
     const target = e.target.closest('[data-logout]');
     if (target) {
         e.preventDefault();

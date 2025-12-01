@@ -79,6 +79,70 @@ class InstitutionService {
         await pool.query('DELETE FROM institutions WHERE id = $1', [id]);
         return { success: true };
     }
+
+    /**
+     * Kuruma ait kullanıcıları ve eklenebilir diğer kullanıcıları getirir.
+     */
+    async getInstitutionUsers(institutionId) {
+        // Kuruma atanmış kullanıcılar (user_institutions tablosundan)
+        const assignedQuery = `
+            SELECT u.id, u.name, u.email, u.role_id, true as is_assigned
+            FROM users u
+            INNER JOIN user_institutions ui ON u.id = ui.user_id
+            WHERE ui.institution_id = $1 AND u.is_active = true
+        `;
+
+        // Bu kuruma atanmamış diğer aktif kullanıcılar
+        const availableQuery = `
+            SELECT u.id, u.name, u.email, u.role_id, false as is_assigned
+            FROM users u
+            WHERE u.is_active = true 
+            AND NOT EXISTS (
+                SELECT 1 FROM user_institutions ui 
+                WHERE ui.user_id = u.id AND ui.institution_id = $1
+            )
+            ORDER BY u.name
+        `;
+
+        const assignedResult = await pool.query(assignedQuery, [institutionId]);
+        const availableResult = await pool.query(availableQuery, [institutionId]);
+
+        // İki listeyi birleştir
+        return [...assignedResult.rows, ...availableResult.rows];
+    }
+
+    /**
+     * Kurumun kullanıcı listesini günceller.
+     * @param {number} institutionId 
+     * @param {Array<number>} userIds - Bu kuruma atanacak kullanıcı ID'leri
+     */
+    async updateInstitutionUsers(institutionId, userIds) {
+        const client = await pool.connect();
+        try {
+            await client.query('BEGIN');
+
+            // 1. Bu kurumdaki tüm yetkilendirmeleri sil
+            await client.query('DELETE FROM user_institutions WHERE institution_id = $1', [institutionId]);
+
+            // 2. Yeni listeyi ekle
+            if (userIds && userIds.length > 0) {
+                const values = userIds.map((uid, index) => `($1, $${index + 2})`).join(',');
+                const params = [institutionId, ...userIds];
+
+                await client.query(`
+                    INSERT INTO user_institutions (institution_id, user_id)
+                    VALUES ${values}
+                `, params);
+            }
+
+            await client.query('COMMIT');
+        } catch (error) {
+            await client.query('ROLLBACK');
+            throw error;
+        } finally {
+            client.release();
+        }
+    }
 }
 
 module.exports = new InstitutionService();

@@ -150,6 +150,163 @@ class AccountService {
 
         return { success: true, newTransactions: newTransactionsCount };
     }
+
+    /**
+     * Tüm hesapları listeler (Admin için).
+     */
+    async getAllAccounts() {
+        const query = `
+            SELECT ba.id, ba.institution_id, i.name as institution_name, ba.bank_name, ba.account_name, ba.account_number, ba.iban, ba.is_active, ba.last_balance, ba.last_balance_update, ba.created_at 
+            FROM bank_accounts ba
+            LEFT JOIN institutions i ON ba.institution_id = i.id
+            ORDER BY ba.created_at DESC
+        `;
+        const result = await pool.query(query);
+        return result.rows;
+    }
+
+    /**
+     * Birden fazla kuruma ait hesapları listeler.
+     */
+    async getAccountsByInstitutions(institutionIds) {
+        if (!institutionIds || institutionIds.length === 0) return [];
+
+        const query = `
+            SELECT ba.id, ba.institution_id, i.name as institution_name, ba.bank_name, ba.account_name, ba.account_number, ba.iban, ba.is_active, ba.last_balance, ba.last_balance_update, ba.created_at 
+            FROM bank_accounts ba
+            LEFT JOIN institutions i ON ba.institution_id = i.id
+            WHERE ba.institution_id = ANY($1)
+            ORDER BY ba.created_at DESC
+        `;
+        const result = await pool.query(query, [institutionIds]);
+        return result.rows;
+    }
+
+    /**
+     * Kuruma ait hesapları listeler.
+     */
+    async getAccountsByInstitution(institutionId) {
+        const query = `
+            SELECT id, institution_id, bank_name, account_name, account_number, iban, is_active, last_balance, last_balance_update, created_at 
+            FROM bank_accounts 
+            WHERE institution_id = $1 
+            ORDER BY created_at DESC
+        `;
+        const result = await pool.query(query, [institutionId]);
+        return result.rows;
+    }
+    /**
+     * Banka hesabını siler.
+     */
+    async deleteAccount(id) {
+        const query = 'DELETE FROM bank_accounts WHERE id = $1 RETURNING *';
+        const result = await pool.query(query, [id]);
+
+        if (result.rows.length === 0) {
+            throw new Error('Hesap bulunamadı veya zaten silinmiş.');
+        }
+
+        return { success: true };
+    }
+    /**
+     * Tekil hesap detayını getirir (Credentials çözülmüş olarak - Şifreler hariç veya maskeli).
+     */
+    async getAccountById(id) {
+        const result = await pool.query('SELECT * FROM bank_accounts WHERE id = $1', [id]);
+        if (result.rows.length === 0) return null;
+
+        const account = result.rows[0];
+        const decryptedCredentials = {};
+
+        if (account.credentials) {
+            for (const [key, value] of Object.entries(account.credentials)) {
+                try {
+                    const val = this.encryption.decrypt(value);
+                    // Şifre alanlarını maskele veya boş döndür
+                    if (key.includes('password') || key.includes('sifre')) {
+                        decryptedCredentials[key] = ''; // Güvenlik için boş gönder
+                    } else {
+                        decryptedCredentials[key] = val;
+                    }
+                } catch (e) {
+                    console.error('Decryption error:', e);
+                }
+            }
+        }
+
+        return { ...account, credentials: decryptedCredentials };
+    }
+
+    /**
+     * Banka hesabını günceller.
+     */
+    async updateAccount(id, data) {
+        const { account_name, is_active, credentials } = data;
+
+        const client = await pool.connect();
+        try {
+            await client.query('BEGIN');
+
+            // Mevcut hesabı çek
+            const currentRes = await client.query('SELECT * FROM bank_accounts WHERE id = $1', [id]);
+            if (currentRes.rows.length === 0) throw new Error('Hesap bulunamadı.');
+            const currentAccount = currentRes.rows[0];
+
+            let finalCredentials = currentAccount.credentials; // Varsayılan olarak eskisi kalsın
+
+            // Eğer credentials güncellenecekse
+            if (credentials && Object.keys(credentials).length > 0) {
+                // 1. Mevcut şifreli veriyi çöz
+                const currentDecrypted = {};
+                for (const [key, value] of Object.entries(currentAccount.credentials || {})) {
+                    try {
+                        currentDecrypted[key] = this.encryption.decrypt(value);
+                    } catch (e) { }
+                }
+
+                // 2. Yeni gelen verilerle birleştir (Boş gelenleri güncelleme)
+                for (const [key, value] of Object.entries(credentials)) {
+                    if (value && value.trim() !== '') {
+                        currentDecrypted[key] = value;
+                    }
+                }
+
+                // 3. Tekrar şifrele
+                const newEncrypted = {};
+                for (const [key, value] of Object.entries(currentDecrypted)) {
+                    newEncrypted[key] = this.encryption.encrypt(value);
+                }
+
+                finalCredentials = JSON.stringify(newEncrypted);
+            }
+
+            const updateQuery = `
+                UPDATE bank_accounts 
+                SET account_name = COALESCE($1, account_name),
+                    is_active = COALESCE($2, is_active),
+                    credentials = COALESCE($3, credentials),
+                    last_balance_update = CURRENT_TIMESTAMP
+                WHERE id = $4
+                RETURNING *
+            `;
+
+            const result = await client.query(updateQuery, [
+                account_name,
+                is_active,
+                typeof finalCredentials === 'string' ? finalCredentials : JSON.stringify(finalCredentials),
+                id
+            ]);
+
+            await client.query('COMMIT');
+            return result.rows[0];
+        } catch (error) {
+            await client.query('ROLLBACK');
+            throw error;
+        } finally {
+            client.release();
+        }
+    }
+
 }
 
 module.exports = new AccountService();
