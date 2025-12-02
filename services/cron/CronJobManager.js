@@ -112,6 +112,26 @@ class CronJobManager {
         const startTime = new Date();
         logger.info(`🚀 ${name} başlatıldı`);
 
+        // ÖNCE: Bu job için önceki RUNNING kayıtlarını temizle (basit ve garantili)
+        try {
+            const clearResult = await query(`
+                UPDATE cron_job_logs
+                SET status = 'FAILED',
+                    completed_at = CURRENT_TIMESTAMP,
+                    duration = EXTRACT(EPOCH FROM (NOW() - started_at))::INTEGER * 1000,
+                    error_message = 'Job yeni başlatıldığı için önceki çalışma iptal edildi'
+                WHERE job_name = $1
+                AND status = 'RUNNING'
+            `, [name]);
+            
+            if (clearResult.rowCount > 0) {
+                logger.warn(`🧹 ${clearResult.rowCount} adet önceki RUNNING kayıt temizlendi (${name})`);
+            }
+        } catch (clearError) {
+            logger.error(`Önceki kayıtları temizleme hatası:`, clearError);
+            // Devam et, kritik değil
+        }
+
         // Log başlangıcını kaydet
         let logId;
         try {
