@@ -125,11 +125,25 @@ class CronJobManager {
             logger.error('Log kaydı oluşturulamadı:', err);
         }
 
+        // Job timeout: Cron 5 dakikada bir çalışıyor, bu yüzden 4 dakika timeout
+        const JOB_TIMEOUT_MS = 4 * 60 * 1000; // 4 dakika
+        
         const executionPromise = (async () => {
             try {
-                // Task'ı çalıştır
+                // Task'ı çalıştır (timeout ile)
                 taskFunction.config = config;
-                const result = await taskFunction();
+                
+                // Timeout wrapper ekle
+                const timeoutPromise = new Promise((_, reject) => {
+                    setTimeout(() => {
+                        reject(new Error(`Job ${name} timeout oldu (${JOB_TIMEOUT_MS / 1000}sn)`));
+                    }, JOB_TIMEOUT_MS);
+                });
+                
+                const result = await Promise.race([
+                    taskFunction(),
+                    timeoutPromise
+                ]);
 
                 const duration = Date.now() - startTime.getTime();
 
@@ -368,6 +382,61 @@ class CronJobManager {
             statuses.push(this.getStatus(name));
         }
         return statuses;
+    }
+
+    /**
+     * Takılı kalmış job'ları temizle
+     * RUNNING durumunda olan ama 10 dakikadan fazla süredir çalışan log kayıtlarını FAILED olarak işaretle
+     */
+    async clearStuckJobs() {
+        try {
+            logger.info('🔧 Takılı kalmış job\'lar temizleniyor...');
+            
+            // 10 dakikadan fazla süredir RUNNING durumunda olan log kayıtlarını bul
+            const stuckLogs = await query(`
+                SELECT id, job_name, started_at
+                FROM cron_job_logs
+                WHERE status = 'RUNNING'
+                AND started_at < NOW() - INTERVAL '10 minutes'
+            `);
+
+            if (stuckLogs.rows.length === 0) {
+                logger.info('✅ Takılı kalmış job bulunamadı');
+                return { cleared: 0 };
+            }
+
+            logger.warn(`⚠️  ${stuckLogs.rows.length} takılı kalmış job bulundu`);
+
+            // Her birini FAILED olarak işaretle
+            for (const log of stuckLogs.rows) {
+                const duration = Date.now() - new Date(log.started_at).getTime();
+                await query(`
+                    UPDATE cron_job_logs
+                    SET status = 'FAILED',
+                        completed_at = CURRENT_TIMESTAMP,
+                        duration = $1,
+                        error_message = $2
+                    WHERE id = $3
+                `, [duration, 'Job timeout - 10 dakikadan fazla süredir çalışıyordu', log.id]);
+
+                logger.warn(`❌ Takılı job temizlendi: ${log.job_name} (Log ID: ${log.id})`);
+            }
+
+            // Memory'deki runningExecutions'ı da temizle
+            for (const log of stuckLogs.rows) {
+                if (this.runningExecutions.has(log.job_name)) {
+                    this.runningExecutions.delete(log.job_name);
+                    logger.info(`🧹 Memory\'den temizlendi: ${log.job_name}`);
+                }
+            }
+
+            logger.info(`✅ ${stuckLogs.rows.length} takılı job temizlendi`);
+            return { cleared: stuckLogs.rows.length };
+
+        } catch (error) {
+            logger.error('❌ Takılı job\'lar temizlenirken hata:', error);
+            throw error;
+        }
     }
 
     /**

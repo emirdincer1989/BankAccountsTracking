@@ -2,6 +2,7 @@ const { bankSyncQueue } = require('../services/queue/QueueManager');
 const { query } = require('../config/database');
 const { logger } = require('../utils/logger');
 const AccountService = require('../services/AccountService');
+const { withTimeout } = require('../utils/timeout');
 
 /**
  * Tüm aktif hesapları bulur ve kuyruğa ekler.
@@ -52,7 +53,12 @@ async function scheduleBankSync() {
                     // Redis yoksa direkt çalıştır (sequential - sırayla)
                     logger.info(`🔄 Direkt senkronizasyon: ${account.account_name} (${account.id})`);
                     try {
-                        const res = await AccountService.syncAccount(account.id);
+                        // Her hesap için 60 saniye timeout
+                        const res = await withTimeout(
+                            AccountService.syncAccount(account.id),
+                            60000, // 60 saniye
+                            `Hesap ${account.account_name} senkronizasyonu timeout oldu (60sn)`
+                        );
                         logger.info(`✅ Direct sync success for ${account.account_name}: ${res.newTransactions} new tx`);
                         directRunCount++;
                     } catch (syncError) {
@@ -65,7 +71,12 @@ async function scheduleBankSync() {
 
                 // Kuyruk hatası varsa direkt çalıştır
                 try {
-                    const res = await AccountService.syncAccount(account.id);
+                    // Her hesap için 60 saniye timeout
+                    const res = await withTimeout(
+                        AccountService.syncAccount(account.id),
+                        60000, // 60 saniye
+                        `Hesap ${account.account_name} senkronizasyonu timeout oldu (60sn)`
+                    );
                     logger.info(`✅ Direct sync success for ${account.account_name}: ${res.newTransactions} new tx`);
                     directRunCount++;
                 } catch (syncError) {
