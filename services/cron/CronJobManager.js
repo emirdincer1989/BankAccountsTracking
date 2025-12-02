@@ -202,31 +202,44 @@ class CronJobManager {
             } catch (error) {
                 const duration = Date.now() - startTime.getTime();
 
-                // Hata - istatistikleri güncelle
-                await query(`
-                    UPDATE cron_jobs
-                    SET last_run_at = $1,
-                        last_run_status = 'FAILED',
-                        last_run_duration = $2,
-                        run_count = run_count + 1,
-                        error_count = error_count + 1
-                    WHERE name = $3
-                `, [new Date(), duration, name]);
+                logger.error(`❌ ${name} hatası (${duration}ms):`, error.message);
+                logger.error(`Stack trace:`, error.stack);
 
-                // Log'u tamamla
+                // Log'u önce tamamla (logId varsa)
                 if (logId) {
-                    await query(`
-                        UPDATE cron_job_logs
-                        SET status = 'FAILED',
-                            completed_at = CURRENT_TIMESTAMP,
-                            duration = $1,
-                            error_message = $2,
-                            error_stack = $3
-                        WHERE id = $4
-                    `, [duration, error.message, error.stack, logId]);
+                    try {
+                        await query(`
+                            UPDATE cron_job_logs
+                            SET status = 'FAILED',
+                                completed_at = CURRENT_TIMESTAMP,
+                                duration = $1,
+                                error_message = $2,
+                                error_stack = $3
+                            WHERE id = $4
+                        `, [duration, error.message.substring(0, 500), (error.stack || '').substring(0, 2000), logId]);
+                        logger.info(`✅ Log kaydı güncellendi (ID: ${logId})`);
+                    } catch (logError) {
+                        logger.error(`❌ Log kaydı güncellenemedi:`, logError.message);
+                    }
+                } else {
+                    logger.warn(`⚠️  Log ID yok, log kaydı güncellenemedi`);
                 }
 
-                logger.error(`❌ ${name} hatası (${duration}ms):`, error.message);
+                // Hata - istatistikleri güncelle
+                try {
+                    await query(`
+                        UPDATE cron_jobs
+                        SET last_run_at = $1,
+                            last_run_status = 'FAILED',
+                            last_run_duration = $2,
+                            run_count = run_count + 1,
+                            error_count = error_count + 1
+                        WHERE name = $3
+                    `, [new Date(), duration, name]);
+                } catch (statsError) {
+                    logger.error(`❌ İstatistik güncellenemedi:`, statsError.message);
+                }
+
                 throw error;
             }
         })();
@@ -417,13 +430,16 @@ class CronJobManager {
         try {
             logger.info('🔧 Takılı kalmış job\'lar temizleniyor...');
             
-            // 5 dakikadan fazla süredir RUNNING durumunda olan log kayıtlarını bul
-            // (Job timeout 4 dakika, bu yüzden 5 dakika yeterli)
+            // 2 dakikadan fazla süredir RUNNING durumunda olan log kayıtlarını bul
+            // (Job timeout 4 dakika, ama normalde job'lar çok daha hızlı bitmeli)
+            // Eğer 2 dakikadan fazla RUNNING ise muhtemelen takılı kalmıştır
             const stuckLogs = await query(`
-                SELECT id, job_name, started_at
+                SELECT id, job_name, started_at,
+                       EXTRACT(EPOCH FROM (NOW() - started_at)) as seconds_ago
                 FROM cron_job_logs
                 WHERE status = 'RUNNING'
-                AND started_at < NOW() - INTERVAL '5 minutes'
+                AND started_at < NOW() - INTERVAL '2 minutes'
+                ORDER BY started_at ASC
             `);
 
             if (stuckLogs.rows.length === 0) {
@@ -435,17 +451,27 @@ class CronJobManager {
 
             // Her birini FAILED olarak işaretle
             for (const log of stuckLogs.rows) {
-                const duration = Date.now() - new Date(log.started_at).getTime();
-                await query(`
-                    UPDATE cron_job_logs
-                    SET status = 'FAILED',
-                        completed_at = CURRENT_TIMESTAMP,
-                        duration = $1,
-                        error_message = $2
-                    WHERE id = $3
-                `, [duration, 'Job timeout - 10 dakikadan fazla süredir çalışıyordu', log.id]);
+                const duration = Math.round(log.seconds_ago * 1000); // saniyeyi ms'ye çevir
+                const minutesAgo = Math.round(log.seconds_ago / 60);
+                
+                try {
+                    await query(`
+                        UPDATE cron_job_logs
+                        SET status = 'FAILED',
+                            completed_at = CURRENT_TIMESTAMP,
+                            duration = $1,
+                            error_message = $2
+                        WHERE id = $3
+                    `, [
+                        duration, 
+                        `Job timeout - ${minutesAgo} dakikadan fazla süredir çalışıyordu (takılı kalmış)`, 
+                        log.id
+                    ]);
 
-                logger.warn(`❌ Takılı job temizlendi: ${log.job_name} (Log ID: ${log.id})`);
+                    logger.warn(`❌ Takılı job temizlendi: ${log.job_name} (Log ID: ${log.id}, ${minutesAgo} dakika)`);
+                } catch (updateError) {
+                    logger.error(`❌ Log güncellenemedi (ID: ${log.id}):`, updateError.message);
+                }
             }
 
             // Memory'deki runningExecutions'ı da temizle

@@ -9,6 +9,18 @@ require('dotenv').config();
 const { query } = require('../config/database');
 const { getCronJobManager } = require('../services/cron/CronJobManager');
 
+// Job'ları yükle (script çalıştırıldığında yeni instance oluşuyor)
+async function initCronManager() {
+    const cronManager = getCronJobManager();
+    try {
+        await cronManager.loadJobsFromDB();
+        console.log('✅ Job\'lar yüklendi\n');
+    } catch (error) {
+        console.log('⚠️  Job\'lar yüklenemedi:', error.message);
+    }
+    return cronManager;
+}
+
 async function testJobTimeout() {
     try {
         console.log('🧪 Job Timeout Test Başlatılıyor...\n');
@@ -96,7 +108,7 @@ async function testJobTimeout() {
         console.log('\n\n🔧 CRON JOB MANAGER DURUMU');
         console.log('-'.repeat(60));
 
-        const cronManager = getCronJobManager();
+        const cronManager = await initCronManager();
         const status = cronManager.getStatus('bankSyncJob');
         
         if (status) {

@@ -17,17 +17,23 @@ async function clearStuckJobs() {
 
         console.log(`\n✅ ${result.cleared || 0} adet takılı kalmış job temizlendi`);
 
-        // Durumu göster
-        const stuckLogs = await query(`
-            SELECT COUNT(*) as count FROM cron_job_logs
+        // Durumu göster - 2 dakikadan eski RUNNING job'ları göster
+        const remainingStuckLogs = await query(`
+            SELECT id, job_name, started_at,
+                   EXTRACT(EPOCH FROM (NOW() - started_at)) as seconds_ago
+            FROM cron_job_logs
             WHERE status = 'RUNNING'
-            AND started_at < NOW() - INTERVAL '30 minutes'
+            AND started_at < NOW() - INTERVAL '2 minutes'
+            ORDER BY started_at ASC
         `);
-
-        const remainingStuck = parseInt(stuckLogs.rows[0].count);
         
-        if (remainingStuck > 0) {
-            console.log(`⚠️  Hala ${remainingStuck} adet takılı kalmış log var (30 dakikadan yeni olanlar normal)`);
+        if (remainingStuckLogs.rows.length > 0) {
+            console.log(`\n⚠️  Hala ${remainingStuckLogs.rows.length} adet takılı kalmış job var:`);
+            remainingStuckLogs.rows.forEach((log, index) => {
+                const minutesAgo = Math.round(log.seconds_ago / 60);
+                console.log(`   ${index + 1}. ${log.job_name} - ${minutesAgo} dakika önce başladı`);
+            });
+            console.log('\n💡 Bu job\'lar muhtemelen takılı kalmış. Tekrar temizlemeyi deneyin.');
         } else {
             console.log('✅ Tüm takılı kalmış job\'lar temizlendi');
         }
