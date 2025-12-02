@@ -124,7 +124,7 @@ class VakifAdapter extends BaseBankAdapter {
             const borcAlacak = getVal('BorcAlacak');
             const description = getVal('Aciklama');
             const refNo = getVal('Id');
-            const balanceStr = getVal('IslemSonrasiBakiye');
+            const balanceStr = getVal('IslemSonrasıBakiye');
 
             let senderReceiver = '';
             const gonderenMatch = block.match(/<[a-zA-Z0-9]+:Key>GonderenAdi<\/[a-zA-Z0-9]+:Key>\s*<[a-zA-Z0-9]+:Value>(.*?)<\/[a-zA-Z0-9]+:Value>/);

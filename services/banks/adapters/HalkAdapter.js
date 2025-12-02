@@ -152,12 +152,19 @@ class HalkAdapter extends BaseBankAdapter {
                 const cleanDesc = description ? description.replace(/[^a-zA-Z0-9]/g, '').substring(0, 30) : '';
                 const deterministicId = `${dateStr}-${amount}-${cleanDesc}`;
 
+                let balance = 0;
+                if (balanceStr) {
+                    balance = parseFloat(balanceStr.replace('+', '').replace(',', '.'));
+                    if (isNaN(balance)) balance = 0;
+                }
+
                 transactions.push({
                     unique_bank_ref_id: refNo || deterministicId,
                     date: new Date(isoDate),
                     amount: amount,
                     description: description || '',
                     sender_receiver: senderReceiver || '',
+                    balance_after_transaction: balance,
                     metadata: {
                         raw: {
                             tarih: dateStr,
