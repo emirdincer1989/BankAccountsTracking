@@ -154,8 +154,13 @@ class VakifAdapter extends BaseBankAdapter {
                 // Tarih formatı: 2025-11-20 02:06:26 -> ISO
                 const isoDate = dateStr.replace(' ', 'T');
 
+                // Unique ID oluşturma: RefNo varsa onu kullan, yoksa Tarih+Tutar+Açıklama(ilk 30 karakter)
+                // Math.random() KULLANMA! Mükerrer kayda sebep olur.
+                const cleanDesc = description ? description.replace(/[^a-zA-Z0-9]/g, '').substring(0, 30) : '';
+                const deterministicId = `${dateStr}-${amount}-${cleanDesc}`;
+
                 transactions.push({
-                    unique_bank_ref_id: refNo || `${dateStr}-${amount}-${Math.random()}`,
+                    unique_bank_ref_id: refNo || deterministicId,
                     date: new Date(isoDate),
                     amount: amount,
                     description: description || '',

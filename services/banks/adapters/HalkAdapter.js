@@ -148,8 +148,12 @@ class HalkAdapter extends BaseBankAdapter {
                     isoDate += 'T00:00:00';
                 }
 
+                // Unique ID
+                const cleanDesc = description ? description.replace(/[^a-zA-Z0-9]/g, '').substring(0, 30) : '';
+                const deterministicId = `${dateStr}-${amount}-${cleanDesc}`;
+
                 transactions.push({
-                    unique_bank_ref_id: refNo || `${dateStr}-${amount}-${Math.random()}`,
+                    unique_bank_ref_id: refNo || deterministicId,
                     date: new Date(isoDate),
                     amount: amount,
                     description: description || '',

@@ -113,8 +113,12 @@ class ZiraatAdapter extends BaseBankAdapter {
                     isoDate = `${year}-${month}-${day}T00:00:00`;
                 }
 
+                // Unique ID: Zaman varsa (zaman+tutar), yoksa (tarih+tutar+açıklama)
+                const cleanDesc = description ? description.replace(/[^a-zA-Z0-9]/g, '').substring(0, 30) : '';
+                const deterministicId = `${dateStr}-${amount}-${cleanDesc}`;
+
                 transactions.push({
-                    unique_bank_ref_id: timeStr ? (timeStr + amount) : `${dateStr}-${amount}-${Math.random()}`,
+                    unique_bank_ref_id: timeStr ? (timeStr + '-' + amount) : deterministicId,
                     date: new Date(isoDate),
                     amount: amount,
                     description: description || '',
