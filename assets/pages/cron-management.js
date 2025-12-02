@@ -238,7 +238,7 @@ function initializePage() {
     // Elementlerin varlığını kontrol et
     const jobsContainer = document.getElementById('jobs-container');
     const statTotal = document.getElementById('stat-total');
-    
+
     if (!jobsContainer || !statTotal) {
         console.warn('DOM elementleri henüz hazır değil, tekrar deneniyor...');
         setTimeout(initializePage, 200);
@@ -346,9 +346,10 @@ async function loadStats() {
 
 function renderJobs(jobs, summary) {
     const container = document.getElementById('jobs-container');
-    
+
     if (!container) {
-        console.error('jobs-container elementi bulunamadı');
+        console.warn('jobs-container elementi bulunamadı, yeniden deneniyor...');
+        setTimeout(() => renderJobs(jobs, summary), 100);
         return;
     }
 
@@ -370,8 +371,8 @@ function renderJobs(jobs, summary) {
         const lastRunBadge = job.lastRunStatus === 'SUCCESS'
             ? '<span class="badge bg-success-subtle text-success">Başarılı</span>'
             : job.lastRunStatus === 'FAILED'
-            ? '<span class="badge bg-danger-subtle text-danger">Hatalı</span>'
-            : '<span class="badge bg-secondary">Henüz çalışmadı</span>';
+                ? '<span class="badge bg-danger-subtle text-danger">Hatalı</span>'
+                : '<span class="badge bg-secondary">Henüz çalışmadı</span>';
 
         const lastRunText = job.lastRun
             ? `${formatDate(job.lastRun)} (${job.lastRunDuration}ms)`
@@ -484,7 +485,7 @@ async function triggerJob(jobName) {
 
         const result = await response.json();
         console.log('📦 API yanıtı:', result);
-        
+
         if (!response.ok) throw new Error(result.message || 'İşlem başarısız');
 
         showSuccess(result.message);
@@ -510,19 +511,19 @@ async function triggerJob(jobName) {
 
 function showCronResultModal(message) {
     console.log('📋 showCronResultModal çağrıldı, message:', message);
-    
+
     const modalEl = document.getElementById('cronResultModal');
     console.log('🔍 Modal element:', modalEl);
-    
+
     if (!modalEl) {
         console.error('❌ cronResultModal elementi bulunamadı!');
         return;
     }
-    
+
     const modal = new bootstrap.Modal(modalEl);
     const titleEl = document.getElementById('cronResultTitle');
     const bodyEl = document.getElementById('cronResultBody');
-    
+
     console.log('🔍 Title element:', titleEl);
     console.log('🔍 Body element:', bodyEl);
 
@@ -580,14 +581,14 @@ async function saveSchedule() {
 
 async function showLogsModal() {
     const modal = new bootstrap.Modal(document.getElementById('logsModal'));
-    
+
     // Modal açıldığında clear logs butonunun event listener'ını kontrol et
     const clearLogsBtn = document.getElementById('clear-logs-btn');
     if (clearLogsBtn && !clearLogsBtn.dataset.listenerAdded) {
         clearLogsBtn.dataset.listenerAdded = 'true';
         clearLogsBtn.addEventListener('click', clearLogs);
     }
-    
+
     modal.show();
     await loadLogs();
 }
@@ -630,11 +631,11 @@ function renderLogs(logs) {
             </thead>
             <tbody>
                 ${logs.map(log => {
-                    const statusBadge = log.status === 'SUCCESS'
-                        ? '<span class="badge bg-success">Başarılı</span>'
-                        : '<span class="badge bg-danger">Hatalı</span>';
+        const statusBadge = log.status === 'SUCCESS'
+            ? '<span class="badge bg-success">Başarılı</span>'
+            : '<span class="badge bg-danger">Hatalı</span>';
 
-                    return `
+        return `
                         <tr>
                             <td>${formatDate(log.started_at)}</td>
                             <td>${log.job_name}</td>
@@ -642,13 +643,13 @@ function renderLogs(logs) {
                             <td>${log.duration || 0}ms</td>
                             <td>
                                 ${log.error_message
-                                    ? `<span class="text-danger small">${log.error_message}</span>`
-                                    : '<span class="text-muted small">-</span>'
-                                }
+                ? `<span class="text-danger small">${log.error_message}</span>`
+                : '<span class="text-muted small">-</span>'
+            }
                             </td>
                         </tr>
                     `;
-                }).join('')}
+    }).join('')}
             </tbody>
         </table>
     `;

@@ -1,15 +1,6 @@
 const { bankSyncQueue } = require('../services/queue/QueueManager');
-const { Pool } = require('pg');
+const { query } = require('../config/database');
 const { logger } = require('../utils/logger');
-
-const pool = new Pool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false
-});
 
 /**
  * Tüm aktif hesapları bulur ve kuyruğa ekler.
@@ -20,7 +11,7 @@ async function scheduleBankSync() {
 
     try {
         // Aktif hesapları çek
-        const result = await pool.query('SELECT id, account_name FROM bank_accounts WHERE is_active = true');
+        const result = await query('SELECT id, account_name FROM bank_accounts WHERE is_active = true');
         const accounts = result.rows;
 
         for (const account of accounts) {
