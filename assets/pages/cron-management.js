@@ -15,7 +15,10 @@ export async function loadContent() {
                             <p class="text-muted mb-0">Zamanlanmış işleri yönetin</p>
                         </div>
                         <div>
-                            <button id="refresh-jobs-btn" class="btn btn-primary">
+                            <button id="clear-stuck-jobs-btn" class="btn btn-warning">
+                                <i class="ri-delete-bin-line"></i> Takılı Job'ları Temizle
+                            </button>
+                            <button id="refresh-jobs-btn" class="btn btn-primary ms-2">
                                 <i class="ri-refresh-line"></i> Yenile
                             </button>
                             <button id="view-logs-btn" class="btn btn-info ms-2">
@@ -258,6 +261,64 @@ function initializePage() {
 }
 
 function setupEventListeners() {
+    const clearStuckBtn = document.getElementById('clear-stuck-jobs-btn');
+    if (clearStuckBtn && !clearStuckBtn.dataset.listenerAdded) {
+        clearStuckBtn.dataset.listenerAdded = 'true';
+        clearStuckBtn.addEventListener('click', async () => {
+            if (!window.showConfirm) {
+                if (!confirm('Takılı kalmış job\'lar temizlenecek. Devam etmek istiyor musunuz?')) return;
+            } else {
+                const confirmed = await window.showConfirm({
+                    title: 'Takılı Job\'ları Temizle',
+                    message: 'Takılı kalmış job\'lar temizlenecek. Devam etmek istiyor musunuz?',
+                    confirmText: 'Evet, Temizle',
+                    cancelText: 'İptal'
+                });
+                if (!confirmed) return;
+            }
+
+            clearStuckBtn.disabled = true;
+            clearStuckBtn.innerHTML = '<i class="ri-loader-4-line spin"></i> Temizleniyor...';
+
+            try {
+                const response = await fetch('/api/cron-management/clear-stuck-jobs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    if (window.showSuccess) {
+                        window.showSuccess(result.message || `${result.data?.clearedCount || 0} adet takılı job temizlendi`);
+                    } else {
+                        alert(result.message || 'Takılı job\'lar temizlendi');
+                    }
+                    // Job listesini yenile
+                    loadAllData();
+                } else {
+                    if (window.showError) {
+                        window.showError(result.message || 'Takılı job\'lar temizlenirken hata oluştu');
+                    } else {
+                        alert(result.message || 'Hata oluştu');
+                    }
+                }
+            } catch (error) {
+                console.error('Clear stuck jobs error:', error);
+                if (window.showError) {
+                    window.showError('Takılı job\'lar temizlenirken hata oluştu');
+                } else {
+                    alert('Hata oluştu');
+                }
+            } finally {
+                clearStuckBtn.disabled = false;
+                clearStuckBtn.innerHTML = '<i class="ri-delete-bin-line"></i> Takılı Job\'ları Temizle';
+            }
+        });
+    }
+
     const refreshBtn = document.getElementById('refresh-jobs-btn');
     if (refreshBtn && !refreshBtn.dataset.listenerAdded) {
         refreshBtn.dataset.listenerAdded = 'true';

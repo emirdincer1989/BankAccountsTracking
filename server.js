@@ -203,6 +203,33 @@ async function initCronJobs() {
         const activeJobs = Array.from(cronManager.jobs.values()).filter(j => j.isRunning);
         logger.info(`▶️  ${activeJobs.length} aktif job çalışıyor`);
         
+        // Server başlangıcında takılı kalmış job'ları temizle
+        try {
+            logger.info('🧹 Server başlangıcında takılı kalmış job\'lar temizleniyor...');
+            const clearResult = await cronManager.clearStuckJobs();
+            if (clearResult.cleared > 0) {
+                logger.warn(`⚠️  ${clearResult.cleared} adet takılı kalmış job temizlendi`);
+            } else {
+                logger.info('✅ Takılı kalmış job bulunamadı');
+            }
+        } catch (clearError) {
+            logger.error('❌ Takılı job temizleme hatası:', clearError);
+        }
+        
+        // Periyodik otomatik temizleme (her 10 dakikada bir)
+        setInterval(async () => {
+            try {
+                const clearResult = await cronManager.clearStuckJobs();
+                if (clearResult.cleared > 0) {
+                    logger.warn(`🧹 Otomatik temizleme: ${clearResult.cleared} adet takılı kalmış job temizlendi`);
+                }
+            } catch (clearError) {
+                logger.error('❌ Otomatik takılı job temizleme hatası:', clearError);
+            }
+        }, 10 * 60 * 1000); // 10 dakika
+        
+        logger.info('✅ Otomatik takılı job temizleme başlatıldı (her 10 dakikada bir)');
+        
     } catch (error) {
         logger.error('❌ Cron job başlatma hatası:', error);
         logger.error('Stack trace:', error.stack);
