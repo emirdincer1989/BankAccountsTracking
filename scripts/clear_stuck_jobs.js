@@ -10,7 +10,7 @@ const { getCronJobManager } = require('../services/cron/CronJobManager');
 
 async function clearStuckJobs() {
     try {
-        console.log('🔧 Takılı Kalmış Job'lar Temizleniyor...\n');
+        console.log('🔧 Takılı Kalmış Job\'lar Temizleniyor...\n');
 
         const cronManager = getCronJobManager();
         const clearedCount = await cronManager.clearStuckJobs();
@@ -29,7 +29,7 @@ async function clearStuckJobs() {
         if (remainingStuck > 0) {
             console.log(`⚠️  Hala ${remainingStuck} adet takılı kalmış log var (30 dakikadan yeni olanlar normal)`);
         } else {
-            console.log('✅ Tüm takılı kalmış job'lar temizlendi');
+            console.log('✅ Tüm takılı kalmış job\'lar temizlendi');
         }
 
         process.exit(0);

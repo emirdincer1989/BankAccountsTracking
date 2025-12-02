@@ -439,7 +439,7 @@ class CronJobManager {
      * Takılı kalmış job'ları temizle
      */
     async clearStuckJobs() {
-        logger.info('🔧 Takılı kalmış job'lar temizleniyor...');
+        logger.info('🔧 Takılı kalmış job\'lar temizleniyor...');
         
         try {
             // Database'de RUNNING durumundaki eski logları bul (30 dakikadan eski)
@@ -468,7 +468,7 @@ class CronJobManager {
                 // Memory'deki execution'ı temizle
                 if (this.runningExecutions.has(jobName)) {
                     this.runningExecutions.delete(jobName);
-                    logger.info(`✅ ${jobName} execution memory'den temizlendi`);
+                    logger.info(`✅ ${jobName} execution memory\'den temizlendi`);
                 }
             }
             
