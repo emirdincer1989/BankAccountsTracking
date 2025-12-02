@@ -10,6 +10,7 @@ const { withTimeout } = require('../utils/timeout');
  */
 async function scheduleBankSync() {
     logger.info('🕒 Scheduled Job: Adding bank accounts to sync queue...');
+    logger.info('📍 scheduleBankSync fonksiyonu başladı');
 
     try {
         // Aktif hesapları çek
@@ -28,14 +29,18 @@ async function scheduleBankSync() {
         let errorCount = 0;
 
         // Redis/Queue kullanılabilir mi kontrol et
+        logger.info('📍 Redis/Queue kontrolü yapılıyor...');
         const isQueueAvailable = bankSyncQueue && typeof bankSyncQueue.add === 'function' && 
                                   !bankSyncQueue.add.toString().includes('Redis unavailable');
+        logger.info(`📍 Queue durumu: ${isQueueAvailable ? 'Kullanılabilir' : 'Kullanılamıyor'}`);
 
         if (!isQueueAvailable) {
             logger.warn('⚠️  Redis/Queue kullanılamıyor, hesaplar direkt senkronize edilecek');
         }
 
+        logger.info(`📍 ${accounts.length} hesap için döngü başlatılıyor...`);
         for (const account of accounts) {
+            logger.info(`📍 Hesap işleniyor: ${account.account_name} (${account.id})`);
             try {
                 if (isQueueAvailable) {
                     // Queue'ya ekle

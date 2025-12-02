@@ -165,15 +165,22 @@ class CronJobManager {
                 
                 // Job'un başladığını işaretle
                 const jobStartTime = Date.now();
+                logger.info(`▶️  ${name} fonksiyonu çağrılıyor...`);
+                
                 const jobPromise = taskFunction().catch(error => {
                     logger.error(`❌ ${name} içinde hata:`, error.message);
+                    logger.error(`Stack:`, error.stack);
                     throw error;
                 });
+                
+                logger.info(`⏳ ${name} Promise.race başlatıldı...`);
                 
                 const result = await Promise.race([
                     jobPromise,
                     timeoutPromise
                 ]);
+                
+                logger.info(`✅ ${name} Promise.race tamamlandı`);
                 
                 const jobDuration = Date.now() - jobStartTime;
                 logger.info(`✅ ${name} tamamlandı (${jobDuration}ms)`);
