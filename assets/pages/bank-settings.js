@@ -8,7 +8,7 @@ let accounts = [];
 let bootstrapModal = null;
 
 export async function loadContent() {
-    const html = `
+    let html = `
         <div class="row h-100">
             <!-- Sol Panel: Kurum Listesi -->
             <div class="col-md-4 col-lg-3">
@@ -107,6 +107,42 @@ export async function loadContent() {
         </div>
     `;
 
+    // Manuel Senkronizasyon Modalı
+    html += `
+        <div class="modal fade" id="syncModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Manuel Senkronizasyon</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="syncForm">
+                        <div class="modal-body">
+                            <div class="alert alert-info">
+                                <i class="ri-information-line me-1"></i>
+                                Belirtilen tarih aralığındaki hesap hareketleri bankadan çekilecektir.
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Başlangıç Tarihi</label>
+                                <input type="date" class="form-control" id="syncStartDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Bitiş Tarihi</label>
+                                <input type="date" class="form-control" id="syncEndDate" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                            <button type="submit" class="btn btn-primary" id="startSyncBtn">
+                                <i class="ri-refresh-line me-1"></i> Başlat
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    `;
+
     return {
         html,
         title: 'Banka Entegrasyon Yönetimi'
@@ -126,6 +162,11 @@ export function init() {
     const form = document.getElementById('accountForm');
     if (form) {
         form.addEventListener('submit', handleAccountSubmit);
+    }
+
+    const syncForm = document.getElementById('syncForm');
+    if (syncForm) {
+        syncForm.addEventListener('submit', handleSyncSubmit);
     }
 }
 
@@ -487,26 +528,61 @@ async function handleAccountSubmit(e) {
     }
 }
 
-async function syncAccount(accountId) {
+function syncAccount(accountId) {
+    const modalEl = document.getElementById('syncModal');
+
+    // Tarihleri varsayılan olarak ayarla (Son 3 gün)
+    const today = new Date();
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(today.getDate() - 3);
+
+    document.getElementById('syncEndDate').value = today.toISOString().split('T')[0];
+    document.getElementById('syncStartDate').value = threeDaysAgo.toISOString().split('T')[0];
+
+    // ID'yi sakla
+    modalEl.dataset.accountId = accountId;
+
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+}
+
+async function handleSyncSubmit(e) {
+    e.preventDefault();
+
+    const modalEl = document.getElementById('syncModal');
+    const accountId = modalEl.dataset.accountId;
+    const startDate = document.getElementById('syncStartDate').value;
+    const endDate = document.getElementById('syncEndDate').value;
+    const btn = document.getElementById('startSyncBtn');
+
+    if (!accountId) return;
+
     try {
-        window.showLoading('Senkronizasyon başlatılıyor...');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> İşleniyor...';
 
         const response = await fetch(`/api/accounts/${accountId}/sync`, {
-            method: 'POST'
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ startDate, endDate })
         });
         const result = await response.json();
 
-        window.Notification.removeAll(); // Loading'i kaldır
-
         if (result.success) {
-            window.showSuccess('Senkronizasyon başarıyla tamamlandı.');
+            // Modalı kapat
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) modalInstance.hide();
+
+            window.showSuccess(`Senkronizasyon tamamlandı. ${result.data.newTransactions} yeni hareket eklendi.`);
             loadAccounts(currentInstitutionId);
         } else {
             window.showError(result.message, 'Senkronizasyon Hatası');
         }
     } catch (error) {
         console.error('Sync hatası:', error);
-        window.Notification.removeAll();
         window.showError('Senkronizasyon sırasında bir hata oluştu.', 'Sistem Hatası');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ri-refresh-line me-1"></i> Başlat';
     }
 }
