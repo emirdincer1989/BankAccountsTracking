@@ -183,7 +183,24 @@ class CronJobManager {
                 logger.info(`✅ ${name} Promise.race tamamlandı`);
                 
                 const jobDuration = Date.now() - jobStartTime;
+                
+                // Result'tan detaylı bilgi çıkar
+                const resultSummary = {
+                    success: result.success !== false,
+                    newTransactions: result.newTransactions || result.synced || 0,
+                    totalAccounts: result.count || 0,
+                    syncedAccounts: result.synced || 0,
+                    errors: result.errors || 0,
+                    batches: result.batches || 0,
+                    message: result.message || 'Tamamlandı'
+                };
+                
                 logger.info(`✅ ${name} tamamlandı (${jobDuration}ms)`);
+                if (resultSummary.newTransactions > 0) {
+                    logger.info(`📊 ${resultSummary.newTransactions} yeni hareket çekildi`);
+                } else if (resultSummary.totalAccounts > 0) {
+                    logger.info(`📊 ${resultSummary.syncedAccounts}/${resultSummary.totalAccounts} hesap senkronize edildi`);
+                }
 
                 const duration = Date.now() - startTime.getTime();
 
@@ -198,7 +215,7 @@ class CronJobManager {
                     WHERE name = $3
                 `, [new Date(), duration, name]);
 
-                // Log'u tamamla
+                // Log'u tamamla - detaylı result bilgisiyle
                 if (logId) {
                     await query(`
                         UPDATE cron_job_logs
@@ -207,7 +224,7 @@ class CronJobManager {
                             duration = $1,
                             result = $2
                         WHERE id = $3
-                    `, [duration, JSON.stringify(result), logId]);
+                    `, [duration, JSON.stringify(resultSummary), logId]);
                 }
 
                 logger.info(`✅ ${name} tamamlandı (${duration}ms)`);

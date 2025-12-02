@@ -724,7 +724,32 @@ function renderLogs(logs) {
                 ${logs.map(log => {
         const statusBadge = log.status === 'SUCCESS'
             ? '<span class="badge bg-success">Başarılı</span>'
+            : log.status === 'RUNNING'
+            ? '<span class="badge bg-warning">Çalışıyor</span>'
             : '<span class="badge bg-danger">Hatalı</span>';
+
+        // Result bilgisini parse et
+        let detailHtml = '<span class="text-muted small">-</span>';
+        
+        if (log.error_message) {
+            detailHtml = `<span class="text-danger small">${log.error_message}</span>`;
+        } else if (log.result) {
+            try {
+                const result = typeof log.result === 'string' ? JSON.parse(log.result) : log.result;
+                
+                // Yeni hareket sayısını göster
+                if (result.newTransactions !== undefined && result.newTransactions > 0) {
+                    detailHtml = `<span class="text-success small"><i class="ri-check-line"></i> ${result.newTransactions} yeni hareket çekildi</span>`;
+                } else if (result.synced !== undefined && result.count !== undefined) {
+                    detailHtml = `<span class="text-info small"><i class="ri-information-line"></i> ${result.synced}/${result.count} hesap senkronize edildi</span>`;
+                } else if (result.message) {
+                    detailHtml = `<span class="text-muted small">${result.message}</span>`;
+                }
+            } catch (e) {
+                // JSON parse hatası - result string olabilir
+                detailHtml = `<span class="text-muted small">${log.result}</span>`;
+            }
+        }
 
         return `
                         <tr>
@@ -732,12 +757,7 @@ function renderLogs(logs) {
                             <td>${log.job_name}</td>
                             <td>${statusBadge}</td>
                             <td>${log.duration || 0}ms</td>
-                            <td>
-                                ${log.error_message
-                ? `<span class="text-danger small">${log.error_message}</span>`
-                : '<span class="text-muted small">-</span>'
-            }
-                            </td>
+                            <td>${detailHtml}</td>
                         </tr>
                     `;
     }).join('')}
