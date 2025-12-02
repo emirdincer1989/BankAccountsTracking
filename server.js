@@ -44,7 +44,7 @@ app.use(helmet({
 }));
 
 app.use(cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
+    origin: (process.env.ALLOWED_ORIGINS && process.env.ALLOWED_ORIGINS.split(',')) || ['http://localhost:3000'],
     credentials: true
 }));
 
@@ -213,7 +213,7 @@ async function initCronJobs() {
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, {
     cors: {
-        origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
+        origin: (process.env.ALLOWED_ORIGINS && process.env.ALLOWED_ORIGINS.split(',')) || ['http://localhost:3000'],
         credentials: true
     }
 });
@@ -222,7 +222,7 @@ const io = require('socket.io')(server, {
 io.use(async (socket, next) => {
     try {
         const token = socket.handshake.auth.token ||
-            socket.handshake.headers.cookie?.split('auth_token=')[1]?.split(';')[0];
+            (socket.handshake.headers.cookie && socket.handshake.headers.cookie.split('auth_token=')[1] && socket.handshake.headers.cookie.split('auth_token=')[1].split(';')[0]);
 
         if (!token) {
             return next(new Error('Authentication token bulunamadı'));

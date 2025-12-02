@@ -4,8 +4,8 @@ const { logger } = require('../utils/logger');
 
 const authMiddleware = async (req, res, next) => {
     try {
-        const token = req.header('Authorization')?.replace('Bearer ', '') ||
-            req.cookies?.auth_token;
+        const token = (req.header('Authorization') && req.header('Authorization').replace('Bearer ', '')) ||
+            (req.cookies && req.cookies.auth_token);
 
         if (!token) {
             return res.status(401).json({

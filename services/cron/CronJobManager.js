@@ -167,7 +167,7 @@ class CronJobManager {
                     });
                     logger.info(`📢 Socket event gönderildi: cron-job-result`);
                 } else {
-                    logger.warn(`⚠️ Socket event gönderilemedi - global.io: ${!!global.io}, name: ${name}, result.success: ${result?.success}`);
+                    logger.warn(`⚠️ Socket event gönderilemedi - global.io: ${!!global.io}, name: ${name}, result.success: ${result && result.success}`);
                 }
 
                 return result;

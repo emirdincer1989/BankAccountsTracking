@@ -21,7 +21,7 @@ async function testModalJob() {
             WHERE name = $1
         `, [jobName]);
 
-        const runCount = result.rows[0]?.run_count || 0;
+        const runCount = (result.rows[0] && result.rows[0].run_count) || 0;
         const startTime = new Date();
 
         // Mesaj oluştur
