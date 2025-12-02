@@ -433,14 +433,20 @@ class CronJobManager {
             // 2 dakikadan fazla süredir RUNNING durumunda olan log kayıtlarını bul
             // (Job timeout 4 dakika, ama normalde job'lar çok daha hızlı bitmeli)
             // Eğer 2 dakikadan fazla RUNNING ise muhtemelen takılı kalmıştır
+            // NOT: PostgreSQL'de NOW() UTC kullanır, bu yüzden doğrudan karşılaştırma yapıyoruz
             const stuckLogs = await query(`
-                SELECT id, job_name, started_at,
-                       EXTRACT(EPOCH FROM (NOW() - started_at)) as seconds_ago
+                SELECT 
+                    id, 
+                    job_name, 
+                    started_at,
+                    EXTRACT(EPOCH FROM (NOW() - started_at))::INTEGER as seconds_ago
                 FROM cron_job_logs
                 WHERE status = 'RUNNING'
-                AND started_at < NOW() - INTERVAL '2 minutes'
+                AND EXTRACT(EPOCH FROM (NOW() - started_at)) > 120
                 ORDER BY started_at ASC
             `);
+            
+            logger.info(`🔍 Sorgu sonucu: ${stuckLogs.rows.length} takılı job bulundu`);
 
             if (stuckLogs.rows.length === 0) {
                 logger.info('✅ Takılı kalmış job bulunamadı');
@@ -451,26 +457,36 @@ class CronJobManager {
 
             // Her birini FAILED olarak işaretle
             for (const log of stuckLogs.rows) {
-                const duration = Math.round(log.seconds_ago * 1000); // saniyeyi ms'ye çevir
-                const minutesAgo = Math.round(log.seconds_ago / 60);
+                const secondsAgo = parseInt(log.seconds_ago) || 0;
+                const duration = secondsAgo * 1000; // saniyeyi ms'ye çevir
+                const minutesAgo = Math.round(secondsAgo / 60);
+                
+                logger.info(`🔧 Temizleniyor: ${log.job_name} (ID: ${log.id}, ${minutesAgo} dakika önce başladı)`);
                 
                 try {
-                    await query(`
+                    const updateResult = await query(`
                         UPDATE cron_job_logs
                         SET status = 'FAILED',
                             completed_at = CURRENT_TIMESTAMP,
                             duration = $1,
                             error_message = $2
                         WHERE id = $3
+                        AND status = 'RUNNING'
+                        RETURNING id
                     `, [
                         duration, 
                         `Job timeout - ${minutesAgo} dakikadan fazla süredir çalışıyordu (takılı kalmış)`, 
                         log.id
                     ]);
 
-                    logger.warn(`❌ Takılı job temizlendi: ${log.job_name} (Log ID: ${log.id}, ${minutesAgo} dakika)`);
+                    if (updateResult.rows.length > 0) {
+                        logger.warn(`✅ Takılı job temizlendi: ${log.job_name} (Log ID: ${log.id}, ${minutesAgo} dakika)`);
+                    } else {
+                        logger.warn(`⚠️  Job zaten güncellenmiş: ${log.job_name} (Log ID: ${log.id})`);
+                    }
                 } catch (updateError) {
                     logger.error(`❌ Log güncellenemedi (ID: ${log.id}):`, updateError.message);
+                    logger.error(`Stack:`, updateError.stack);
                 }
             }
 

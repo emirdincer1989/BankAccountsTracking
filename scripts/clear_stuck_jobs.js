@@ -19,11 +19,14 @@ async function clearStuckJobs() {
 
         // Durumu göster - 2 dakikadan eski RUNNING job'ları göster
         const remainingStuckLogs = await query(`
-            SELECT id, job_name, started_at,
-                   EXTRACT(EPOCH FROM (NOW() - started_at)) as seconds_ago
+            SELECT 
+                id, 
+                job_name, 
+                started_at,
+                EXTRACT(EPOCH FROM (NOW() - started_at))::INTEGER as seconds_ago
             FROM cron_job_logs
             WHERE status = 'RUNNING'
-            AND started_at < NOW() - INTERVAL '2 minutes'
+            AND EXTRACT(EPOCH FROM (NOW() - started_at)) > 120
             ORDER BY started_at ASC
         `);
         

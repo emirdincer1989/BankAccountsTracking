@@ -9,14 +9,26 @@ require('dotenv').config();
 const { query } = require('../config/database');
 const { getCronJobManager } = require('../services/cron/CronJobManager');
 
-// Job'ları yükle (script çalıştırıldığında yeni instance oluşuyor)
+// Job'ları yükle ve register et (script çalıştırıldığında yeni instance oluşuyor)
 async function initCronManager() {
     const cronManager = getCronJobManager();
     try {
-        await cronManager.loadJobsFromDB();
-        console.log('✅ Job\'lar yüklendi\n');
+        const jobs = await cronManager.loadJobsFromDB();
+        console.log(`✅ ${jobs.length} job database'den yüklendi`);
+        
+        // Job'ları register et
+        for (const job of jobs) {
+            try {
+                cronManager.registerJob(job.name, job.taskFunction, job.config);
+                console.log(`   ✓ ${job.name} register edildi`);
+            } catch (regError) {
+                console.log(`   ⚠️  ${job.name} register edilemedi:`, regError.message);
+            }
+        }
+        console.log('');
     } catch (error) {
         console.log('⚠️  Job\'lar yüklenemedi:', error.message);
+        console.log(error.stack);
     }
     return cronManager;
 }
@@ -116,7 +128,23 @@ async function testJobTimeout() {
             console.log(`   - Running: ${status.isRunning ? '✅' : '❌'}`);
             console.log(`   - Executing: ${status.isExecuting ? '⏳ Çalışıyor' : '✅ Boşta'}`);
         } else {
-            console.log('❌ bankSyncJob durumu alınamadı');
+            console.log('⚠️  bankSyncJob register edilmemiş (script çalıştırıldığında yeni instance oluşuyor)');
+            console.log('💡 Bu normal - server.js\'de çalışan instance\'dan farklı');
+            
+            // Database'den direkt kontrol et
+            const dbStatus = await query(`
+                SELECT is_enabled, last_run_at, last_run_status
+                FROM cron_jobs
+                WHERE name = 'bankSyncJob'
+            `);
+            
+            if (dbStatus.rows.length > 0) {
+                const job = dbStatus.rows[0];
+                console.log(`   Database durumu:`);
+                console.log(`   - Enabled: ${job.is_enabled ? '✅' : '❌'}`);
+                console.log(`   - Son Çalışma: ${job.last_run_at ? new Date(job.last_run_at).toLocaleString('tr-TR') : 'Henüz çalışmadı'}`);
+                console.log(`   - Son Durum: ${job.last_run_status || 'N/A'}`);
+            }
         }
 
         // 4. Son job istatistikleri
