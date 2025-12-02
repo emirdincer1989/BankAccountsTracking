@@ -22,9 +22,12 @@ class AccountController {
         try {
             const { id } = req.params;
             const { startDate, endDate } = req.body;
+            console.log(`Sync Request - ID: ${id}, Start: ${startDate}, End: ${endDate}`); // Debug log
+
             const result = await AccountService.syncAccount(id, startDate, endDate);
             res.json({ success: true, message: 'Senkronizasyon tamamlandı.', data: result });
         } catch (error) {
+            console.error('Controller Sync Error:', error); // Debug log
             next(error);
         }
     }

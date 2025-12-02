@@ -576,6 +576,7 @@ async function handleSyncSubmit(e) {
             window.showSuccess(`Senkronizasyon tamamlandı. ${result.data.newTransactions} yeni hareket eklendi.`);
             loadAccounts(currentInstitutionId);
         } else {
+            console.error('Sync Failed Message:', result.message); // Debug log
             window.showError(result.message, 'Senkronizasyon Hatası');
         }
     } catch (error) {
