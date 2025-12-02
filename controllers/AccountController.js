@@ -21,7 +21,8 @@ class AccountController {
     async sync(req, res, next) {
         try {
             const { id } = req.params;
-            const result = await AccountService.syncAccount(id);
+            const { startDate, endDate } = req.body;
+            const result = await AccountService.syncAccount(id, startDate, endDate);
             res.json({ success: true, message: 'Senkronizasyon tamamlandı.', data: result });
         } catch (error) {
             next(error);

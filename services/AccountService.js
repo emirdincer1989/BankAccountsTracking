@@ -55,7 +55,7 @@ class AccountService {
      * Hesabın güncel bakiyesini ve hareketlerini çeker.
      * Adapter Factory mantığı burada çalışır.
      */
-    async syncAccount(accountId) {
+    async syncAccount(accountId, startDateInput, endDateInput) {
         // 1. Hesabı getir
         const accResult = await pool.query('SELECT * FROM bank_accounts WHERE id = $1', [accountId]);
         if (accResult.rows.length === 0) throw new Error('Hesap bulunamadı');
@@ -79,11 +79,18 @@ class AccountService {
             default: throw new Error('Bilinmeyen banka: ' + account.bank_name);
         }
 
-        // 4. Bankaya bağlan ve veri çek (Son 1 gün veya son başarılı güncellemeden itibaren)
-        // Şimdilik son 3 gün diyelim garanti olsun.
-        const endDate = new Date();
-        const startDate = new Date();
-        startDate.setDate(startDate.getDate() - 3);
+        // 4. Bankaya bağlan ve veri çek
+        // Tarih aralığı verilmişse onu kullan, yoksa son 3 günü al
+        let startDate, endDate;
+
+        if (startDateInput && endDateInput) {
+            startDate = new Date(startDateInput);
+            endDate = new Date(endDateInput);
+        } else {
+            endDate = new Date();
+            startDate = new Date();
+            startDate.setDate(startDate.getDate() - 3);
+        }
 
         const transactions = await adapter.getTransactions(account.account_number, startDate, endDate);
 
