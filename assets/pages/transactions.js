@@ -222,6 +222,10 @@ function renderTable() {
         // Kurum adı (veritabanından geliyorsa)
         const institutionName = tx.institution_name || '-';
 
+        // Metadata'dan verileri al
+        const senderReceiver = tx.metadata?.sender_receiver || tx.sender_receiver || '-';
+        const transactionType = tx.metadata?.transaction_type || '';
+
         return `
         <tr>
             <td class="date">${date} <small class="text-muted">${time}</small></td>
@@ -241,8 +245,9 @@ function renderTable() {
                     </div>
                 </div>
             </td>
-            <td class="counterparty">${tx.sender_receiver || '-'}</td>
+            <td class="counterparty">${senderReceiver}</td>
             <td class="description" style="max-width: 300px; white-space: normal; word-wrap: break-word;">
+                ${transactionType ? `<span class="badge bg-info-subtle text-info mb-1">${transactionType}</span><br>` : ''}
                 ${tx.description}
             </td>
             <td class="amount ${amountClass} fw-bold">

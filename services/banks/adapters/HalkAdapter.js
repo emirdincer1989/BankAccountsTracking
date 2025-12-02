@@ -105,7 +105,7 @@ class HalkAdapter extends BaseBankAdapter {
     }
 
     parseResponse(xml) {
-        console.log('Halkbank Raw XML Response:', xml);
+        // console.log('Halkbank Raw XML Response:', xml);
 
         const transactions = [];
         const movementRegex = /<[a-zA-Z0-9]+:Hareket>([\s\S]*?)<\/[a-zA-Z0-9]+:Hareket>/g;
@@ -158,23 +158,31 @@ class HalkAdapter extends BaseBankAdapter {
                     if (isNaN(balance)) balance = 0;
                 }
 
+                const transactionType = getVal('IslemKod');
+
+                // Metadata object
+                const metadata = {
+                    sender_receiver: senderReceiver,
+                    transaction_type: transactionType,
+                    raw: {
+                        tarih: dateStr,
+                        saat: timeStr,
+                        tutar: amountStr,
+                        aciklama: description,
+                        ref: refNo,
+                        bakiye: balanceStr,
+                        karsi_iban: getVal('KarsiHesapIBAN'),
+                        karsi_vkn: getVal('KarsiKimlikNo')
+                    }
+                };
+
                 transactions.push({
                     unique_bank_ref_id: refNo || deterministicId,
                     date: new Date(isoDate),
                     amount: amount,
                     description: description || '',
-                    sender_receiver: senderReceiver || '',
                     balance_after_transaction: balance,
-                    metadata: {
-                        raw: {
-                            tarih: dateStr,
-                            saat: timeStr,
-                            tutar: amountStr,
-                            aciklama: description,
-                            ref: refNo,
-                            bakiye: balanceStr
-                        }
-                    }
+                    metadata: metadata
                 });
             }
         }

@@ -139,9 +139,15 @@ class AccountService {
 
                 for (const tx of transactions) {
                     const insertQuery = `
-                        INSERT INTO transactions (account_id, unique_bank_ref_id, date, amount, description, metadata)
-                        VALUES ($1, $2, $3, $4, $5, $6)
-                        ON CONFLICT (account_id, unique_bank_ref_id) DO NOTHING
+                        INSERT INTO transactions (account_id, unique_bank_ref_id, date, amount, description, sender_receiver, balance_after_transaction, metadata)
+                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                        ON CONFLICT (account_id, unique_bank_ref_id) 
+                        DO UPDATE SET 
+                            description = EXCLUDED.description,
+                            sender_receiver = EXCLUDED.sender_receiver,
+                            balance_after_transaction = EXCLUDED.balance_after_transaction,
+                            metadata = EXCLUDED.metadata,
+                            updated_at = NOW()
                         RETURNING id
                     `;
                     const res = await client.query(insertQuery, [
@@ -150,6 +156,8 @@ class AccountService {
                         tx.date,
                         tx.amount,
                         tx.description,
+                        tx.sender_receiver,
+                        tx.balance_after_transaction,
                         JSON.stringify(tx.metadata)
                     ]);
 

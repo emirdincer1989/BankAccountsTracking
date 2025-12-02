@@ -103,7 +103,7 @@ class VakifAdapter extends BaseBankAdapter {
     }
 
     parseResponse(xml) {
-        console.log('VakifBank Raw XML Response:', xml);
+        // console.log('VakifBank Raw XML Response:', xml);
 
         const transactions = [];
 
@@ -130,10 +130,20 @@ class VakifAdapter extends BaseBankAdapter {
             const gonderenMatch = block.match(/<[a-zA-Z0-9]+:Key>GonderenAdi<\/[a-zA-Z0-9]+:Key>\s*<[a-zA-Z0-9]+:Value>(.*?)<\/[a-zA-Z0-9]+:Value>/);
             const aliciMatch = block.match(/<[a-zA-Z0-9]+:Key>AliciAdi<\/[a-zA-Z0-9]+:Key>\s*<[a-zA-Z0-9]+:Value>(.*?)<\/[a-zA-Z0-9]+:Value>/);
 
-            if (gonderenMatch && gonderenMatch[1] && gonderenMatch[1] !== 'ESHOT GENEL MÜDÜRLÜĞÜ') {
-                senderReceiver = gonderenMatch[1];
-            } else if (aliciMatch && aliciMatch[1] && aliciMatch[1] !== 'ESHOT GENEL MÜDÜRLÜĞÜ') {
-                senderReceiver = aliciMatch[1];
+            const gonderen = gonderenMatch ? gonderenMatch[1] : '';
+            const alici = aliciMatch ? aliciMatch[1] : '';
+
+            // BorcAlacak: A (Alacak/Giriş) -> Gönderen kim?
+            // BorcAlacak: B (Borç/Çıkış) -> Alıcı kim?
+            if (borcAlacak === 'A') {
+                senderReceiver = gonderen;
+            } else {
+                senderReceiver = alici;
+            }
+
+            // Eğer boşsa veya kendi ismimizse diğerini deneyelim (fallback)
+            if (!senderReceiver || senderReceiver === 'ESHOT GENEL MÜDÜRLÜĞÜ') {
+                senderReceiver = (borcAlacak === 'A') ? alici : gonderen;
             }
 
             if (dateStr && amountStr) {
@@ -155,23 +165,30 @@ class VakifAdapter extends BaseBankAdapter {
                 const cleanDesc = description ? description.replace(/[^a-zA-Z0-9]/g, '').substring(0, 30) : '';
                 const deterministicId = `${dateStr}-${amount}-${cleanDesc}`;
 
+                // Transaction Type (İşlem Türü)
+                const transactionType = getVal('IslemAdi') || getVal('IslemKodu');
+
+                // Metadata object
+                const metadata = {
+                    sender_receiver: senderReceiver,
+                    transaction_type: transactionType,
+                    raw: {
+                        tarih: dateStr,
+                        tutar: amountStr,
+                        aciklama: description,
+                        ref: refNo,
+                        bakiye: balanceStr,
+                        islem_kodu: getVal('IslemKodu')
+                    }
+                };
+
                 transactions.push({
                     unique_bank_ref_id: refNo || deterministicId,
                     date: new Date(isoDate),
                     amount: amount,
                     description: description || '',
-                    sender_receiver: senderReceiver,
                     balance_after_transaction: balance,
-                    metadata: {
-                        raw: {
-                            tarih: dateStr,
-                            tutar: amountStr,
-                            aciklama: description,
-                            ref: refNo,
-                            sender_receiver: senderReceiver,
-                            bakiye: balanceStr
-                        }
-                    }
+                    metadata: metadata
                 });
             }
         }

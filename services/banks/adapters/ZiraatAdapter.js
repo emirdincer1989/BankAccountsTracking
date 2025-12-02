@@ -55,7 +55,7 @@ class ZiraatAdapter extends BaseBankAdapter {
     }
 
     parseResponse(xml) {
-        console.log('Ziraat Raw XML Response:', xml);
+        // console.log('Ziraat Raw XML Response:', xml);
 
         const transactions = [];
         const movementRegex = /<Hareket>([\s\S]*?)<\/Hareket>/g;
@@ -76,18 +76,28 @@ class ZiraatAdapter extends BaseBankAdapter {
             const timeStr = getVal('islemZamani'); // Örn: 2025-11-25T16:55:33
             const balanceStr = getVal('kalanBakiye');
 
+            const transactionType = getVal('islemAciklama') || getVal('islemKodu');
+
             let senderReceiver = '';
-            if (description && description.includes('Gönd:')) {
-                try {
-                    const parts = description.split('Gönd:');
-                    if (parts[1]) {
-                        const subParts = parts[1].trim().split(' ');
-                        if (subParts.length >= 2) {
-                            senderReceiver = subParts[0] + ' ' + subParts[1];
-                        }
+            if (description) {
+                if (description.includes('Gönd:')) {
+                    // "Gönd: AD SOYAD ..." formatını yakala
+                    // Genellikle "Gönd: " den sonra isim gelir, sonra sayısal bir değer veya "numaralı" gibi bir kelime gelir.
+                    const match = description.match(/Gönd:\s*(.*?)(?:\s+(?:\d{10,}|numaralı|hesabından|hesabına|Referanslı|TC:|Vergi No:|$))/i);
+                    if (match && match[1]) {
+                        senderReceiver = match[1].trim();
+                    } else {
+                        // Fallback: İlk 3 kelimeyi al
+                        const parts = description.split('Gönd:')[1].trim().split(' ');
+                        senderReceiver = parts.slice(0, 3).join(' ');
                     }
-                } catch (e) {
-                    console.warn('Ziraat sender parse error:', e);
+                } else if (description.includes('OTOMATIK Plaka no:')) {
+                    const match = description.match(/Plaka no:\s*(\w+)/);
+                    if (match && match[1]) {
+                        senderReceiver = `HGS/OGS - ${match[1]}`;
+                    } else {
+                        senderReceiver = 'HGS/OGS';
+                    }
                 }
             }
 
@@ -112,22 +122,27 @@ class ZiraatAdapter extends BaseBankAdapter {
                 const cleanDesc = description ? description.replace(/[^a-zA-Z0-9]/g, '').substring(0, 30) : '';
                 const deterministicId = `${dateStr}-${amount}-${cleanDesc}`;
 
+                // Metadata object
+                const metadata = {
+                    sender_receiver: senderReceiver,
+                    transaction_type: transactionType,
+                    raw: {
+                        tarih: dateStr,
+                        tutar: amountStr,
+                        aciklama: description,
+                        zaman: timeStr,
+                        bakiye: balanceStr,
+                        islem_kodu: getVal('islemKodu')
+                    }
+                };
+
                 transactions.push({
                     unique_bank_ref_id: timeStr ? (timeStr + '-' + amount) : deterministicId,
                     date: new Date(isoDate),
                     amount: amount,
                     description: description || '',
-                    sender_receiver: senderReceiver,
                     balance_after_transaction: balance,
-                    metadata: {
-                        raw: {
-                            tarih: dateStr,
-                            tutar: amountStr,
-                            aciklama: description,
-                            zaman: timeStr,
-                            bakiye: balanceStr
-                        }
-                    }
+                    metadata: metadata
                 });
             }
         }
