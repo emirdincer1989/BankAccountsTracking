@@ -56,7 +56,11 @@ class TransactionService {
         if (end_date) {
             paramCount++;
             query += ` AND t.date <= $${paramCount}`;
-            params.push(end_date);
+            let finalEndDate = end_date;
+            if (/^\d{4}-\d{2}-\d{2}$/.test(end_date)) {
+                finalEndDate += ' 23:59:59';
+            }
+            params.push(finalEndDate);
         }
 
         if (min_amount) {
