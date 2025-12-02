@@ -105,7 +105,19 @@ class AccountService {
             let newTransactionsCount = 0;
             let lastBalance = account.last_balance;
 
-            // Bakiye sorgulama (Opsiyonel)
+            // Hareketlerden en güncel bakiyeyi bul
+            if (transactions && transactions.length > 0) {
+                // Tarihe göre sırala (Yeniden eskiye)
+                const sortedTx = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+                const latestTx = sortedTx[0];
+
+                if (latestTx.balance_after_transaction !== undefined && latestTx.balance_after_transaction !== 0) {
+                    lastBalance = latestTx.balance_after_transaction;
+                    console.log(`Bakiye hareketlerden güncellendi: ${lastBalance}`);
+                }
+            }
+
+            // Bakiye sorgulama (Yedek yöntem)
             try {
                 const accountsInfo = await adapter.getAccounts();
                 if (accountsInfo.length > 0) {

@@ -69,7 +69,7 @@ async function test() {
     const today = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()}`;
 
     const lastWeekDate = new Date();
-    lastWeekDate.setDate(lastWeekDate.getDate() - 7);
+    lastWeekDate.setDate(lastWeekDate.getDate() - 60);
     const startDate = `${String(lastWeekDate.getDate()).padStart(2, '0')}.${String(lastWeekDate.getMonth() + 1).padStart(2, '0')}.${lastWeekDate.getFullYear()}`;
 
     console.log('--- ZIRAAT BANKASI TEST (HTTP POST) ---');

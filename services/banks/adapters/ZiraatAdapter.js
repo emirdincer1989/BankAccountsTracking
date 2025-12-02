@@ -1,7 +1,7 @@
 const BaseBankAdapter = require('../BaseBankAdapter');
 const https = require('https');
 const querystring = require('querystring');
-const { DataEncryption } = require('../../../utils/encryption'); // Assuming encryption util exists
+const { DataEncryption } = require('../../../utils/encryption');
 
 class ZiraatAdapter extends BaseBankAdapter {
     constructor(credentials) {
@@ -10,37 +10,21 @@ class ZiraatAdapter extends BaseBankAdapter {
         this.apiUrl = "https://hesap.ziraatbank.com.tr/HEK_NKYWS/HesapHareketleri.asmx/SorgulaDetayWS";
     }
 
-    /**
-     * Ziraat Bankası için login işlemi stateless (her istekte credentials gönderiliyor).
-     * Bu yüzden login metodu sadece credentials kontrolü yapabilir veya boş geçilebilir.
-     */
     async login() {
-        // Ziraat servisi her istekte kullanıcı adı/şifre istiyor.
-        // Session mantığı yok.
         return true;
     }
 
-    /**
-     * Hesap listesi servisi Ziraat'te bu endpoint'te yok gibi görünüyor (test scriptine göre).
-     * Genelde bu tür servislerde hesap no zaten biliniyor olur.
-     * Şimdilik boş dizi dönelim veya credentials içindeki IBAN'ı tek hesap olarak dönelim.
-     */
     async getAccounts() {
-        // Credentials içinde IBAN varsa onu hesap olarak dön
         if (this.credentials.iban) {
             return [{
-                accountNumber: this.credentials.iban, // Ziraat genelde IBAN ile çalışıyor
-                currency: 'TRY' // Varsayılan
+                accountNumber: this.credentials.iban,
+                currency: 'TRY'
             }];
         }
         return [];
     }
 
-    /**
-     * Hareketleri çeker
-     */
     async getTransactions(accountNumber, startDate, endDate) {
-        // Tarih formatı: dd.MM.yyyy
         const formatDate = (date) => {
             const d = new Date(date);
             return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
@@ -58,9 +42,6 @@ class ZiraatAdapter extends BaseBankAdapter {
         return this.parseResponse(responseXml);
     }
 
-    /**
-     * XML yanıtını parse eder ve standart formata çevirir
-     */
     parseResponse(xml) {
         console.log('Ziraat Raw XML Response:', xml);
 
@@ -81,6 +62,7 @@ class ZiraatAdapter extends BaseBankAdapter {
             const amountStr = getVal('tutar');
             const description = getVal('aciklama');
             const timeStr = getVal('islemZamani'); // Örn: 2025-11-25T16:55:33
+            const balanceStr = getVal('kalanBakiye');
 
             // Karşı taraf bilgisi (Açıklamadan)
             let senderReceiver = '';
@@ -104,6 +86,13 @@ class ZiraatAdapter extends BaseBankAdapter {
                 let amount = parseFloat(amountStr.replace(',', '.'));
                 if (isNaN(amount)) amount = 0;
 
+                // Bakiye parse
+                let balance = 0;
+                if (balanceStr) {
+                    balance = parseFloat(balanceStr.replace(',', '.'));
+                    if (isNaN(balance)) balance = 0;
+                }
+
                 // Tarih: 25/11/2025 -> 2025-11-25
                 let isoDate;
                 if (timeStr) {
@@ -123,12 +112,14 @@ class ZiraatAdapter extends BaseBankAdapter {
                     amount: amount,
                     description: description || '',
                     sender_receiver: senderReceiver,
+                    balance_after_transaction: balance,
                     metadata: {
                         raw: {
                             tarih: dateStr,
                             tutar: amountStr,
                             aciklama: description,
-                            zaman: timeStr
+                            zaman: timeStr,
+                            bakiye: balanceStr
                         }
                     }
                 });
@@ -139,7 +130,6 @@ class ZiraatAdapter extends BaseBankAdapter {
     }
 
     _parseDate(dateStr) {
-        // dd.MM.yyyy HH:mm:ss veya dd.MM.yyyy
         const parts = dateStr.split(' ')[0].split('.');
         return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
     }

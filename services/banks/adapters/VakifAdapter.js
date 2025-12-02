@@ -10,12 +10,10 @@ class VakifAdapter extends BaseBankAdapter {
     }
 
     async login() {
-        // Vakıfbank servisi her istekte credentials istiyor.
         return true;
     }
 
     async getAccounts() {
-        // Credentials içinde HesapNo varsa onu dön
         if (this.credentials.account_no) {
             return [{
                 accountNumber: this.credentials.account_no,
@@ -26,7 +24,6 @@ class VakifAdapter extends BaseBankAdapter {
     }
 
     async getTransactions(accountNumber, startDate, endDate) {
-        // Tarih formatı: YYYY-MM-DD
         const formatDate = (date) => {
             return date.toISOString().split('T')[0];
         };
@@ -110,29 +107,26 @@ class VakifAdapter extends BaseBankAdapter {
 
         const transactions = [];
 
-        // DtoEkstreHareket bloklarını bul
         const movementRegex = /<[a-zA-Z0-9]+:DtoEkstreHareket>([\s\S]*?)<\/[a-zA-Z0-9]+:DtoEkstreHareket>/g;
 
         let match;
         while ((match = movementRegex.exec(xml)) !== null) {
             const block = match[1];
 
-            // Helper to extract value by tag name (ignoring namespace)
             const getVal = (tag) => {
                 const regex = new RegExp(`<[a-zA-Z0-9]+:${tag}>(.*?)</[a-zA-Z0-9]+:${tag}>`);
                 const m = block.match(regex);
                 return m ? m[1] : null;
             };
 
-            const dateStr = getVal('IslemTarihi'); // Örn: 2025-11-20 02:06:26
+            const dateStr = getVal('IslemTarihi');
             const amountStr = getVal('Tutar');
             const borcAlacak = getVal('BorcAlacak');
             const description = getVal('Aciklama');
             const refNo = getVal('Id');
+            const balanceStr = getVal('IslemSonrasiBakiye');
 
-            // Karşı taraf bilgisi (Key-Value yapısında)
             let senderReceiver = '';
-            // Regex for Key-Value pairs: <c:Key>GonderenAdi</c:Key><c:Value>...</c:Value>
             const gonderenMatch = block.match(/<[a-zA-Z0-9]+:Key>GonderenAdi<\/[a-zA-Z0-9]+:Key>\s*<[a-zA-Z0-9]+:Value>(.*?)<\/[a-zA-Z0-9]+:Value>/);
             const aliciMatch = block.match(/<[a-zA-Z0-9]+:Key>AliciAdi<\/[a-zA-Z0-9]+:Key>\s*<[a-zA-Z0-9]+:Value>(.*?)<\/[a-zA-Z0-9]+:Value>/);
 
@@ -146,16 +140,18 @@ class VakifAdapter extends BaseBankAdapter {
                 let amount = parseFloat(amountStr);
                 if (isNaN(amount)) amount = 0;
 
-                // Borç ise eksi
                 if (borcAlacak === 'B') {
                     amount = -Math.abs(amount);
                 }
 
-                // Tarih formatı: 2025-11-20 02:06:26 -> ISO
+                let balance = 0;
+                if (balanceStr) {
+                    balance = parseFloat(balanceStr);
+                    if (isNaN(balance)) balance = 0;
+                }
+
                 const isoDate = dateStr.replace(' ', 'T');
 
-                // Unique ID oluşturma: RefNo varsa onu kullan, yoksa Tarih+Tutar+Açıklama(ilk 30 karakter)
-                // Math.random() KULLANMA! Mükerrer kayda sebep olur.
                 const cleanDesc = description ? description.replace(/[^a-zA-Z0-9]/g, '').substring(0, 30) : '';
                 const deterministicId = `${dateStr}-${amount}-${cleanDesc}`;
 
@@ -165,13 +161,15 @@ class VakifAdapter extends BaseBankAdapter {
                     amount: amount,
                     description: description || '',
                     sender_receiver: senderReceiver,
+                    balance_after_transaction: balance,
                     metadata: {
                         raw: {
                             tarih: dateStr,
                             tutar: amountStr,
                             aciklama: description,
                             ref: refNo,
-                            sender_receiver: senderReceiver
+                            sender_receiver: senderReceiver,
+                            bakiye: balanceStr
                         }
                     }
                 });
