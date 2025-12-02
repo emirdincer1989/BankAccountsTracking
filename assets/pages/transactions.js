@@ -53,7 +53,6 @@ export async function loadContent() {
                                 <thead class="table-light text-muted">
                                     <tr>
                                         <th class="sort" data-sort="date" scope="col">Tarih</th>
-                                        <th class="sort" data-sort="status" scope="col" style="width: 50px;">Drm</th>
                                         <th class="sort" data-sort="institution" scope="col">Kurum</th>
                                         <th class="sort" data-sort="bank" scope="col">Banka / Hesap</th>
                                         <th class="sort" data-sort="counterparty" scope="col">Karşı Taraf</th>
@@ -116,20 +115,6 @@ export function init() {
 async function loadAccounts(selectedId) {
     try {
         // currentUser global değişkeninden alalım
-        // Eğer currentUser henüz yüklenmediyse bekleyelim
-        if (!window.currentUser) {
-            await new Promise(resolve => {
-                const checkUser = setInterval(() => {
-                    if (window.currentUser) {
-                        clearInterval(checkUser);
-                        resolve();
-                    }
-                }, 100);
-                setTimeout(() => { clearInterval(checkUser); resolve(); }, 5000);
-            });
-        }
-
-        const userInstitutionIds = window.currentUser?.institution_ids || [];
         const isSuperAdmin = window.currentUser?.role_name === 'super_admin';
 
         // Eğer normal kullanıcı ise ve kurum yetkisi yoksa
@@ -201,6 +186,13 @@ function renderTable() {
         return;
     }
 
+    // Banka Renk ve İsim Tanımları
+    const bankConfig = {
+        'vakif': { name: 'Vakıfbank', color: '#FFC107', bg: 'rgba(255, 193, 7, 0.05)', badgeClass: 'bg-warning text-dark' }, // Sarı
+        'ziraat': { name: 'Ziraat Bankası', color: '#E30613', bg: 'rgba(227, 6, 19, 0.05)', badgeClass: 'bg-danger text-white' }, // Kırmızı
+        'halk': { name: 'Halkbank', color: '#005596', bg: 'rgba(0, 85, 150, 0.05)', badgeClass: 'bg-info text-white' } // Mavi
+    };
+
     tbody.innerHTML = transactions.map(tx => {
         const dateObj = new Date(tx.date);
         const date = dateObj.toLocaleDateString('tr-TR');
@@ -213,45 +205,48 @@ function renderTable() {
 
         const isPositive = tx.amount > 0;
         const amountClass = isPositive ? 'text-success' : 'text-danger';
-        // Icons from the theme example: 
-        // Income: ri-arrow-left-down-fill (Green)
-        // Expense: ri-arrow-right-up-fill (Red)
         const amountIcon = isPositive ? 'ri-arrow-left-down-fill' : 'ri-arrow-right-up-fill';
-        const iconBgClass = isPositive ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger';
 
-        // Kurum adı (veritabanından geliyorsa)
+        // Kurum adı
         const institutionName = tx.institution_name || '-';
+
+        // Banka Bilgisi
+        let bankKey = (tx.bank_name || '').toLowerCase();
+        if (bankKey.includes('vakif')) bankKey = 'vakif';
+        else if (bankKey.includes('ziraat')) bankKey = 'ziraat';
+        else if (bankKey.includes('halk')) bankKey = 'halk';
+
+        const bankInfo = bankConfig[bankKey] || { name: tx.bank_name, color: '#6c757d', bg: '', badgeClass: 'bg-secondary text-white' };
+        const rowStyle = bankInfo.bg ? `style="background-color: ${bankInfo.bg}"` : '';
 
         // Metadata'dan verileri al
         const senderReceiver = tx.metadata?.sender_receiver || tx.sender_receiver || '-';
         const transactionType = tx.metadata?.transaction_type || '';
 
         return `
-        <tr>
-            <td class="date">${date} <small class="text-muted">${time}</small></td>
-            <td>
-                <div class="avatar-xs">
-                    <div class="avatar-title ${iconBgClass} rounded-circle fs-16">
-                        <i class="${amountIcon}"></i>
-                    </div>
-                </div>
+        <tr ${rowStyle}>
+            <td class="date">
+                <div class="fw-medium">${date}</div>
+                <div class="text-muted small">${time}</div>
             </td>
             <td class="institution">${institutionName}</td>
             <td class="bank_account">
                 <div class="d-flex align-items-center">
                     <div class="flex-grow-1">
-                        <h6 class="mb-0">${tx.bank_name}</h6>
-                        <small class="text-muted">${tx.account_name}</small>
+                        <span class="badge ${bankInfo.badgeClass} mb-1">${bankInfo.name}</span>
+                        <div class="small text-muted">${tx.account_name}</div>
                     </div>
                 </div>
             </td>
-            <td class="counterparty">${senderReceiver}</td>
-            <td class="description" style="max-width: 300px; white-space: normal; word-wrap: break-word;">
-                ${transactionType ? `<span class="badge bg-info-subtle text-info mb-1">${transactionType}</span><br>` : ''}
-                ${tx.description}
+            <td class="counterparty fw-bold">${senderReceiver}</td>
+            <td class="description" style="max-width: 300px;">
+                ${transactionType ? `<span class="badge bg-light text-dark border mb-1">${transactionType}</span><br>` : ''}
+                <div class="text-truncate" style="max-width: 100%;" title="${tx.description}">
+                    ${tx.description}
+                </div>
             </td>
-            <td class="amount ${amountClass} fw-bold">
-                ${amount}
+            <td class="amount ${amountClass} fw-bold text-end">
+                <i class="${amountIcon} me-1"></i> ${amount}
             </td>
         </tr>
     `}).join('');
@@ -275,7 +270,7 @@ function updatePagination(pagination) {
     const currentPage = pagination.page;
 
     // Simple pagination logic: show all if <= 7 pages, otherwise show range
-    // For now, let's keep it simple and show up to 5 pages around current
+    // For now, let's keep it simple and show up to5 pages around current
     let startPage = Math.max(1, currentPage - 2);
     let endPage = Math.min(totalPages, startPage + 4);
 
