@@ -64,11 +64,9 @@ class ZiraatAdapter extends BaseBankAdapter {
             const timeStr = getVal('islemZamani'); // Örn: 2025-11-25T16:55:33
             const balanceStr = getVal('kalanBakiye');
 
-            // Karşı taraf bilgisi (Açıklamadan)
             let senderReceiver = '';
             if (description && description.includes('Gönd:')) {
                 try {
-                    // Örn: ... Gönd: AD SOYAD ...
                     const parts = description.split('Gönd:');
                     if (parts[1]) {
                         const subParts = parts[1].trim().split(' ');
@@ -82,27 +80,23 @@ class ZiraatAdapter extends BaseBankAdapter {
             }
 
             if (dateStr && amountStr) {
-                // Tutar: 1234,56 -> 1234.56
                 let amount = parseFloat(amountStr.replace(',', '.'));
                 if (isNaN(amount)) amount = 0;
 
-                // Bakiye parse
                 let balance = 0;
                 if (balanceStr) {
                     balance = parseFloat(balanceStr.replace(',', '.'));
                     if (isNaN(balance)) balance = 0;
                 }
 
-                // Tarih: 25/11/2025 -> 2025-11-25
                 let isoDate;
                 if (timeStr) {
                     isoDate = timeStr;
                 } else {
-                    const [day, month, year] = dateStr.split('/');
-                    isoDate = `${year}-${month}-${day}T00:00:00`;
+                    const parts = dateStr.split('/');
+                    isoDate = `${parts[2]}-${parts[1]}-${parts[0]}T00:00:00`;
                 }
 
-                // Unique ID: Zaman varsa (zaman+tutar), yoksa (tarih+tutar+açıklama)
                 const cleanDesc = description ? description.replace(/[^a-zA-Z0-9]/g, '').substring(0, 30) : '';
                 const deterministicId = `${dateStr}-${amount}-${cleanDesc}`;
 
@@ -130,7 +124,7 @@ class ZiraatAdapter extends BaseBankAdapter {
     }
 
     _parseDate(dateStr) {
-        const parts = dateStr.split(' ')[0].split('.');
+        const parts = dateStr.split(' ')[0].split('/');
         return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
     }
 
