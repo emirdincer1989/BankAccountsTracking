@@ -498,7 +498,12 @@ async function triggerJob(jobName) {
         // Eğer job atlandıysa kullanıcıya bilgi ver
         if (result.data && result.data.skipped) {
             console.warn('⚠️ Job atlandı:', result.data.reason);
-            showWarning(`Job çalıştırılamadı: ${result.data.reason}`);
+            
+            if (result.data.reason === 'Already running') {
+                showWarning(`Job şu anda çalışıyor. Eğer takılı kalmışsa, sayfayı yenileyip tekrar deneyin veya "Takılı Kalmış Job'ları Temizle" butonunu kullanın.`);
+            } else {
+                showWarning(`Job çalıştırılamadı: ${result.data.reason}`);
+            }
         }
         // Eğer result data varsa ve message varsa modal göster
         else if (result.data && result.data.message) {

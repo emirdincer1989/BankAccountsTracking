@@ -202,6 +202,14 @@ router.post('/jobs/:name/trigger', async (req, res) => {
 
         // CronJobManager üzerinden çalıştır
         const cronManager = getCronJobManager();
+        
+        // Önce takılı kalmış job'ları temizle
+        try {
+            await cronManager.clearStuckJobs();
+        } catch (clearError) {
+            logger.warn('Stuck job temizleme hatası (devam ediliyor):', clearError.message);
+        }
+        
         const result = await cronManager.runNow(name);
 
         // Audit log
@@ -431,6 +439,44 @@ router.delete('/logs', async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Loglar temizlenirken hata oluştu',
+            error: error.message
+        });
+    }
+});
+
+/**
+ * POST /api/cron-management/clear-stuck-jobs
+ * Takılı kalmış job'ları temizle
+ */
+router.post('/clear-stuck-jobs', async (req, res) => {
+    try {
+        logger.info(`Takılı kalmış job'lar temizleniyor by user ${req.user.id}`);
+
+        const cronManager = getCronJobManager();
+        const clearedCount = await cronManager.clearStuckJobs();
+
+        // Audit log
+        await query(`
+            INSERT INTO audit_logs (user_id, action, table_name, new_values)
+            VALUES ($1, $2, $3, $4)
+        `, [
+            req.user.id,
+            'CLEAR_STUCK_JOBS',
+            'cron_jobs',
+            JSON.stringify({ clearedCount })
+        ]);
+
+        res.json({
+            success: true,
+            message: `${clearedCount} adet takılı kalmış job temizlendi`,
+            data: { clearedCount }
+        });
+
+    } catch (error) {
+        logger.error('Stuck job temizleme hatası:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Takılı kalmış job'lar temizlenirken hata oluştu',
             error: error.message
         });
     }
