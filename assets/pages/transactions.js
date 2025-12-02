@@ -115,6 +115,20 @@ export function init() {
 async function loadAccounts(selectedId) {
     try {
         // currentUser global değişkeninden alalım
+        // Eğer currentUser henüz yüklenmediyse bekleyelim
+        if (!window.currentUser) {
+            await new Promise(resolve => {
+                const checkUser = setInterval(() => {
+                    if (window.currentUser) {
+                        clearInterval(checkUser);
+                        resolve();
+                    }
+                }, 100);
+                setTimeout(() => { clearInterval(checkUser); resolve(); }, 5000);
+            });
+        }
+
+        const userInstitutionIds = window.currentUser?.institution_ids || [];
         const isSuperAdmin = window.currentUser?.role_name === 'super_admin';
 
         // Eğer normal kullanıcı ise ve kurum yetkisi yoksa
