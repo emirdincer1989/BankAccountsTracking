@@ -28,7 +28,11 @@ class AccountController {
             res.json({ success: true, message: 'Senkronizasyon tamamlandı.', data: result });
         } catch (error) {
             console.error('Controller Sync Error:', error); // Debug log
-            next(error);
+            // Hatanın detayını frontend'e gönder (Debug için)
+            res.status(500).json({
+                success: false,
+                message: error.message || 'Bilinmeyen bir hata oluştu.'
+            });
         }
     }
 
