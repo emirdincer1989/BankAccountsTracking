@@ -95,7 +95,7 @@ class AccountService {
         } else {
             endDate = new Date();
             startDate = new Date();
-            startDate.setDate(startDate.getDate() - 3);
+            startDate.setDate(startDate.getDate() - 30);
         }
 
         try {

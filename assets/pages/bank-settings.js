@@ -533,11 +533,11 @@ function syncAccount(accountId) {
 
     // Tarihleri varsayılan olarak ayarla (Son 3 gün)
     const today = new Date();
-    const threeDaysAgo = new Date();
-    threeDaysAgo.setDate(today.getDate() - 3);
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(today.getDate() - 30);
 
     document.getElementById('syncEndDate').value = today.toISOString().split('T')[0];
-    document.getElementById('syncStartDate').value = threeDaysAgo.toISOString().split('T')[0];
+    document.getElementById('syncStartDate').value = thirtyDaysAgo.toISOString().split('T')[0];
 
     // ID'yi sakla
     modalEl.dataset.accountId = accountId;
