@@ -92,70 +92,70 @@ class AccountService {
             startDate.setDate(startDate.getDate() - 3);
         }
 
-        const transactions = await adapter.getTransactions(account.account_number, startDate, endDate);
-
-        // 5. Veritabanına kaydet
-        let newTransactionsCount = 0;
-        let lastBalance = account.last_balance; // Bankadan bakiye dönmüyor, hareketlerden hesaplanmalı veya ayrı servis varsa oradan
-
-        // Not: Bazı bankalar getAccounts() içinde bakiye döner.
-        // Eğer adapter.getAccounts() destekliyorsa oradan güncel bakiye alabiliriz.
         try {
-            const accountsInfo = await adapter.getAccounts();
-            if (accountsInfo.length > 0) {
-                // Eşleşen hesabı bul (IBAN veya HesapNo ile)
-                const match = accountsInfo.find(a =>
-                    (a.accountNumber && account.account_number && a.accountNumber.includes(account.account_number)) ||
-                    (a.iban && account.iban && a.iban === account.iban)
-                );
-                if (match && match.balance !== undefined) {
-                    lastBalance = match.balance;
+            const transactions = await adapter.getTransactions(account.account_number, startDate, endDate);
+
+            // 5. Veritabanına kaydet
+            let newTransactionsCount = 0;
+            let lastBalance = account.last_balance;
+
+            // Bakiye sorgulama (Opsiyonel)
+            try {
+                const accountsInfo = await adapter.getAccounts();
+                if (accountsInfo.length > 0) {
+                    const match = accountsInfo.find(a =>
+                        (a.accountNumber && account.account_number && a.accountNumber.includes(account.account_number)) ||
+                        (a.iban && account.iban && a.iban === account.iban)
+                    );
+                    if (match && match.balance !== undefined) {
+                        lastBalance = match.balance;
+                    }
                 }
-            }
-        } catch (e) {
-            console.warn('Bakiye sorgulama hatası:', e.message);
-        }
-
-        const client = await pool.connect();
-        try {
-            await client.query('BEGIN');
-
-            for (const tx of transactions) {
-                // Mükerrer kayıt kontrolü (unique constraint hatasını yakala veya ON CONFLICT DO NOTHING)
-                const insertQuery = `
-                    INSERT INTO transactions (account_id, unique_bank_ref_id, date, amount, description, metadata)
-                    VALUES ($1, $2, $3, $4, $5, $6)
-                    ON CONFLICT (account_id, unique_bank_ref_id) DO NOTHING
-                    RETURNING id
-                `;
-                const res = await client.query(insertQuery, [
-                    accountId,
-                    tx.unique_bank_ref_id,
-                    tx.date,
-                    tx.amount,
-                    tx.description,
-                    JSON.stringify(tx.metadata)
-                ]);
-
-                if (res.rows.length > 0) {
-                    newTransactionsCount++;
-                    // Bakiyeyi güncelle (Eğer bankadan net bakiye alamadıysak hareketlerden gitmek zor ama riskli. 
-                    // Şimdilik sadece bankadan bakiye gelirse güncelleyelim veya manuel kalsın)
-                }
+            } catch (e) {
+                console.warn('Bakiye sorgulama hatası:', e.message);
             }
 
-            // Son güncelleme zamanını kaydet
-            await client.query('UPDATE bank_accounts SET last_balance_update = NOW(), last_balance = $1 WHERE id = $2', [lastBalance, accountId]);
+            const client = await pool.connect();
+            try {
+                await client.query('BEGIN');
 
-            await client.query('COMMIT');
-        } catch (e) {
-            await client.query('ROLLBACK');
-            throw e;
-        } finally {
-            client.release();
+                for (const tx of transactions) {
+                    const insertQuery = `
+                        INSERT INTO transactions (account_id, unique_bank_ref_id, date, amount, description, metadata)
+                        VALUES ($1, $2, $3, $4, $5, $6)
+                        ON CONFLICT (account_id, unique_bank_ref_id) DO NOTHING
+                        RETURNING id
+                    `;
+                    const res = await client.query(insertQuery, [
+                        accountId,
+                        tx.unique_bank_ref_id,
+                        tx.date,
+                        tx.amount,
+                        tx.description,
+                        JSON.stringify(tx.metadata)
+                    ]);
+
+                    if (res.rows.length > 0) {
+                        newTransactionsCount++;
+                    }
+                }
+
+                await client.query('UPDATE bank_accounts SET last_balance_update = NOW(), last_balance = $1 WHERE id = $2', [lastBalance, accountId]);
+
+                await client.query('COMMIT');
+            } catch (e) {
+                await client.query('ROLLBACK');
+                throw e;
+            } finally {
+                client.release();
+            }
+
+            return { success: true, newTransactions: newTransactionsCount };
+
+        } catch (error) {
+            console.error('Sync Error Detail:', error);
+            throw new Error(`Banka entegrasyon hatası: ${error.message}`);
         }
-
-        return { success: true, newTransactions: newTransactionsCount };
     }
 
     /**
