@@ -476,7 +476,7 @@ router.post('/clear-stuck-jobs', async (req, res) => {
         logger.error('Stuck job temizleme hatası:', error);
         res.status(500).json({
             success: false,
-            message: 'Takılı kalmış job'lar temizlenirken hata oluştu',
+            message: 'Takılı kalmış job\'lar temizlenirken hata oluştu',
             error: error.message
         });
     }
