@@ -30,16 +30,28 @@ class ZiraatAdapter extends BaseBankAdapter {
             return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
         };
 
+        // Debug Log: Credentials check
+        console.log('Ziraat Adapter Credentials Keys:', Object.keys(this.credentials));
+
         const postData = querystring.stringify({
-            'kullaniciKod': this.credentials.customer_code,
+            'kullaniciKod': this.credentials.user_code || this.credentials.customer_code, // Fallback for safety
             'sifre': this.credentials.password,
             'ibanNo': accountNumber || this.credentials.iban,
             'baslangicTarihi': formatDate(startDate),
             'bitisTarihi': formatDate(endDate)
         });
 
-        const responseXml = await this._makeRequest(postData);
-        return this.parseResponse(responseXml);
+        console.log('Ziraat Request Body (Masked):', postData.replace(/sifre=[^&]+/, 'sifre=***'));
+
+        try {
+            const responseXml = await this._makeRequest(postData);
+            console.log('Ziraat Raw XML Response Length:', responseXml.length);
+            // console.log('Ziraat Raw XML Response:', responseXml); // Uncomment if needed, but might be too large
+            return this.parseResponse(responseXml);
+        } catch (error) {
+            console.error('Ziraat Request Error:', error);
+            throw error;
+        }
     }
 
     parseResponse(xml) {
