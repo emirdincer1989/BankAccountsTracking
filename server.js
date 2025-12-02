@@ -166,23 +166,46 @@ async function initCronJobs() {
 
         // Database'den job'ları yükle
         const jobs = await cronManager.loadJobsFromDB();
+        logger.info(`📋 ${jobs.length} cron job database'den yüklendi`);
+
+        let registeredCount = 0;
+        let errorCount = 0;
 
         // Her job'ı kaydet
         for (const jobConfig of jobs) {
-            if (jobConfig.name === 'testModalJob') {
-                cronManager.registerJob(jobConfig, testModalJob);
-            } else if (jobConfig.name === 'emailQueueProcessor') {
-                cronManager.registerJob(jobConfig, emailQueueProcessor);
-            } else if (jobConfig.name === 'bankSyncJob') {
-                const scheduleBankSync = require('./jobs/scheduleBankSync');
-                cronManager.registerJob(jobConfig, scheduleBankSync);
+            try {
+                if (jobConfig.name === 'testModalJob') {
+                    cronManager.registerJob(jobConfig, testModalJob);
+                    registeredCount++;
+                    logger.info(`✅ testModalJob kaydedildi`);
+                } else if (jobConfig.name === 'emailQueueProcessor') {
+                    cronManager.registerJob(jobConfig, emailQueueProcessor);
+                    registeredCount++;
+                    logger.info(`✅ emailQueueProcessor kaydedildi`);
+                } else if (jobConfig.name === 'bankSyncJob') {
+                    const scheduleBankSync = require('./jobs/scheduleBankSync');
+                    cronManager.registerJob(jobConfig, scheduleBankSync);
+                    registeredCount++;
+                    logger.info(`✅ bankSyncJob kaydedildi (Schedule: ${jobConfig.schedule}, Enabled: ${jobConfig.is_enabled})`);
+                } else {
+                    logger.warn(`⚠️  Bilinmeyen job: ${jobConfig.name} - Kayıt atlandı`);
+                }
+            } catch (jobError) {
+                errorCount++;
+                logger.error(`❌ Job kayıt hatası (${jobConfig.name}):`, jobError);
+                // Bir job hata verse bile diğerlerini kaydetmeye devam et
             }
-            // Yeni job'lar buraya eklenebilir
         }
 
-        logger.info(`✅ ${jobs.length} cron job başlatıldı`);
+        logger.info(`✅ Cron job başlatma tamamlandı: ${registeredCount} başarılı, ${errorCount} hata`);
+        
+        // Aktif job sayısını göster
+        const activeJobs = Array.from(cronManager.jobs.values()).filter(j => j.isRunning);
+        logger.info(`▶️  ${activeJobs.length} aktif job çalışıyor`);
+        
     } catch (error) {
         logger.error('❌ Cron job başlatma hatası:', error);
+        logger.error('Stack trace:', error.stack);
     }
 }
 
