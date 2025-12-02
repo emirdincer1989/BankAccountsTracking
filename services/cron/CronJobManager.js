@@ -103,45 +103,10 @@ class CronJobManager {
             logger.info(`🔓 ${name} manuel tetikleme - stopped kontrolü de bypass ediliyor`);
         }
 
-        // Job zaten çalışıyorsa kontrol et
+        // Job zaten çalışıyorsa atla
         if (this.runningExecutions.has(name)) {
-            // Manuel tetiklemede ve job takılı kalmışsa temizle
-            if (forceRun) {
-                logger.warn(`⚠️  ${name} zaten çalışıyor görünüyor, takılı kalmış olabilir. Temizleniyor...`);
-                
-                // Database'de RUNNING durumundaki eski logları kontrol et (30 dakikadan eski)
-                try {
-                    const stuckLogs = await query(`
-                        SELECT id FROM cron_job_logs
-                        WHERE job_name = $1 
-                        AND status = 'RUNNING'
-                        AND started_at < NOW() - INTERVAL '30 minutes'
-                    `, [name]);
-                    
-                    if (stuckLogs.rows.length > 0) {
-                        logger.warn(`🔧 ${stuckLogs.rows.length} adet takılı kalmış log bulundu, temizleniyor...`);
-                        await query(`
-                            UPDATE cron_job_logs
-                            SET status = 'FAILED',
-                                completed_at = CURRENT_TIMESTAMP,
-                                error_message = 'Job timeout - stuck execution cleared',
-                                duration = EXTRACT(EPOCH FROM (NOW() - started_at)) * 1000
-                            WHERE job_name = $1 
-                            AND status = 'RUNNING'
-                            AND started_at < NOW() - INTERVAL '30 minutes'
-                        `, [name]);
-                    }
-                } catch (err) {
-                    logger.error('Stuck log temizleme hatası:', err);
-                }
-                
-                // Memory'deki execution'ı temizle
-                this.runningExecutions.delete(name);
-                logger.info(`✅ ${name} execution temizlendi, yeniden başlatılıyor...`);
-            } else {
-                logger.warn(`${name} zaten çalışıyor, atlandı`);
-                return { skipped: true, reason: 'Already running' };
-            }
+            logger.warn(`${name} zaten çalışıyor, atlandı`);
+            return { skipped: true, reason: 'Already running' };
         }
 
         const startTime = new Date();
@@ -160,27 +125,11 @@ class CronJobManager {
             logger.error('Log kaydı oluşturulamadı:', err);
         }
 
-        // Timeout mekanizması (30 dakika)
-        const timeoutMs = 30 * 60 * 1000; // 30 dakika
-        let timeoutHandle;
-        
         const executionPromise = (async () => {
             try {
-                // Timeout ayarla
-                timeoutHandle = setTimeout(() => {
-                    logger.error(`⏱️  ${name} timeout oldu (${timeoutMs}ms)`);
-                    // Timeout durumunda execution'ı temizle
-                    this.runningExecutions.delete(name);
-                }, timeoutMs);
-                
                 // Task'ı çalıştır
                 taskFunction.config = config;
                 const result = await taskFunction();
-                
-                // Timeout'u temizle
-                if (timeoutHandle) {
-                    clearTimeout(timeoutHandle);
-                }
 
                 const duration = Date.now() - startTime.getTime();
 
@@ -224,11 +173,6 @@ class CronJobManager {
                 return result;
 
             } catch (error) {
-                // Timeout'u temizle
-                if (timeoutHandle) {
-                    clearTimeout(timeoutHandle);
-                }
-                
                 const duration = Date.now() - startTime.getTime();
 
                 // Hata - istatistikleri güncelle
@@ -264,17 +208,8 @@ class CronJobManager {
 
         try {
             await executionPromise;
-        } catch (error) {
-            // Hata durumunda da execution'ı temizle
-            logger.error(`❌ ${name} execution hatası, temizleniyor:`, error.message);
-            throw error;
         } finally {
-            // Her durumda execution'ı temizle
             this.runningExecutions.delete(name);
-            if (timeoutHandle) {
-                clearTimeout(timeoutHandle);
-            }
-            logger.debug(`🧹 ${name} execution temizlendi`);
         }
     }
 
@@ -433,51 +368,6 @@ class CronJobManager {
             statuses.push(this.getStatus(name));
         }
         return statuses;
-    }
-
-    /**
-     * Takılı kalmış job'ları temizle
-     */
-    async clearStuckJobs() {
-        logger.info('🔧 Takılı kalmış job\'lar temizleniyor...');
-        
-        try {
-            // Database'de RUNNING durumundaki eski logları bul (30 dakikadan eski)
-            const stuckLogs = await query(`
-                SELECT DISTINCT job_name FROM cron_job_logs
-                WHERE status = 'RUNNING'
-                AND started_at < NOW() - INTERVAL '30 minutes'
-            `);
-            
-            for (const log of stuckLogs.rows) {
-                const jobName = log.job_name;
-                logger.warn(`🔧 ${jobName} için takılı kalmış loglar temizleniyor...`);
-                
-                // Logları FAILED olarak işaretle
-                await query(`
-                    UPDATE cron_job_logs
-                    SET status = 'FAILED',
-                        completed_at = CURRENT_TIMESTAMP,
-                        error_message = 'Job timeout - stuck execution cleared',
-                        duration = EXTRACT(EPOCH FROM (NOW() - started_at)) * 1000
-                    WHERE job_name = $1 
-                    AND status = 'RUNNING'
-                    AND started_at < NOW() - INTERVAL '30 minutes'
-                `, [jobName]);
-                
-                // Memory'deki execution'ı temizle
-                if (this.runningExecutions.has(jobName)) {
-                    this.runningExecutions.delete(jobName);
-                    logger.info(`✅ ${jobName} execution memory\'den temizlendi`);
-                }
-            }
-            
-            logger.info(`✅ ${stuckLogs.rows.length} job için takılı kalmış execution temizlendi`);
-            return stuckLogs.rows.length;
-        } catch (error) {
-            logger.error('Takılı kalmış job temizleme hatası:', error);
-            return 0;
-        }
     }
 
     /**
