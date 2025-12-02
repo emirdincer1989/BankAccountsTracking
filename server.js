@@ -277,17 +277,33 @@ global.io = io;
 
 // Start server
 server.listen(PORT, async () => {
-    logger.info(`🚀 Server running on port ${PORT}`);
-    logger.info(`📊 Environment: ${process.env.NODE_ENV}`);
-    logger.info(`🔒 Security: ${process.env.NODE_ENV === 'production' ? 'HTTPS Required' : 'Development Mode'}`);
-    logger.info(`🔌 Socket.io enabled for real-time notifications`);
+    try {
+        logger.info(`🚀 Server running on port ${PORT}`);
+        logger.info(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+        logger.info(`🔒 Security: ${process.env.NODE_ENV === 'production' ? 'HTTPS Required' : 'Development Mode'}`);
+        logger.info(`🔌 Socket.io enabled for real-time notifications`);
 
-    // Cron Manager'ı başlat
-    await initCronJobs();
+        // Cron Manager'ı başlat
+        try {
+            await initCronJobs();
+        } catch (cronError) {
+            logger.error('❌ Cron job başlatma hatası (devam ediliyor):', cronError);
+            // Cron hatası server'ı durdurmamalı
+        }
 
-    // BullMQ Worker'ları başlat
-    const { initWorkers } = require('./services/queue/QueueManager');
-    initWorkers();
+        // BullMQ Worker'ları başlat
+        try {
+            const { initWorkers } = require('./services/queue/QueueManager');
+            initWorkers();
+        } catch (workerError) {
+            logger.error('❌ Worker başlatma hatası (devam ediliyor):', workerError);
+            // Worker hatası server'ı durdurmamalı
+        }
+    } catch (error) {
+        logger.error('❌ Server başlatma hatası:', error);
+        logger.error('Stack trace:', error.stack);
+        // Hata olsa bile server çalışmaya devam etsin (en azından static dosyalar servis edilsin)
+    }
 });
 
 module.exports = app;
