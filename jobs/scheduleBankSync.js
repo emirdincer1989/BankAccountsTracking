@@ -1,4 +1,3 @@
-const { bankSyncQueue } = require('../services/queue/QueueManager');
 const { query } = require('../config/database');
 const { logger } = require('../utils/logger');
 const AccountService = require('../services/AccountService');
@@ -9,8 +8,7 @@ const { withTimeout } = require('../utils/timeout');
  * Bu fonksiyon CronJobManager tarafından çağrılacak.
  */
 async function scheduleBankSync() {
-    logger.info('🕒 Scheduled Job: Adding bank accounts to sync queue...');
-    logger.info('📍 scheduleBankSync fonksiyonu başladı');
+    logger.info('🕒 Scheduled Job: Bank account sync başlatılıyor...');
 
     try {
         // Aktif hesapları çek
@@ -18,88 +16,47 @@ async function scheduleBankSync() {
         const accounts = result.rows;
         
         if (accounts.length === 0) {
-            logger.info('ℹ️  Aktif hesap bulunamadı, işlem atlanıyor');
-            return { success: true, count: 0, queued: 0, direct: 0, message: 'Aktif hesap yok' };
+            logger.info('ℹ️  Aktif hesap bulunamadı');
+            return { success: true, count: 0, synced: 0, errors: 0, message: 'Aktif hesap yok' };
         }
 
         logger.info(`📋 ${accounts.length} aktif hesap bulundu`);
         
-        let queuedCount = 0;
-        let directRunCount = 0;
+        let successCount = 0;
         let errorCount = 0;
 
-        // Redis/Queue kullanılabilir mi kontrol et
-        logger.info('📍 Redis/Queue kontrolü yapılıyor...');
-        const isQueueAvailable = bankSyncQueue && typeof bankSyncQueue.add === 'function' && 
-                                  !bankSyncQueue.add.toString().includes('Redis unavailable');
-        logger.info(`📍 Queue durumu: ${isQueueAvailable ? 'Kullanılabilir' : 'Kullanılamıyor'}`);
-
-        if (!isQueueAvailable) {
-            logger.warn('⚠️  Redis/Queue kullanılamıyor, hesaplar direkt senkronize edilecek');
-        }
-
-        logger.info(`📍 ${accounts.length} hesap için döngü başlatılıyor...`);
+        // Her hesabı manuel senkronizasyon gibi bağımsız olarak çalıştır
+        // Manuel senkronizasyon nasıl çalışıyorsa aynı şekilde
         for (const account of accounts) {
-            logger.info(`📍 Hesap işleniyor: ${account.account_name} (${account.id})`);
             try {
-                if (isQueueAvailable) {
-                    // Queue'ya ekle
-                    await bankSyncQueue.add('syncAccount', { accountId: account.id }, {
-                        attempts: 3, // 3 kez dene
-                        backoff: {
-                            type: 'exponential',
-                            delay: 5000 // 5sn, 10sn, 20sn...
-                        },
-                        removeOnComplete: true, // Başarılı olursa sil (Redis şişmesin)
-                        removeOnFail: 100 // Son 100 hatayı tut
-                    });
-                    queuedCount++;
-                } else {
-                    // Redis yoksa direkt çalıştır (sequential - sırayla)
-                    logger.info(`🔄 Direkt senkronizasyon: ${account.account_name} (${account.id})`);
-                    try {
-                        // Her hesap için 60 saniye timeout
-                        const res = await withTimeout(
-                            AccountService.syncAccount(account.id),
-                            60000, // 60 saniye
-                            `Hesap ${account.account_name} senkronizasyonu timeout oldu (60sn)`
-                        );
-                        logger.info(`✅ Direct sync success for ${account.account_name}: ${res.newTransactions} new tx`);
-                        directRunCount++;
-                    } catch (syncError) {
-                        logger.error(`❌ Direct sync failed for ${account.account_name} (${account.id}):`, syncError.message);
-                        errorCount++;
-                    }
-                }
-            } catch (queueError) {
-                logger.warn(`⚠️ Queue add failed for account ${account.account_name} (${account.id}). Running directly. Error: ${queueError.message}`);
-
-                // Kuyruk hatası varsa direkt çalıştır
-                try {
-                    // Her hesap için 60 saniye timeout
-                    const res = await withTimeout(
-                        AccountService.syncAccount(account.id),
-                        60000, // 60 saniye
-                        `Hesap ${account.account_name} senkronizasyonu timeout oldu (60sn)`
-                    );
-                    logger.info(`✅ Direct sync success for ${account.account_name}: ${res.newTransactions} new tx`);
-                    directRunCount++;
-                } catch (syncError) {
-                    logger.error(`❌ Direct sync failed for ${account.account_name} (${account.id}):`, syncError.message);
-                    errorCount++;
-                }
+                logger.info(`🔄 Senkronizasyon başlatılıyor: ${account.account_name} (${account.id})`);
+                
+                // Manuel senkronizasyon gibi direkt AccountService.syncAccount çağır
+                // Timeout: Her hesap için 90 saniye (banka API'leri yavaş olabilir)
+                const res = await withTimeout(
+                    AccountService.syncAccount(account.id),
+                    90000, // 90 saniye
+                    `Hesap ${account.account_name} senkronizasyonu timeout oldu (90sn)`
+                );
+                
+                logger.info(`✅ ${account.account_name} senkronizasyonu tamamlandı: ${res.newTransactions || 0} yeni işlem`);
+                successCount++;
+                
+            } catch (syncError) {
+                logger.error(`❌ ${account.account_name} (${account.id}) senkronizasyon hatası:`, syncError.message);
+                errorCount++;
+                // Bir hesap hata verse bile diğerlerine devam et
             }
         }
 
         const summary = {
             success: true,
             count: accounts.length,
-            queued: queuedCount,
-            direct: directRunCount,
+            synced: successCount,
             errors: errorCount
         };
 
-        logger.info(`✅ Sync job finished. Total: ${accounts.length}, Queued: ${queuedCount}, Direct: ${directRunCount}, Errors: ${errorCount}`);
+        logger.info(`✅ Sync job tamamlandı: ${successCount} başarılı, ${errorCount} hatalı`);
         return summary;
 
     } catch (error) {
