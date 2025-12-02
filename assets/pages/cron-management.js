@@ -484,9 +484,16 @@ async function triggerJob(jobName) {
         console.log('🔧 triggerJob çağrıldı:', jobName);
         showInfo('Job çalıştırılıyor...');
 
+        // Timeout için AbortController kullan
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 saniye timeout
+        
         const response = await fetch(`/api/cron-management/jobs/${jobName}/trigger`, {
-            method: 'POST'
+            method: 'POST',
+            signal: controller.signal
         });
+        
+        clearTimeout(timeoutId);
 
         const result = await response.json();
         console.log('📦 API yanıtı:', result);
@@ -515,7 +522,20 @@ async function triggerJob(jobName) {
 
     } catch (error) {
         console.error('❌ Trigger hatası:', error);
-        showError(error.message);
+        
+        // Timeout hatası için özel mesaj
+        if (error.name === 'TimeoutError' || error.name === 'AbortError') {
+            showWarning('Job başlatıldı ancak yanıt zaman aşımına uğradı. Job arka planda çalışıyor olabilir. Loglardan kontrol edin.');
+        } else if (error.message.includes('504') || error.message.includes('Gateway Timeout')) {
+            showWarning('Job başlatıldı ancak yanıt çok uzun sürdü. Job arka planda çalışıyor olabilir. Loglardan kontrol edin.');
+        } else {
+            showError(error.message);
+        }
+        
+        // Hata olsa bile job listesini yenile (belki job başladı)
+        setTimeout(() => {
+            loadJobs();
+        }, 2000);
     }
 }
 

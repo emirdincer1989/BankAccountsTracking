@@ -210,23 +210,47 @@ router.post('/jobs/:name/trigger', async (req, res) => {
             logger.warn('Stuck job temizleme hatası (devam ediliyor):', clearError.message);
         }
         
-        const result = await cronManager.runNow(name);
+        // Job zaten çalışıyor mu kontrol et
+        const status = cronManager.getStatus(name);
+        if (status && status.isExecuting) {
+            return res.json({
+                success: true,
+                message: `${name} zaten çalışıyor`,
+                data: { skipped: true, reason: 'Already running' }
+            });
+        }
+        
+        // Job'ı asenkron çalıştır (fire-and-forget)
+        // Hemen response dön, job arka planda çalışsın
+        cronManager.runNow(name)
+            .then(result => {
+                logger.info(`✅ ${name} manuel tetikleme tamamlandı:`, result);
+            })
+            .catch(error => {
+                logger.error(`❌ ${name} manuel tetikleme hatası:`, error);
+            });
 
-        // Audit log
-        await query(`
+        // Audit log (asenkron)
+        query(`
             INSERT INTO audit_logs (user_id, action, table_name, new_values)
             VALUES ($1, $2, $3, $4)
         `, [
             req.user.id,
             'TRIGGER_JOB',
             'cron_jobs',
-            JSON.stringify({ name, result })
-        ]);
+            JSON.stringify({ name, triggered_at: new Date() })
+        ]).catch(err => {
+            logger.error('Audit log hatası:', err);
+        });
 
+        // Hemen response dön (job arka planda çalışıyor)
         res.json({
             success: true,
-            message: `${name} başarıyla çalıştırıldı`,
-            data: result
+            message: `${name} başlatıldı, arka planda çalışıyor. Durumu loglardan takip edebilirsiniz.`,
+            data: { 
+                triggered: true,
+                message: 'Job arka planda çalışıyor, loglardan takip edebilirsiniz'
+            }
         });
 
     } catch (error) {
