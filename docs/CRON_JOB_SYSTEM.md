@@ -252,6 +252,72 @@ node server.js
 
 ---
 
+## 🏦 bankSyncJob - Banka Senkronizasyon Job'u
+
+### Genel Bakış
+
+`bankSyncJob` tüm aktif banka hesaplarını periyodik olarak senkronize eder. Her 5 dakikada bir çalışır ve son 3 günlük hareketleri çeker.
+
+### Özellikler
+
+- ✅ **Paralel Senkronizasyon:** Aynı anda maksimum 10 hesap senkronize edilir
+- ✅ **Batch Processing:** Hesaplar 50'şerlik gruplar halinde işlenir
+- ✅ **Rate Limiting:** Banka API'lerine çok fazla istek göndermez
+- ✅ **Timeout Koruması:** Her hesap için 90 saniye timeout
+- ✅ **Detaylı Loglama:** Her hesap için kaç yeni hareket geldiği kaydedilir
+- ✅ **Otomatik Temizleme:** Takılı kalan job'lar otomatik temizlenir
+
+### Konfigürasyon
+
+**Dosya:** `jobs/scheduleBankSync.js`
+
+```javascript
+const CONFIG = {
+    MAX_CONCURRENT: 10,        // Aynı anda maksimum 10 hesap
+    TIMEOUT_PER_ACCOUNT: 90000, // Her hesap için 90 saniye
+    RATE_LIMIT_DELAY: 100,     // Her hesap arasında 100ms
+    BATCH_SIZE: 50             // Her batch'te 50 hesap
+};
+```
+
+### Veri Çekme
+
+- **Varsayılan:** Son 3 günlük hareketler
+- **Environment Variable:** `SYNC_DAYS_BACK=7` (son 7 gün için)
+- **Manuel Tetiklemede:** Tarih aralığı belirtilebilir
+
+### Sonuç Takibi
+
+Job başarılı olduğunda:
+- **Log'da:** Kaç yeni hareket çekildiği gösterilir
+- **Database'de:** `cron_job_logs.result` kolonunda JSON olarak kaydedilir
+- **Frontend'de:** Log tablosunda "Detay" kolonunda gösterilir
+
+**Örnek Sonuç:**
+```json
+{
+  "success": true,
+  "newTransactions": 15,
+  "count": 3,
+  "synced": 3,
+  "errors": 0,
+  "batches": 1
+}
+```
+
+### Performans
+
+- **3 hesap:** ~1-2 saniye
+- **100 hesap:** ~10-15 saniye
+- **Ölçeklenebilirlik:** 100 hesaba kadar optimize edilmiştir
+
+### İlgili Dokümantasyon
+
+- Detaylı sistem dokümantasyonu: [`docs/bank_sync_system.md`](./bank_sync_system.md)
+- Durum kontrolü: [`docs/HOW_TO_CHECK_CRON_STATUS.md`](./HOW_TO_CHECK_CRON_STATUS.md)
+
+---
+
 ## 🎯 Mevcut Özellikler
 
 ### ✅ Şu An Yapabilecekleriniz

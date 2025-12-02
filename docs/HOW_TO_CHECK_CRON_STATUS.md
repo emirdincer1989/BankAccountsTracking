@@ -202,6 +202,22 @@ WHERE created_at >= NOW() - INTERVAL '1 hour';
 -- Son 1 saatte transaction eklenmiş olmalı
 ```
 
+### 6. Job Sonuçlarını Kontrol Et (Yeni Hareket Sayısı)
+```sql
+SELECT 
+    started_at,
+    status,
+    result->>'newTransactions' as yeni_hareket,
+    result->>'synced' as senkronize_hesap,
+    result->>'count' as toplam_hesap,
+    result->>'errors' as hatali_hesap
+FROM cron_job_logs
+WHERE job_name = 'bankSyncJob'
+ORDER BY started_at DESC
+LIMIT 10;
+-- result kolonunda JSON formatında detaylı bilgi var
+```
+
 ---
 
 ## 🔧 Hızlı Test Komutları
