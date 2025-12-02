@@ -13,9 +13,9 @@ async function clearStuckJobs() {
         console.log('🔧 Takılı Kalmış Job\'lar Temizleniyor...\n');
 
         const cronManager = getCronJobManager();
-        const clearedCount = await cronManager.clearStuckJobs();
+        const result = await cronManager.clearStuckJobs();
 
-        console.log(`\n✅ ${clearedCount} adet takılı kalmış job temizlendi`);
+        console.log(`\n✅ ${result.cleared || 0} adet takılı kalmış job temizlendi`);
 
         // Durumu göster
         const stuckLogs = await query(`

@@ -133,17 +133,30 @@ class CronJobManager {
                 // Task'ı çalıştır (timeout ile)
                 taskFunction.config = config;
                 
+                logger.info(`⏱️  ${name} başlatıldı, timeout: ${JOB_TIMEOUT_MS / 1000}sn`);
+                
                 // Timeout wrapper ekle
                 const timeoutPromise = new Promise((_, reject) => {
                     setTimeout(() => {
+                        logger.error(`⏰ ${name} timeout oldu (${JOB_TIMEOUT_MS / 1000}sn)`);
                         reject(new Error(`Job ${name} timeout oldu (${JOB_TIMEOUT_MS / 1000}sn)`));
                     }, JOB_TIMEOUT_MS);
                 });
                 
+                // Job'un başladığını işaretle
+                const jobStartTime = Date.now();
+                const jobPromise = taskFunction().catch(error => {
+                    logger.error(`❌ ${name} içinde hata:`, error.message);
+                    throw error;
+                });
+                
                 const result = await Promise.race([
-                    taskFunction(),
+                    jobPromise,
                     timeoutPromise
                 ]);
+                
+                const jobDuration = Date.now() - jobStartTime;
+                logger.info(`✅ ${name} tamamlandı (${jobDuration}ms)`);
 
                 const duration = Date.now() - startTime.getTime();
 
@@ -220,9 +233,21 @@ class CronJobManager {
 
         this.runningExecutions.set(name, executionPromise);
 
+        // Timeout koruması: Eğer job çok uzun sürerse memory'den temizle
+        const cleanupTimeout = setTimeout(() => {
+            if (this.runningExecutions.has(name)) {
+                logger.warn(`⚠️  ${name} timeout oldu, memory'den temizleniyor`);
+                this.runningExecutions.delete(name);
+            }
+        }, JOB_TIMEOUT_MS + 60000); // Job timeout + 1 dakika ekstra
+
         try {
             await executionPromise;
+        } catch (error) {
+            // Hata zaten log'landı, burada sadece re-throw ediyoruz
+            throw error;
         } finally {
+            clearTimeout(cleanupTimeout);
             this.runningExecutions.delete(name);
         }
     }
@@ -392,12 +417,13 @@ class CronJobManager {
         try {
             logger.info('🔧 Takılı kalmış job\'lar temizleniyor...');
             
-            // 10 dakikadan fazla süredir RUNNING durumunda olan log kayıtlarını bul
+            // 5 dakikadan fazla süredir RUNNING durumunda olan log kayıtlarını bul
+            // (Job timeout 4 dakika, bu yüzden 5 dakika yeterli)
             const stuckLogs = await query(`
                 SELECT id, job_name, started_at
                 FROM cron_job_logs
                 WHERE status = 'RUNNING'
-                AND started_at < NOW() - INTERVAL '10 minutes'
+                AND started_at < NOW() - INTERVAL '5 minutes'
             `);
 
             if (stuckLogs.rows.length === 0) {
