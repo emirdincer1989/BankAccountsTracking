@@ -62,59 +62,73 @@ class ZiraatAdapter extends BaseBankAdapter {
      * XML yanıtını parse eder ve standart formata çevirir
      */
     parseResponse(xml) {
-        const extract = (tag, content) => {
-            const regex = new RegExp(`<[^:]*${tag}[^>]*>(.*?)</[^:]*${tag}>`, 'g');
-            const matches = [];
-            let match;
-            while ((match = regex.exec(content)) !== null) {
-                matches.push(match[1]);
-            }
-            return matches;
-        };
-
-        // Hata kontrolü
-        const hataKodu = extract('hataKodu', xml)[0];
-        const hataAciklama = extract('hataAciklama', xml)[0];
-
-        if (hataKodu && hataKodu !== '0') {
-            throw new Error(`Ziraat API Hatası: ${hataKodu} - ${hataAciklama}`);
-        }
-
-        const tarihler = extract('islemTarihi', xml);
-        const tutarlar = extract('tutar', xml);
-        const aciklamalar = extract('aciklama', xml);
-        const dekontNolar = extract('dekontNo', xml); // Varsa unique ID için
+        console.log('Ziraat Raw XML Response:', xml);
 
         const transactions = [];
+        const movementRegex = /<Hareket>([\s\S]*?)<\/Hareket>/g;
 
-        for (let i = 0; i < tarihler.length; i++) {
-            const rawAmount = tutarlar[i] || "0";
-            // Tutar formatı: "1.234,56" veya "1234.56" olabilir. Test scriptinde raw kullanılmış.
-            // Genelde TR formatı: 1.234,56
-            // Veritabanı için nokta ondalık, virgül binlik olmalı veya tam tersi.
-            // Standartlaştırma gerekebilir. Şimdilik basit replace yapalım.
+        let match;
+        while ((match = movementRegex.exec(xml)) !== null) {
+            const block = match[1];
 
-            // Not: Test çıktısında formatı görmedik ama genelde XML servisleri nokta kullanır.
-            // Eğer "1.000,50" geliyorsa: replace('.','').replace(',','.')
-
-            let amount = parseFloat(rawAmount.replace(/\./g, '').replace(',', '.'));
-            if (isNaN(amount)) amount = 0;
-
-            // Eksi işareti varsa negatiftir (Borç)
-            // Ancak banka ekstresinde eksi "giden para" demek mi?
-            // Genelde ekstrede eksi olmaz, Borç/Alacak sütunu olur.
-            // Test scripti: const isNegative = rawAmount.includes('-');
-            // Demek ki eksi gelebiliyor.
-
-            const transaction = {
-                unique_bank_ref_id: dekontNolar[i] || `${tarihler[i]}-${i}-${amount}`, // Unique ID üretimi
-                date: this._parseDate(tarihler[i]),
-                amount: amount,
-                description: aciklamalar[i],
-                sender_receiver: '', // XML'den gelmiyor
-                metadata: { raw: { tarih: tarihler[i], tutar: tutarlar[i], aciklama: aciklamalar[i] } }
+            const getVal = (tag) => {
+                const regex = new RegExp(`<${tag}>(.*?)</${tag}>`);
+                const m = block.match(regex);
+                return m ? m[1] : null;
             };
-            transactions.push(transaction);
+
+            const dateStr = getVal('islemTarihi'); // Örn: 25/11/2025
+            const amountStr = getVal('tutar');
+            const description = getVal('aciklama');
+            const timeStr = getVal('islemZamani'); // Örn: 2025-11-25T16:55:33
+
+            // Karşı taraf bilgisi (Açıklamadan)
+            let senderReceiver = '';
+            if (description && description.includes('Gönd:')) {
+                try {
+                    // Örn: ... Gönd: AD SOYAD ...
+                    const parts = description.split('Gönd:');
+                    if (parts[1]) {
+                        const subParts = parts[1].trim().split(' ');
+                        if (subParts.length >= 2) {
+                            senderReceiver = subParts[0] + ' ' + subParts[1];
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Ziraat sender parse error:', e);
+                }
+            }
+
+            if (dateStr && amountStr) {
+                // Tutar: 1234,56 -> 1234.56
+                let amount = parseFloat(amountStr.replace(',', '.'));
+                if (isNaN(amount)) amount = 0;
+
+                // Tarih: 25/11/2025 -> 2025-11-25
+                let isoDate;
+                if (timeStr) {
+                    isoDate = timeStr;
+                } else {
+                    const [day, month, year] = dateStr.split('/');
+                    isoDate = `${year}-${month}-${day}T00:00:00`;
+                }
+
+                transactions.push({
+                    unique_bank_ref_id: timeStr ? (timeStr + amount) : `${dateStr}-${amount}-${Math.random()}`,
+                    date: new Date(isoDate),
+                    amount: amount,
+                    description: description || '',
+                    sender_receiver: senderReceiver,
+                    metadata: {
+                        raw: {
+                            tarih: dateStr,
+                            tutar: amountStr,
+                            aciklama: description,
+                            zaman: timeStr
+                        }
+                    }
+                });
+            }
         }
 
         return transactions;

@@ -105,50 +105,67 @@ class HalkAdapter extends BaseBankAdapter {
     }
 
     parseResponse(xml) {
-        const extract = (tag, content) => {
-            const regex = new RegExp(`<[^:]*${tag}[^>]*>(.*?)</[^:]*${tag}>`, 'g');
-            const matches = [];
-            let match;
-            while ((match = regex.exec(content)) !== null) {
-                matches.push(match[1]);
-            }
-            return matches;
-        };
-
-        const hataKodu = extract('HataKodu', xml)[0];
-        const hataAciklama = extract('HataAciklama', xml)[0];
-
-        if (hataKodu !== '0') {
-            throw new Error(`Halkbank API Hatası: ${hataKodu} - ${hataAciklama}`);
-        }
-
-        // Halkbank XML yapısına göre alanları çek (Test scriptinden bakarak)
-        // Örn: IslemTarihi, Tutar, Aciklama, FisNo
-        const tarihler = extract('IslemTarihi', xml);
-        const tutarlar = extract('Tutar', xml);
-        const aciklamalar = extract('Aciklama', xml);
-        const fisNolar = extract('FisNo', xml);
-        const borcAlacak = extract('BorcAlacak', xml);
+        console.log('Halkbank Raw XML Response:', xml);
 
         const transactions = [];
+        const movementRegex = /<[a-zA-Z0-9]+:Hareket>([\s\S]*?)<\/[a-zA-Z0-9]+:Hareket>/g;
 
-        for (let i = 0; i < tarihler.length; i++) {
-            let amount = parseFloat(tutarlar[i]);
-            if (isNaN(amount)) amount = 0;
+        let match;
+        while ((match = movementRegex.exec(xml)) !== null) {
+            const block = match[1];
 
-            if (borcAlacak[i] === 'B') { // Borç ise negatif
-                amount = -Math.abs(amount);
-            }
-
-            const transaction = {
-                unique_bank_ref_id: fisNolar[i] || `${tarihler[i]}-${i}-${amount}`,
-                date: new Date(tarihler[i]),
-                amount: amount,
-                description: aciklamalar[i],
-                sender_receiver: '',
-                metadata: { raw: { tarih: tarihler[i], tutar: tutarlar[i], aciklama: aciklamalar[i] } }
+            const getVal = (tag) => {
+                const regex = new RegExp(`<[a-zA-Z0-9]+:${tag}>(.*?)</[a-zA-Z0-9]+:${tag}>`);
+                const m = block.match(regex);
+                return m ? m[1] : null;
             };
-            transactions.push(transaction);
+
+            const dateStr = getVal('Tarih'); // Örn: 25/11/2025
+            const timeStr = getVal('Saat'); // Örn: 16:55:33
+            const amountStr = getVal('HareketTutari');
+            const description = getVal('Aciklama');
+            const refNo = getVal('ReferansNo');
+            const senderReceiver = getVal('KarsiAdSoyad');
+            const balanceStr = getVal('Bakiye');
+
+            if (dateStr && amountStr) {
+                // Tutar: +1234,56 -> 1234.56
+                let amount = parseFloat(amountStr.replace('+', '').replace(',', '.'));
+                if (isNaN(amount)) amount = 0;
+
+                // Tarih: 25/11/2025 + 16:55:33 -> ISO
+                let isoDate;
+                if (dateStr.includes('/')) {
+                    const [day, month, year] = dateStr.split('/');
+                    isoDate = `${year}-${month}-${day}`;
+                } else {
+                    isoDate = dateStr;
+                }
+
+                if (timeStr) {
+                    isoDate += `T${timeStr}`;
+                } else {
+                    isoDate += 'T00:00:00';
+                }
+
+                transactions.push({
+                    unique_bank_ref_id: refNo || `${dateStr}-${amount}-${Math.random()}`,
+                    date: new Date(isoDate),
+                    amount: amount,
+                    description: description || '',
+                    sender_receiver: senderReceiver || '',
+                    metadata: {
+                        raw: {
+                            tarih: dateStr,
+                            saat: timeStr,
+                            tutar: amountStr,
+                            aciklama: description,
+                            ref: refNo,
+                            bakiye: balanceStr
+                        }
+                    }
+                });
+            }
         }
 
         return transactions;

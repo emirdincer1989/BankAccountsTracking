@@ -106,52 +106,71 @@ class VakifAdapter extends BaseBankAdapter {
     }
 
     parseResponse(xml) {
-        const extract = (tag, content) => {
-            // Namespace'li tagleri yakalamak için regex (örn: <b:IslemTarihi>)
-            const regex = new RegExp(`<[^:]+:${tag}[^>]*>(.*?)</[^:]+:${tag}>`, 'g');
-            const matches = [];
-            let match;
-            while ((match = regex.exec(content)) !== null) {
-                matches.push(match[1]);
-            }
-            return matches;
-        };
-
-        const islemKodu = extract('IslemKodu', xml)[0];
-        const islemAciklama = extract('IslemAciklamasi', xml)[0];
-
-        if (islemKodu !== 'VBB0001') {
-            throw new Error(`Vakıfbank API Hatası: ${islemKodu} - ${islemAciklama}`);
-        }
-
-        // Hareket detaylarını çek (Tag isimleri test scriptinden veya örnek XML'den teyit edilmeli)
-        // Genelde: IslemTarihi, IslemTutari, Aciklama, IslemRefNo
-        const tarihler = extract('IslemTarihi', xml);
-        const tutarlar = extract('IslemTutari', xml);
-        const aciklamalar = extract('Aciklama', xml);
-        const refNolar = extract('IslemRefNo', xml);
-        const borcAlacak = extract('BorcAlacak', xml); // B veya A
+        console.log('VakifBank Raw XML Response:', xml);
 
         const transactions = [];
 
-        for (let i = 0; i < tarihler.length; i++) {
-            let amount = parseFloat(tutarlar[i]);
-            if (isNaN(amount)) amount = 0;
+        // DtoEkstreHareket bloklarını bul
+        const movementRegex = /<[a-zA-Z0-9]+:DtoEkstreHareket>([\s\S]*?)<\/[a-zA-Z0-9]+:DtoEkstreHareket>/g;
 
-            // Borç ise eksi yapalım (Opsiyonel, sisteme göre değişir)
-            if (borcAlacak[i] === 'B') {
-                amount = -Math.abs(amount);
+        let match;
+        while ((match = movementRegex.exec(xml)) !== null) {
+            const block = match[1];
+
+            // Helper to extract value by tag name (ignoring namespace)
+            const getVal = (tag) => {
+                const regex = new RegExp(`<[a-zA-Z0-9]+:${tag}>(.*?)</[a-zA-Z0-9]+:${tag}>`);
+                const m = block.match(regex);
+                return m ? m[1] : null;
+            };
+
+            const dateStr = getVal('IslemTarihi'); // Örn: 2025-11-20 02:06:26
+            const amountStr = getVal('Tutar');
+            const borcAlacak = getVal('BorcAlacak');
+            const description = getVal('Aciklama');
+            const refNo = getVal('Id');
+
+            // Karşı taraf bilgisi (Key-Value yapısında)
+            let senderReceiver = '';
+            // Regex for Key-Value pairs: <c:Key>GonderenAdi</c:Key><c:Value>...</c:Value>
+            const gonderenMatch = block.match(/<[a-zA-Z0-9]+:Key>GonderenAdi<\/[a-zA-Z0-9]+:Key>\s*<[a-zA-Z0-9]+:Value>(.*?)<\/[a-zA-Z0-9]+:Value>/);
+            const aliciMatch = block.match(/<[a-zA-Z0-9]+:Key>AliciAdi<\/[a-zA-Z0-9]+:Key>\s*<[a-zA-Z0-9]+:Value>(.*?)<\/[a-zA-Z0-9]+:Value>/);
+
+            if (gonderenMatch && gonderenMatch[1] && gonderenMatch[1] !== 'ESHOT GENEL MÜDÜRLÜĞÜ') {
+                senderReceiver = gonderenMatch[1];
+            } else if (aliciMatch && aliciMatch[1] && aliciMatch[1] !== 'ESHOT GENEL MÜDÜRLÜĞÜ') {
+                senderReceiver = aliciMatch[1];
             }
 
-            const transaction = {
-                unique_bank_ref_id: refNolar[i] || `${tarihler[i]}-${i}-${amount}`,
-                date: new Date(tarihler[i]), // ISO format geliyorsa direkt parse edilir
-                amount: amount,
-                description: aciklamalar[i],
-                sender_receiver: '',
-                metadata: { raw: { tarih: tarihler[i], tutar: tutarlar[i], aciklama: aciklamalar[i], ref: refNolar[i] } }
-            };
-            transactions.push(transaction);
+            if (dateStr && amountStr) {
+                let amount = parseFloat(amountStr);
+                if (isNaN(amount)) amount = 0;
+
+                // Borç ise eksi
+                if (borcAlacak === 'B') {
+                    amount = -Math.abs(amount);
+                }
+
+                // Tarih formatı: 2025-11-20 02:06:26 -> ISO
+                const isoDate = dateStr.replace(' ', 'T');
+
+                transactions.push({
+                    unique_bank_ref_id: refNo || `${dateStr}-${amount}-${Math.random()}`,
+                    date: new Date(isoDate),
+                    amount: amount,
+                    description: description || '',
+                    sender_receiver: senderReceiver,
+                    metadata: {
+                        raw: {
+                            tarih: dateStr,
+                            tutar: amountStr,
+                            aciklama: description,
+                            ref: refNo,
+                            sender_receiver: senderReceiver
+                        }
+                    }
+                });
+            }
         }
 
         return transactions;
