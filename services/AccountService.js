@@ -72,10 +72,16 @@ class AccountService {
 
         // 3. Doğru adaptörü seç
         let adapter;
-        switch (account.bank_name) {
-            case 'Ziraat': adapter = new ZiraatAdapter(decryptedCredentials); break;
-            case 'Vakif': adapter = new VakifAdapter(decryptedCredentials); break;
-            case 'Halk': adapter = new HalkAdapter(decryptedCredentials); break;
+        // Banka adını normalize et (İlk harf büyük, gerisi küçük veya tamamen küçük kontrolü)
+        // Frontend 'vakif' gönderiyor, DB'de 'vakif' kayıtlı olabilir.
+        // Kodda 'Vakif' bekleniyor.
+
+        const bankName = account.bank_name.toLowerCase();
+
+        switch (bankName) {
+            case 'ziraat': adapter = new ZiraatAdapter(decryptedCredentials); break;
+            case 'vakif': adapter = new VakifAdapter(decryptedCredentials); break;
+            case 'halk': adapter = new HalkAdapter(decryptedCredentials); break;
             default: throw new Error('Bilinmeyen banka: ' + account.bank_name);
         }
 
