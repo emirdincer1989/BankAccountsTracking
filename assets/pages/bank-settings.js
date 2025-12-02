@@ -431,7 +431,7 @@ function updateBankFields() {
             </div>
             <div class="mb-3">
                 <label class="form-label">Kurum Kullanıcısı <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" name="user_code" required>
+                <input type="text" class="form-control" name="username" required>
             </div>
             <div class="mb-3">
                 <label class="form-label">Şifre <span class="text-danger">*</span></label>
