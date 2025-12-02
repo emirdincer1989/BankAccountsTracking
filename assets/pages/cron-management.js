@@ -297,6 +297,9 @@ async function loadAllData() {
 
 async function loadJobs() {
     try {
+        // Eğer sayfa değiştiyse ve container yoksa işlem yapma
+        if (!document.getElementById('jobs-container')) return;
+
         const response = await fetch('/api/cron-management/jobs');
         if (!response.ok) throw new Error('API hatası');
 
@@ -319,6 +322,9 @@ async function loadJobs() {
 
 async function loadStats() {
     try {
+        // Eğer sayfa değiştiyse işlem yapma
+        if (!document.getElementById('stats-container')) return;
+
         const response = await fetch('/api/cron-management/stats');
         if (!response.ok) throw new Error('API hatası');
 
@@ -348,8 +354,7 @@ function renderJobs(jobs, summary) {
     const container = document.getElementById('jobs-container');
 
     if (!container) {
-        console.warn('jobs-container elementi bulunamadı, yeniden deneniyor...');
-        setTimeout(() => renderJobs(jobs, summary), 100);
+        // Container yoksa (sayfa değişmiş olabilir) işlemi durdur
         return;
     }
 
