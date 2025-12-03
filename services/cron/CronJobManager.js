@@ -383,12 +383,29 @@ class CronJobManager {
             throw new Error(`Job bulunamadı: ${name}`);
         }
 
-        // Database'i güncelle
-        await query(`
-            UPDATE cron_jobs
-            SET schedule = $1, updated_at = CURRENT_TIMESTAMP
-            WHERE name = $2
-        `, [newSchedule, name]);
+        // Veritabanından job'ın aktif durumunu kontrol et
+        // NOT: Route'da zaten veritabanı güncelleniyor, burada sadece durumu okuyoruz
+        const dbJob = await query(`
+            SELECT is_enabled, schedule
+            FROM cron_jobs
+            WHERE name = $1
+        `, [name]);
+
+        if (dbJob.rows.length === 0) {
+            throw new Error(`Job veritabanında bulunamadı: ${name}`);
+        }
+
+        const isEnabledInDB = dbJob.rows[0].is_enabled;
+        
+        // Veritabanındaki schedule'ın güncel olduğundan emin ol (route'da güncellenmiş olmalı)
+        // Eğer route'dan önce buraya gelirse, burada da güncelleyelim
+        if (dbJob.rows[0].schedule !== newSchedule) {
+            await query(`
+                UPDATE cron_jobs
+                SET schedule = $1, updated_at = CURRENT_TIMESTAMP
+                WHERE name = $2
+            `, [newSchedule, name]);
+        }
 
         // Job'ı yeniden başlat
         const wasRunning = jobData.isRunning;
@@ -410,11 +427,22 @@ class CronJobManager {
         jobData.cronTask = newCronTask;
         jobData.config.schedule = newSchedule;
 
-        if (wasRunning) {
+        // Veritabanındaki is_enabled durumuna göre başlat veya durdur
+        // Eğer veritabanında enabled ise başlat, değilse durdur
+        logger.info(`🔍 ${name} schedule güncelleme: wasRunning=${wasRunning}, isEnabledInDB=${isEnabledInDB}, newSchedule=${newSchedule}`);
+        
+        if (isEnabledInDB) {
             this.start(name);
+            logger.info(`✓ ${name} schedule güncellendi ve başlatıldı: ${newSchedule} (veritabanında aktif)`);
+            
+            // Başlatıldığını doğrula
+            const statusAfterStart = this.getStatus(name);
+            logger.info(`🔍 ${name} başlatma sonrası durum: isRunning=${statusAfterStart?.isRunning}, cronTask=${!!jobData.cronTask}`);
+        } else {
+            this.stoppedJobs.add(name);
+            jobData.isRunning = false;
+            logger.info(`✓ ${name} schedule güncellendi: ${newSchedule} (veritabanında pasif, başlatılmadı)`);
         }
-
-        logger.info(`✓ ${name} schedule güncellendi: ${newSchedule}`);
     }
 
     /**
