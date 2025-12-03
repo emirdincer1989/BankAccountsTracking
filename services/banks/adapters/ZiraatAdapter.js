@@ -15,13 +15,50 @@ class ZiraatAdapter extends BaseBankAdapter {
     }
 
     async getAccounts() {
-        if (this.credentials.iban) {
+        // Hesap bilgilerini almak için bugün için kısa bir tarih aralığında sorgu yapıyoruz
+        // Bu sayede XML response'undan kalanBakiye'yi parse edebiliriz
+        const today = new Date();
+        
+        try {
+            const accountNumber = this.credentials.iban || this.credentials.account_number;
+            if (!accountNumber) {
+                return [];
+            }
+
+            // Bugün için işlem sorgusu yap
+            const transactions = await this.getTransactions(accountNumber, today, today);
+            
+            // Son işlemden bakiyeyi al
+            let balance = 0;
+            if (transactions && transactions.length > 0) {
+                // Tarihe göre sırala (Yeniden eskiye)
+                const sortedTx = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+                const latestTx = sortedTx[0];
+                if (latestTx.balance_after_transaction !== undefined && latestTx.balance_after_transaction !== null) {
+                    balance = latestTx.balance_after_transaction;
+                }
+            }
+
             return [{
-                accountNumber: this.credentials.iban,
-                currency: 'TRY'
+                accountNumber: accountNumber,
+                iban: this.credentials.iban || null,
+                currency: 'TRY',
+                balance: balance
             }];
+        } catch (error) {
+            // Hata durumunda fallback: Sadece account bilgilerini döndür
+            console.warn('ZiraatAdapter getAccounts hatası:', error.message);
+            const accountNumber = this.credentials.iban || this.credentials.account_number;
+            if (accountNumber) {
+                return [{
+                    accountNumber: accountNumber,
+                    iban: this.credentials.iban || null,
+                    currency: 'TRY',
+                    balance: 0
+                }];
+            }
+            return [];
         }
-        return [];
     }
 
     async getTransactions(accountNumber, startDate, endDate) {

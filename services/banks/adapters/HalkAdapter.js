@@ -14,13 +14,48 @@ class HalkAdapter extends BaseBankAdapter {
     }
 
     async getAccounts() {
-        if (this.credentials.account_no) {
+        // Hesap bilgilerini almak için bugün için kısa bir tarih aralığında sorgu yapıyoruz
+        // Bu sayede XML response'undan Bakiye'yi parse edebiliriz
+        const today = new Date();
+        
+        try {
+            const accountNumber = this.credentials.account_no || this.credentials.account_number;
+            if (!accountNumber) {
+                return [];
+            }
+
+            // Bugün için işlem sorgusu yap
+            const transactions = await this.getTransactions(accountNumber, today, today);
+            
+            // Son işlemden bakiyeyi al
+            let balance = 0;
+            if (transactions && transactions.length > 0) {
+                // Tarihe göre sırala (Yeniden eskiye)
+                const sortedTx = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+                const latestTx = sortedTx[0];
+                if (latestTx.balance_after_transaction !== undefined && latestTx.balance_after_transaction !== null) {
+                    balance = latestTx.balance_after_transaction;
+                }
+            }
+
             return [{
-                accountNumber: this.credentials.account_no,
-                currency: 'TRY'
+                accountNumber: accountNumber,
+                currency: 'TRY',
+                balance: balance
             }];
+        } catch (error) {
+            // Hata durumunda fallback: Sadece account bilgilerini döndür
+            console.warn('HalkAdapter getAccounts hatası:', error.message);
+            const accountNumber = this.credentials.account_no || this.credentials.account_number;
+            if (accountNumber) {
+                return [{
+                    accountNumber: accountNumber,
+                    currency: 'TRY',
+                    balance: 0
+                }];
+            }
+            return [];
         }
-        return [];
     }
 
     async getTransactions(accountNumber, startDate, endDate) {

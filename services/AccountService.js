@@ -111,7 +111,8 @@ class AccountService {
                 const sortedTx = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
                 const latestTx = sortedTx[0];
 
-                if (latestTx.balance_after_transaction !== undefined && latestTx.balance_after_transaction !== 0) {
+                // Bakiye 0 olsa bile güncelle (süpürme işlemleri için önemli)
+                if (latestTx.balance_after_transaction !== undefined && latestTx.balance_after_transaction !== null) {
                     lastBalance = latestTx.balance_after_transaction;
                     console.log(`Bakiye hareketlerden güncellendi: ${lastBalance}`);
                 }

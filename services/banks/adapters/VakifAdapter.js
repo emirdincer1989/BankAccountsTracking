@@ -14,13 +14,76 @@ class VakifAdapter extends BaseBankAdapter {
     }
 
     async getAccounts() {
-        if (this.credentials.account_no) {
-            return [{
-                accountNumber: this.credentials.account_no,
-                currency: 'TRY'
-            }];
+        // Hesap bilgilerini almak için kısa bir tarih aralığında sorgu yapıyoruz
+        // Bu sayede XML response'undan CariBakiye'yi parse edebiliriz
+        const today = new Date().toISOString().split('T')[0];
+        
+        try {
+            const xml = this._createSoapEnvelope(
+                this.credentials.customer_no,
+                this.credentials.username,
+                this.credentials.password,
+                this.credentials.account_no || '',
+                today,
+                today
+            );
+
+            const responseXml = await this._sendSoapRequest(xml);
+            return this._parseAccountsFromResponse(responseXml);
+        } catch (error) {
+            // Hata durumunda fallback: Sadece account_no döndür
+            console.warn('VakifAdapter getAccounts hatası:', error.message);
+            if (this.credentials.account_no) {
+                return [{
+                    accountNumber: this.credentials.account_no,
+                    currency: 'TRY',
+                    balance: 0
+                }];
+            }
+            return [];
         }
-        return [];
+    }
+
+    _extractTag(tag, content) {
+        const regex = new RegExp(`<[^:]+:${tag}[^>]*>(.*?)</[^:]+:${tag}>`, 'g');
+        const matches = [];
+        let match;
+        while ((match = regex.exec(content)) !== null) {
+            matches.push(match[1]);
+        }
+        return matches;
+    }
+
+    _parseAccountsFromResponse(xml) {
+        const accounts = [];
+
+        // XML'den hesap bilgilerini regex ile çek
+        const hesapNolar = this._extractTag('HesapNo', xml);
+        const ibanlar = this._extractTag('HesapNoIban', xml);
+        const bakiyeler = this._extractTag('CariBakiye', xml);
+        const dovizTipleri = this._extractTag('DovizTipi', xml);
+        const subeAdlari = this._extractTag('SubeAdi', xml);
+
+        for (let i = 0; i < hesapNolar.length; i++) {
+            accounts.push({
+                accountNumber: hesapNolar[i],
+                iban: ibanlar[i] || null,
+                currency: dovizTipleri[i] || 'TRY',
+                balance: parseFloat(bakiyeler[i] || 0),
+                name: subeAdlari[i] || `Vakıfbank Hesabı ${hesapNolar[i]}`
+            });
+        }
+
+        // Eğer hesap bulunamadıysa ve credentials'da account_no varsa fallback
+        if (accounts.length === 0 && this.credentials.account_no) {
+            accounts.push({
+                accountNumber: this.credentials.account_no,
+                currency: 'TRY',
+                balance: 0
+            });
+        }
+
+        return accounts;
     }
 
     async getTransactions(accountNumber, startDate, endDate) {
