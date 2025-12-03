@@ -17,6 +17,9 @@ async function loadUserInfo() {
             if (userNameText) userNameText.textContent = currentUser.name;
             if (userNameSubText) userNameSubText.textContent = currentUser.role_name;
 
+            // Avatar'ı güncelle
+            updateUserAvatar(currentUser.name);
+
             return currentUser;
         } else {
             const base = (window.APP_CONFIG && window.APP_CONFIG.BASE_PATH) || '';
@@ -301,7 +304,42 @@ document.addEventListener('click', function (e) {
     }
 });
 
+// Avatar'ı güncelle
+function updateUserAvatar(userName) {
+    const avatarElement = document.getElementById('headerProfileAvatar');
+    if (!avatarElement || !userName) return;
+
+    // Kullanıcı adının ilk harfini al (büyük harf)
+    const firstLetter = userName.trim().charAt(0).toUpperCase();
+    
+    // Kullanıcı adına göre renk seç (tutarlı renk için hash kullan)
+    const colors = [
+        { bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }, // Mor
+        { bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }, // Pembe
+        { bg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }, // Mavi
+        { bg: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' }, // Yeşil
+        { bg: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' }, // Turuncu-Pembe
+        { bg: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)' }, // Mor-Mavi
+        { bg: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' }, // Açık Pembe
+        { bg: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)' }, // Açık Kırmızı
+    ];
+
+    // Kullanıcı adına göre tutarlı bir renk seç (basit hash)
+    let hash = 0;
+    for (let i = 0; i < userName.length; i++) {
+        hash = userName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const colorIndex = Math.abs(hash) % colors.length;
+    const selectedColor = colors[colorIndex];
+
+    // Avatar'ı güncelle
+    avatarElement.style.background = selectedColor.bg;
+    avatarElement.innerHTML = firstLetter;
+    avatarElement.setAttribute('title', userName);
+}
+
 // Global fonksiyonları window objesine ekle
 window.loadUserInfo = loadUserInfo;
 window.loadMenus = loadMenus;
 window.logout = logout;
+window.updateUserAvatar = updateUserAvatar;

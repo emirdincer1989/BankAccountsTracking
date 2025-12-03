@@ -196,6 +196,26 @@ File: Main Css File
   width: 32px;
 }
 
+.header-profile-avatar {
+  height: 32px;
+  width: 32px;
+  min-width: 32px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  user-select: none;
+}
+
+.header-profile-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.topbar-user:hover .header-profile-avatar {
+  transform: scale(1.05);
+}
+
 .topbar-badge-sm {
   left: 0;
   top: 7px !important;
