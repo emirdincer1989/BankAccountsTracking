@@ -298,12 +298,26 @@ router.put('/jobs/:name/schedule', async (req, res) => {
         `, [schedule, req.user.id, name]);
 
         // CronJobManager'da da güncelle
+        let managerUpdateSuccess = false;
+        let managerUpdateError = null;
+        
         try {
             const cronManager = getCronJobManager();
             await cronManager.updateSchedule(name, schedule);
-            logger.info(`Schedule CronJobManager'da da güncellendi`);
+            logger.info(`✅ Schedule CronJobManager'da da güncellendi: ${name} -> ${schedule}`);
+            
+            // Güncellemenin başarılı olduğunu doğrula
+            const status = cronManager.getStatus(name);
+            if (status && status.config.schedule === schedule) {
+                managerUpdateSuccess = true;
+                logger.info(`✅ Schedule doğrulandı: ${status.config.schedule}`);
+            } else {
+                logger.warn(`⚠️  Schedule doğrulama başarısız: Beklenen ${schedule}, Bulunan ${status?.config?.schedule || 'N/A'}`);
+            }
         } catch (err) {
-            logger.warn(`CronJobManager güncellenemedi: ${err.message}`);
+            managerUpdateError = err.message;
+            logger.error(`❌ CronJobManager güncellenemedi: ${err.message}`);
+            logger.error(`Stack:`, err.stack);
         }
 
         // Audit log
@@ -317,15 +331,38 @@ router.put('/jobs/:name/schedule', async (req, res) => {
             JSON.stringify({ name, schedule, scheduleText: humanizeSchedule(schedule) })
         ]);
 
-        res.json({
-            success: true,
-            message: `${name} schedule güncellendi`,
-            data: {
-                name,
-                schedule,
-                scheduleText: humanizeSchedule(schedule)
-            }
-        });
+        // Eğer CronJobManager güncellenemediyse uyarı ver
+        if (!managerUpdateSuccess) {
+            const warningMessage = managerUpdateError 
+                ? `Schedule veritabanında güncellendi ancak memory'de güncellenemedi. Server'ı yeniden başlatmanız gerekebilir. Hata: ${managerUpdateError}`
+                : `Schedule veritabanında güncellendi ancak memory'de doğrulanamadı. Server'ı yeniden başlatmanız gerekebilir.`;
+            
+            logger.warn(`⚠️  ${warningMessage}`);
+            
+            res.json({
+                success: true,
+                message: `${name} schedule veritabanında güncellendi`,
+                warning: warningMessage,
+                requiresRestart: true,
+                data: {
+                    name,
+                    schedule,
+                    scheduleText: humanizeSchedule(schedule),
+                    managerUpdated: managerUpdateSuccess
+                }
+            });
+        } else {
+            res.json({
+                success: true,
+                message: `${name} schedule güncellendi ve aktif hale getirildi`,
+                data: {
+                    name,
+                    schedule,
+                    scheduleText: humanizeSchedule(schedule),
+                    managerUpdated: true
+                }
+            });
+        }
 
     } catch (error) {
         logger.error('Schedule güncelleme hatası:', error);

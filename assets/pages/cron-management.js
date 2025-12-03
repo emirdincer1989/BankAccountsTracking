@@ -657,7 +657,30 @@ async function saveSchedule() {
         const result = await response.json();
         if (!response.ok) throw new Error(result.message || 'İşlem başarısız');
 
-        showSuccess(result.message);
+        // Eğer uyarı varsa göster
+        if (result.warning) {
+            showWarning(result.warning);
+            if (result.requiresRestart) {
+                // Server yeniden başlatma uyarısı
+                setTimeout(() => {
+                    if (window.Modal && window.Modal.confirm) {
+                        window.Modal.confirm({
+                            title: 'Server Yeniden Başlatma Gerekli',
+                            message: 'Schedule güncellendi ancak memory\'de aktif olmadı. Server\'ı yeniden başlatmak ister misiniz?',
+                            confirmText: 'Evet, Yeniden Başlat',
+                            cancelText: 'Hayır',
+                            onConfirm: () => {
+                                showInfo('Server yeniden başlatma işlemi için sunucu yöneticinizle iletişime geçin.');
+                            }
+                        });
+                    } else {
+                        showWarning('Schedule güncellendi ancak server\'ı yeniden başlatmanız gerekebilir.');
+                    }
+                }, 1000);
+            }
+        } else {
+            showSuccess(result.message);
+        }
 
         const modal = bootstrap.Modal.getInstance(document.getElementById('scheduleModal'));
         modal.hide();
