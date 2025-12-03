@@ -3,6 +3,49 @@
  */
 
 export async function loadContent() {
+    // Super admin kontrolü
+    if (!window.currentUser) {
+        // Kullanıcı bilgisi yüklenene kadar bekle
+        await new Promise(resolve => {
+            const checkUser = setInterval(() => {
+                if (window.currentUser) {
+                    clearInterval(checkUser);
+                    resolve();
+                }
+            }, 100);
+            setTimeout(() => { clearInterval(checkUser); resolve(); }, 5000);
+        });
+    }
+
+    const userRole = window.currentUser?.role_name || window.currentUser?.role;
+
+    // Sadece super_admin erişebilir
+    if (userRole !== 'super_admin') {
+        // Rol bazlı yönlendirme
+        let redirectUrl = '/accounts-view'; // Varsayılan
+        
+        if (userRole === 'finans_admin') {
+            redirectUrl = '/finans-dashboard';
+        } else if (userRole === 'admin') {
+            redirectUrl = '/accounts-view';
+        } else {
+            redirectUrl = '/accounts-view'; // Diğer roller için varsayılan
+        }
+
+        // Yönlendirme yap
+        setTimeout(() => {
+            window.location.href = redirectUrl;
+        }, 100);
+
+        return {
+            html: `<div class="alert alert-warning">
+                <i class="ri-alert-line me-2"></i>
+                Bu sayfaya erişim yetkiniz yok. Yönlendiriliyorsunuz...
+            </div>`,
+            title: 'Erişim Reddedildi'
+        };
+    }
+
     try {
         const response = await fetch('/api/dashboard/stats');
         const data = await response.json();

@@ -35,7 +35,7 @@
             <div class="d-flex">
                 <!-- LOGO -->
                 <div class="navbar-brand-box horizontal-logo">
-                    <a href="/dashboard" class="logo logo-dark">
+                    <a href="javascript:void(0);" class="logo logo-dark" id="headerLogoDark">
                         <span class="logo-sm">
                             <img src="assets/images/logo-sm.png" alt="" height="40">
                         </span>
@@ -44,7 +44,7 @@
                         </span>
                     </a>
 
-                    <a href="/dashboard" class="logo logo-light">
+                    <a href="javascript:void(0);" class="logo logo-light" id="headerLogoLight">
                         <span class="logo-sm">
                             <img src="assets/images/logo-sm.png" alt="" height="40">
                         </span>
@@ -125,7 +125,7 @@
             <!-- LOGO -->
             <div class="navbar-brand-box">
                 <!-- Dark Logo-->
-                <a href="/dashboard" class="logo logo-dark">
+                <a href="javascript:void(0);" class="logo logo-dark" id="sidebarLogoDark">
                     <span class="logo-sm">
                         <img src="assets/images/logo-sm.png" alt="" height="40">
                     </span>
@@ -134,7 +134,7 @@
                     </span>
                 </a>
                 <!-- Light Logo-->
-                <a href="/dashboard" class="logo logo-light">
+                <a href="javascript:void(0);" class="logo logo-light" id="sidebarLogoLight">
                     <span class="logo-sm">
                         <img src="assets/images/logo-sm.png" alt="" height="40">
                     </span>
@@ -475,19 +475,36 @@
         let currentPage = 'dashboard';
         
          // Sayfa yüklendiğinde
-         document.addEventListener('DOMContentLoaded', function() {
-             loadUserInfo();
+         document.addEventListener('DOMContentLoaded', async function() {
+             await loadUserInfo();
              loadMenus();
              
              // Mevcut URL'den sayfa adını al
              const currentPath = window.location.pathname;
-             const page = currentPath.substring(1) || 'dashboard';
+             let page = currentPath.substring(1) || 'dashboard';
+             
+             // Dashboard erişim kontrolü - sadece super_admin erişebilir
+             if (page === 'dashboard' || page === '') {
+                 const userRole = window.currentUser?.role_name || window.currentUser?.role;
+                 if (userRole !== 'super_admin') {
+                     // Rol bazlı yönlendirme
+                     if (userRole === 'finans_admin') {
+                         page = 'finans-dashboard';
+                     } else if (userRole === 'admin') {
+                         page = 'accounts-view';
+                     } else {
+                         page = 'accounts-view'; // Varsayılan
+                     }
+                     // URL'yi güncelle
+                     window.history.replaceState({page: page}, '', `/${page}`);
+                 }
+             }
              
              // URL'yi güncelle
-             if (currentPath !== '/dashboard' && currentPath !== '/') {
-                 window.history.replaceState({page: page}, '', currentPath);
-             } else {
-                 window.history.replaceState({page: 'dashboard'}, '', '/dashboard');
+             if (currentPath !== `/${page}` && currentPath !== '/') {
+                 window.history.replaceState({page: page}, '', `/${page}`);
+             } else if (currentPath === '/' || currentPath === '/dashboard') {
+                 window.history.replaceState({page: page}, '', `/${page}`);
              }
              
              currentPage = page;

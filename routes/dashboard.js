@@ -21,9 +21,17 @@ router.get('/finans-stats', async (req, res) => {
     }
 });
 
-// Dashboard istatistikleri
+// Dashboard istatistikleri - Sadece super_admin erişebilir
 router.get('/stats', async (req, res) => {
     try {
+        // Super admin kontrolü
+        if (req.user.role_name !== 'super_admin') {
+            return res.status(403).json({
+                success: false,
+                message: 'Bu sayfaya erişim yetkiniz yok. Sadece süper yöneticiler erişebilir.'
+            });
+        }
+
         // Kullanıcı sayısı
         const userCountResult = await query('SELECT COUNT(*) as count FROM users WHERE is_active = true');
         const userCount = parseInt(userCountResult.rows[0].count);

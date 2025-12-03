@@ -20,6 +20,11 @@ async function loadUserInfo() {
             // Avatar'ı güncelle
             updateUserAvatar(currentUser.name);
 
+            // Logo yönlendirmelerini ayarla
+            if (typeof setupLogoRedirects === 'function') {
+                setupLogoRedirects();
+            }
+
             return currentUser;
         } else {
             const base = (window.APP_CONFIG && window.APP_CONFIG.BASE_PATH) || '';
@@ -288,6 +293,62 @@ async function logout() {
         window.location.href = `${base}/`;
     }
 }
+
+// Logo yönlendirmesini ayarla (global fonksiyon)
+window.setupLogoRedirects = function() {
+    const getDashboardUrl = () => {
+        const userRole = window.currentUser?.role_name || window.currentUser?.role;
+        
+        if (userRole === 'super_admin') {
+            return '/dashboard';
+        } else if (userRole === 'finans_admin') {
+            return '/finans-dashboard';
+        } else if (userRole === 'admin') {
+            return '/accounts-view';
+        } else {
+            return '/accounts-view'; // Varsayılan
+        }
+    };
+
+    const handleLogoClick = (e) => {
+        e.preventDefault();
+        const url = getDashboardUrl();
+        if (window.loadPage) {
+            // SPA routing kullan
+            window.history.pushState({}, '', url);
+            window.loadPage(url.substring(1) || 'dashboard');
+        } else {
+            // Normal redirect
+            window.location.href = url;
+        }
+    };
+
+    // Sidebar logoları
+    const sidebarLogoDark = document.getElementById('sidebarLogoDark');
+    const sidebarLogoLight = document.getElementById('sidebarLogoLight');
+    
+    if (sidebarLogoDark && !sidebarLogoDark.dataset.listenerAdded) {
+        sidebarLogoDark.addEventListener('click', handleLogoClick);
+        sidebarLogoDark.dataset.listenerAdded = 'true';
+    }
+    if (sidebarLogoLight && !sidebarLogoLight.dataset.listenerAdded) {
+        sidebarLogoLight.addEventListener('click', handleLogoClick);
+        sidebarLogoLight.dataset.listenerAdded = 'true';
+    }
+
+    // Header logoları
+    const headerLogoDark = document.getElementById('headerLogoDark');
+    const headerLogoLight = document.getElementById('headerLogoLight');
+    
+    if (headerLogoDark && !headerLogoDark.dataset.listenerAdded) {
+        headerLogoDark.addEventListener('click', handleLogoClick);
+        headerLogoDark.dataset.listenerAdded = 'true';
+    }
+    if (headerLogoLight && !headerLogoLight.dataset.listenerAdded) {
+        headerLogoLight.addEventListener('click', handleLogoClick);
+        headerLogoLight.dataset.listenerAdded = 'true';
+    }
+};
 
 // Sayfa yüklendiğinde ortak işlemleri yap
 document.addEventListener('DOMContentLoaded', function () {
