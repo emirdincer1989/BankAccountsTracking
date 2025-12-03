@@ -179,7 +179,17 @@
                         // Başarılı giriş - role göre yönlendir
                         try {
                             const role = data?.data?.user?.role;
-                            const target = role === 'finans_admin' ? '/finans-dashboard' : '/dashboard';
+                            let target = '/dashboard'; // Varsayılan
+                            
+                            // Rol bazlı yönlendirme
+                            if (role === 'finans_admin') {
+                                target = '/finans-dashboard';
+                            } else if (role === 'admin') {
+                                target = '/accounts-view';
+                            } else {
+                                target = '/dashboard';
+                            }
+                            
                             window.location.href = target;
                         } catch (_) {
                             window.location.href = '/dashboard';
