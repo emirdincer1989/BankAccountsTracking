@@ -205,13 +205,39 @@ function renderAccountCard(acc) {
     // Hesap numarasını maskele (son 4 hane hariç)
     const maskedAccount = acc.account_number ? `•••• ${acc.account_number.slice(-4)}` : '••••';
 
+    // Banka Renk ve İsim Tanımları (hesap hareketleri sayfası ile aynı)
+    const bankConfig = {
+        'vakif': { name: 'Vakıfbank', color: '#FFC107', bg: 'rgba(255, 193, 7, 0.1)', badgeClass: 'bg-warning text-dark', borderColor: '#FFC107' }, // Sarı
+        'ziraat': { name: 'Ziraat Bankası', color: '#E30613', bg: 'rgba(227, 6, 19, 0.1)', badgeClass: 'bg-danger text-white', borderColor: '#E30613' }, // Kırmızı
+        'halk': { name: 'Halkbank', color: '#005596', bg: 'rgba(0, 85, 150, 0.1)', badgeClass: 'bg-info text-white', borderColor: '#005596' } // Mavi
+    };
+
+    // Banka bilgisini belirle
+    let bankKey = (acc.bank_name || '').toLowerCase();
+    if (bankKey.includes('vakif')) bankKey = 'vakif';
+    else if (bankKey.includes('ziraat')) bankKey = 'ziraat';
+    else if (bankKey.includes('halk')) bankKey = 'halk';
+
+    const bankInfo = bankConfig[bankKey] || { 
+        name: acc.bank_name, 
+        color: '#6c757d', 
+        bg: 'rgba(108, 117, 125, 0.1)', 
+        badgeClass: 'bg-secondary text-white',
+        borderColor: '#6c757d'
+    };
+
+    // Kart stilini banka rengine göre ayarla
+    const cardStyle = `border-left: 4px solid ${bankInfo.borderColor}; background-color: ${bankInfo.bg}; cursor: pointer;`;
+    const bankBadgeClass = bankInfo.badgeClass;
+
     return `
         <div class="col-xl-4 col-md-6">
-            <div class="card border h-100 shadow-none bg-white hover-shadow transition-all" style="cursor: pointer;" onclick="viewTransactions(${acc.id})">
+            <div class="card border h-100 shadow-none hover-shadow transition-all" style="${cardStyle}" onclick="viewTransactions(${acc.id})">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between mb-4">
                         <div>
-                            <h5 class="fs-16 fw-bold text-dark mb-1">${acc.bank_name} - ${acc.account_name}</h5>
+                            <span class="badge ${bankBadgeClass} mb-2">${bankInfo.name}</span>
+                            <h5 class="fs-16 fw-bold text-dark mb-1 mt-2">${acc.account_name}</h5>
                             <p class="text-muted mb-0 fs-13">${maskedAccount}</p>
                         </div>
                         <div class="${statusClass} fs-13 fw-medium bg-light px-2 py-1 rounded h-100 d-flex align-items-center">
