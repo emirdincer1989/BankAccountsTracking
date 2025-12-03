@@ -8,17 +8,8 @@ let accounts = [];
 
 export async function loadContent() {
     const html = `
-        <div class="row mb-4">
-            <div class="col-12 d-flex justify-content-between align-items-center">
-                <h4 class="mb-0 fw-bold">Hesaplara Genel Bakış</h4>
-                <button class="btn btn-light" onclick="loadAccounts()">
-                    <i class="ri-refresh-line align-bottom me-1"></i> Verileri Yenile
-                </button>
-            </div>
-        </div>
-
         <!-- Özet İstatistik Kartları -->
-        <div class="row mb-4" id="summaryCards">
+        <div class="row mb-3" id="summaryCards">
             <div class="col-xl-4 col-md-6">
                 <div class="card card-animate">
                     <div class="card-body">
@@ -95,7 +86,7 @@ export async function loadContent() {
             </div>
         </div>
 
-        <div class="row mb-4">
+        <div class="row mb-3">
             <div class="col-12">
                 <div class="search-box">
                     <input type="text" class="form-control form-control-lg bg-light border-light" id="searchAccount" placeholder="Kurum veya hesap ara...">
