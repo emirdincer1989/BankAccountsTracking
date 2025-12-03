@@ -544,6 +544,61 @@ router.post('/clear-stuck-jobs', async (req, res) => {
 });
 
 /**
+ * POST /api/cron-management/restart-server
+ * Server'ı yeniden başlat (Plesk Passenger için)
+ */
+router.post('/restart-server', async (req, res) => {
+    try {
+        logger.info(`Server restart isteği: user ${req.user.id}`);
+
+        const fs = require('fs');
+        const path = require('path');
+
+        // Plesk Passenger restart için tmp/restart.txt dosyası oluştur
+        const restartFile = path.join(__dirname, '../tmp/restart.txt');
+        const tmpDir = path.dirname(restartFile);
+
+        // tmp dizini yoksa oluştur
+        if (!fs.existsSync(tmpDir)) {
+            fs.mkdirSync(tmpDir, { recursive: true });
+        }
+
+        // Restart dosyasını oluştur
+        fs.writeFileSync(restartFile, new Date().toISOString());
+        
+        logger.info(`✅ Restart dosyası oluşturuldu: ${restartFile}`);
+
+        // Audit log
+        await query(`
+            INSERT INTO audit_logs (user_id, action, table_name, new_values)
+            VALUES ($1, $2, $3, $4)
+        `, [
+            req.user.id,
+            'RESTART_SERVER',
+            'server',
+            JSON.stringify({ restartFile, timestamp: new Date().toISOString() })
+        ]);
+
+        res.json({
+            success: true,
+            message: 'Server yeniden başlatma isteği gönderildi. Birkaç saniye içinde server yeniden başlayacak.',
+            data: {
+                restartFile,
+                timestamp: new Date().toISOString()
+            }
+        });
+
+    } catch (error) {
+        logger.error('Server restart hatası:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server yeniden başlatılırken hata oluştu',
+            error: error.message
+        });
+    }
+});
+
+/**
  * GET /api/cron-management/stats
  * İstatistikler
  */

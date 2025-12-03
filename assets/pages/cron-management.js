@@ -669,8 +669,30 @@ async function saveSchedule() {
                             message: 'Schedule güncellendi ancak memory\'de aktif olmadı. Server\'ı yeniden başlatmak ister misiniz?',
                             confirmText: 'Evet, Yeniden Başlat',
                             cancelText: 'Hayır',
-                            onConfirm: () => {
-                                showInfo('Server yeniden başlatma işlemi için sunucu yöneticinizle iletişime geçin.');
+                            onConfirm: async () => {
+                                try {
+                                    showInfo('Server yeniden başlatılıyor...');
+                                    
+                                    const response = await fetch('/api/cron-management/restart-server', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' }
+                                    });
+
+                                    const result = await response.json();
+                                    
+                                    if (response.ok && result.success) {
+                                        showSuccess(result.message);
+                                        // Birkaç saniye sonra sayfayı yenile
+                                        setTimeout(() => {
+                                            window.location.reload();
+                                        }, 3000);
+                                    } else {
+                                        throw new Error(result.message || 'Server yeniden başlatılamadı');
+                                    }
+                                } catch (error) {
+                                    console.error('Server restart hatası:', error);
+                                    showError(error.message || 'Server yeniden başlatılamadı. Lütfen sunucu yöneticinizle iletişime geçin.');
+                                }
                             }
                         });
                     } else {
