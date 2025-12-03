@@ -9,6 +9,8 @@ let currentFilters = {
     offset: 0
 };
 let paginationData = null;
+let autoRefreshInterval = null;
+let isAutoRefreshActive = false;
 
 export async function loadContent() {
     const html = `
@@ -129,7 +131,79 @@ export function init() {
         currentFilters.account_id = accountId;
     }
 
+    // İlk yükleme
     loadTransactions();
+
+    // Otomatik güncelleme başlat (her 60 saniyede bir)
+    setTimeout(() => {
+        startAutoRefresh();
+    }, 1000);
+
+    // Page Visibility API ile performans optimizasyonu
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+}
+
+/**
+ * Otomatik güncellemeyi başlatır
+ */
+function startAutoRefresh() {
+    // Eğer zaten aktifse, önce temizle
+    stopAutoRefresh();
+
+    isAutoRefreshActive = true;
+    
+    // Her 60 saniyede bir otomatik güncelleme
+    const REFRESH_INTERVAL = 60000; // 60 saniye
+    
+    console.log(`[Transactions Auto Refresh] Otomatik güncelleme başlatıldı. Her ${REFRESH_INTERVAL / 1000} saniyede bir veriler güncellenecek.`);
+    
+    // Periyodik güncelleme
+    autoRefreshInterval = setInterval(() => {
+        // Sayfa görünür değilse güncelleme yapma
+        if (document.hidden) {
+            console.log('[Transactions Auto Refresh] Sayfa görünür değil, güncelleme atlandı.');
+            return;
+        }
+
+        console.log('[Transactions Auto Refresh] Otomatik güncelleme başlatılıyor...');
+        // Sessiz güncelleme (loading göstergesi olmadan, mevcut filtreleri ve sayfayı koruyarak)
+        loadTransactions(true);
+    }, REFRESH_INTERVAL);
+}
+
+/**
+ * Otomatik güncellemeyi durdurur
+ */
+function stopAutoRefresh() {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+        autoRefreshInterval = null;
+    }
+    isAutoRefreshActive = false;
+}
+
+/**
+ * Sayfa görünürlük değişikliğini yönetir
+ */
+function handleVisibilityChange() {
+    if (document.hidden) {
+        // Sayfa gizlendiğinde güncelleme yapma
+    } else {
+        // Sayfa görünür olduğunda hemen güncelle ve interval'i başlat
+        if (!isAutoRefreshActive) {
+            startAutoRefresh();
+        }
+        // Sayfa tekrar görünür olduğunda verileri güncelle
+        loadTransactions(true);
+    }
+}
+
+/**
+ * Sayfa değiştiğinde temizlik yapmak için export edilen fonksiyon
+ */
+export function destroy() {
+    stopAutoRefresh();
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
 }
 
 async function loadAccounts(selectedId) {
@@ -183,9 +257,17 @@ async function loadAccounts(selectedId) {
     }
 }
 
-async function loadTransactions() {
+/**
+ * Hareketleri yükler
+ * @param {boolean} silent - Sessiz güncelleme (loading göstermeden)
+ */
+async function loadTransactions(silent = false) {
     const tbody = document.getElementById('transactionTableBody');
-    tbody.innerHTML = '<tr><td colspan="7" class="text-center"><div class="spinner-border spinner-border-sm text-primary"></div></td></tr>';
+    
+    // Loading göstergesi (sessiz güncelleme değilse)
+    if (!silent && tbody) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center"><div class="spinner-border spinner-border-sm text-primary"></div></td></tr>';
+    }
 
     try {
         // Query string oluştur
@@ -196,8 +278,11 @@ async function loadTransactions() {
             }
         }
 
+        console.log('[Load Transactions] API çağrısı yapılıyor: /api/transactions?' + params.toString());
         const response = await fetch(`/api/transactions?${params.toString()}`);
+        console.log('[Load Transactions] API yanıtı alındı:', response.status, response.statusText);
         const data = await response.json();
+        console.log('[Load Transactions] Veri güncellendi:', data.success ? `${data.data?.length || 0} hareket` : data.message);
 
         if (data.success) {
             transactions = data.data;
@@ -205,11 +290,15 @@ async function loadTransactions() {
             renderTable();
             updatePagination(data.pagination);
         } else {
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">${data.message}</td></tr>`;
+            if (!silent && tbody) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">${data.message}</td></tr>`;
+            }
         }
     } catch (error) {
         console.error('API Hatası:', error);
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Bağlantı hatası.</td></tr>';
+        if (!silent && tbody) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Bağlantı hatası.</td></tr>';
+        }
     }
 }
 

@@ -52,6 +52,18 @@ class PageLoader {
             return;
         }
 
+        // Önceki sayfanın destroy fonksiyonunu çağır (temizlik için)
+        if (this.currentPage && this.currentPage !== pageName) {
+            try {
+                const previousModule = this.pages.get(this.currentPage);
+                if (previousModule && typeof previousModule.destroy === 'function') {
+                    previousModule.destroy();
+                }
+            } catch (error) {
+                console.warn('Error calling destroy on previous page:', error);
+            }
+        }
+
         // Loading state
         contentArea.innerHTML = `
             <div class="d-flex justify-content-center align-items-center" style="height: 400px;">

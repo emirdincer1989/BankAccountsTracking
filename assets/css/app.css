@@ -5442,6 +5442,13 @@ a {
             transform: rotate(-360deg);
   }
 }
+
+/* Spin animation for refresh buttons */
+.spin-animation {
+  -webkit-animation: spin 1s linear infinite;
+          animation: spin 1s linear infinite;
+}
+
 .card-overlay {
   position: relative;
   overflow: hidden;

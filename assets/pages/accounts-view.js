@@ -1,10 +1,11 @@
 /**
  * Banka Hesapları İzleme Sayfası (Kullanıcılar için)
-/**
- * Banka Hesapları İzleme Sayfası (Kullanıcılar için)
  */
 
 let accounts = [];
+let autoRefreshInterval = null;
+let isAutoRefreshActive = false;
+let currentSearchTerm = '';
 
 export async function loadContent() {
     const html = `
@@ -115,18 +116,93 @@ export function init() {
     window.loadAccounts = loadAccounts;
     window.viewTransactions = viewTransactions;
 
+    // İlk yükleme
     loadAccounts();
 
     // Arama fonksiyonu
     document.addEventListener('keyup', function (e) {
         if (e.target && e.target.id === 'searchAccount') {
-            const searchTerm = e.target.value.toLowerCase();
-            filterAccounts(searchTerm);
+            currentSearchTerm = e.target.value.toLowerCase();
+            filterAccounts(currentSearchTerm);
         }
     });
+
+    // Otomatik güncelleme başlat (her 60 saniyede bir)
+    // İlk yükleme tamamlandıktan sonra interval'i başlat
+    setTimeout(() => {
+        startAutoRefresh();
+    }, 1000); // 1 saniye bekle, sayfa tamamen yüklensin
+
+    // Page Visibility API ile performans optimizasyonu
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+}
+
+/**
+ * Otomatik güncellemeyi başlatır
+ */
+function startAutoRefresh() {
+    // Eğer zaten aktifse, önce temizle
+    stopAutoRefresh();
+
+    isAutoRefreshActive = true;
+    
+    // Her 60 saniyede bir otomatik güncelleme
+    const REFRESH_INTERVAL = 60000; // 60 saniye
+    
+    console.log(`[Auto Refresh] Otomatik güncelleme başlatıldı. Her ${REFRESH_INTERVAL / 1000} saniyede bir veriler güncellenecek.`);
+    
+    // Periyodik güncelleme
+    autoRefreshInterval = setInterval(() => {
+        // Sayfa görünür değilse güncelleme yapma
+        if (document.hidden) {
+            console.log('[Auto Refresh] Sayfa görünür değil, güncelleme atlandı.');
+            return;
+        }
+
+        console.log('[Auto Refresh] Otomatik güncelleme başlatılıyor...');
+        // Sessiz güncelleme (loading göstergesi olmadan)
+        loadAccounts(false, true);
+    }, REFRESH_INTERVAL);
+}
+
+/**
+ * Otomatik güncellemeyi durdurur
+ */
+function stopAutoRefresh() {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+        autoRefreshInterval = null;
+    }
+    isAutoRefreshActive = false;
+}
+
+/**
+ * Sayfa görünürlük değişikliğini yönetir
+ */
+function handleVisibilityChange() {
+    if (document.hidden) {
+        // Sayfa gizlendiğinde güncellemeyi durdur (performans için)
+        // Interval'i temizleme, sadece güncelleme yapmama yeterli
+    } else {
+        // Sayfa görünür olduğunda hemen güncelle ve interval'i başlat
+        if (!isAutoRefreshActive) {
+            startAutoRefresh();
+        }
+        // Sayfa tekrar görünür olduğunda verileri güncelle
+        loadAccounts(false, true);
+    }
+}
+
+/**
+ * Sayfa değiştiğinde temizlik yapmak için export edilen fonksiyon
+ */
+export function destroy() {
+    stopAutoRefresh();
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
 }
 
 function filterAccounts(searchTerm) {
+    currentSearchTerm = searchTerm;
     const filtered = accounts.filter(acc =>
         (acc.institution_name || '').toLowerCase().includes(searchTerm) ||
         (acc.bank_name || '').toLowerCase().includes(searchTerm) ||
@@ -138,7 +214,12 @@ function filterAccounts(searchTerm) {
     renderGroupedAccounts(filtered);
 }
 
-async function loadAccounts() {
+/**
+ * Hesapları yükler
+ * @param {boolean} showLoading - Loading göstergesi gösterilsin mi?
+ * @param {boolean} silent - Sessiz güncelleme (loading göstermeden)
+ */
+async function loadAccounts(showLoading = true, silent = false) {
     const container = document.getElementById('accountsContainer');
 
     try {
@@ -168,25 +249,52 @@ async function loadAccounts() {
             return;
         }
 
-        const response = await fetch('/api/accounts');
-        const data = await response.json();
-
-        if (data.success) {
-            accounts = data.data || [];
-            updateSummaryCards(accounts);
-            renderGroupedAccounts(accounts);
-        } else {
+        // Loading göstergesi (sessiz güncelleme değilse)
+        if (showLoading && !silent && container) {
+            const currentContent = container.innerHTML;
             container.innerHTML = `
-                <div class="alert alert-danger">
-                    Veri yüklenirken hata oluştu: ${data.message}
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
                 </div>
             `;
         }
+
+        console.log('[Load Accounts] API çağrısı yapılıyor: /api/accounts');
+        const response = await fetch('/api/accounts');
+        console.log('[Load Accounts] API yanıtı alındı:', response.status, response.statusText);
+        const data = await response.json();
+        console.log('[Load Accounts] Veri güncellendi:', data.success ? `${data.data?.length || 0} hesap` : data.message);
+
+        if (data.success) {
+            accounts = data.data || [];
+
+            // Özet kartları güncelle
+            updateSummaryCards(accounts);
+
+            // Eğer arama yapılmışsa filtreyi uygula, değilse tüm hesapları göster
+            if (currentSearchTerm) {
+                filterAccounts(currentSearchTerm);
+            } else {
+                renderGroupedAccounts(accounts);
+            }
+        } else {
+            if (!silent) {
+                container.innerHTML = `
+                    <div class="alert alert-danger">
+                        Veri yüklenirken hata oluştu: ${data.message}
+                    </div>
+                `;
+            }
+        }
     } catch (error) {
         console.error('API Hatası:', error);
-        container.innerHTML = `
-            <div class="alert alert-danger">Sunucu hatası!</div>
-        `;
+        if (!silent) {
+            container.innerHTML = `
+                <div class="alert alert-danger">Sunucu hatası!</div>
+            `;
+        }
     }
 }
 
