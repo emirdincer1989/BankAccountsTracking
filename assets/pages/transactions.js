@@ -5,9 +5,10 @@
 let transactions = [];
 let accounts = [];
 let currentFilters = {
-    limit: 20,
+    limit: 25,
     offset: 0
 };
+let paginationData = null;
 
 export async function loadContent() {
     const html = `
@@ -71,14 +72,29 @@ export async function loadContent() {
                                 </tbody>
                             </table>
                         </div>
-                        <div class="d-flex justify-content-end mt-3">
+                        <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="text-muted mb-0">Sayfa başına:</label>
+                                <select class="form-select form-select-sm" id="pageSizeSelect" style="width: auto;" onchange="changePageSize()">
+                                    <option value="10">10</option>
+                                    <option value="25" selected>25</option>
+                                    <option value="50">50</option>
+                                </select>
+                                <span class="text-muted small" id="paginationInfo"></span>
+                            </div>
                             <div class="pagination-wrap hstack gap-2">
-                                <button class="page-item pagination-prev disabled" id="prevPageBtn" onclick="changePage(-1)">
-                                    Önceki
+                                <button class="btn btn-sm btn-outline-secondary" id="firstPageBtn" onclick="goToFirstPage()" title="İlk Sayfa">
+                                    <i class="ri-skip-back-line"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" id="prevPageBtn" onclick="changePage(-1)" title="Önceki Sayfa">
+                                    <i class="ri-arrow-left-s-line"></i>
                                 </button>
                                 <ul class="pagination listjs-pagination mb-0"></ul>
-                                <button class="page-item pagination-next disabled" id="nextPageBtn" onclick="changePage(1)">
-                                    Sonraki
+                                <button class="btn btn-sm btn-outline-secondary" id="nextPageBtn" onclick="changePage(1)" title="Sonraki Sayfa">
+                                    <i class="ri-arrow-right-s-line"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" id="lastPageBtn" onclick="goToLastPage()" title="Son Sayfa">
+                                    <i class="ri-skip-forward-line"></i>
                                 </button>
                             </div>
                         </div>
@@ -98,6 +114,10 @@ export function init() {
     window.applyFilters = applyFilters;
     window.resetFilters = resetFilters;
     window.changePage = changePage;
+    window.goToPage = goToPage;
+    window.goToFirstPage = goToFirstPage;
+    window.goToLastPage = goToLastPage;
+    window.changePageSize = changePageSize;
 
     // URL'den parametreleri al (örn: accounts-view'den gelen account_id)
     const urlParams = new URLSearchParams(window.location.search);
@@ -181,6 +201,7 @@ async function loadTransactions() {
 
         if (data.success) {
             transactions = data.data;
+            paginationData = data.pagination;
             renderTable();
             updatePagination(data.pagination);
         } else {
@@ -269,45 +290,161 @@ function renderTable() {
 function updatePagination(pagination) {
     const prevBtn = document.getElementById('prevPageBtn');
     const nextBtn = document.getElementById('nextPageBtn');
+    const firstBtn = document.getElementById('firstPageBtn');
+    const lastBtn = document.getElementById('lastPageBtn');
     const paginationList = document.querySelector('.pagination.listjs-pagination');
-
-    if (pagination.page <= 1) prevBtn.classList.add('disabled');
-    else prevBtn.classList.remove('disabled');
-
-    if (pagination.page >= pagination.totalPages) nextBtn.classList.add('disabled');
-    else nextBtn.classList.remove('disabled');
-
-    // Render page numbers
-    paginationList.innerHTML = '';
+    const paginationInfo = document.getElementById('paginationInfo');
+    const pageSizeSelect = document.getElementById('pageSizeSelect');
 
     const totalPages = pagination.totalPages;
     const currentPage = pagination.page;
+    const total = pagination.total;
+    const limit = pagination.limit;
+    const startRecord = pagination.offset + 1;
+    const endRecord = Math.min(pagination.offset + limit, total);
 
-    // Simple pagination logic: show all if <= 7 pages, otherwise show range
-    // For now, let's keep it simple and show up to5 pages around current
-    let startPage = Math.max(1, currentPage - 2);
-    let endPage = Math.min(totalPages, startPage + 4);
-
-    if (endPage - startPage < 4) {
-        startPage = Math.max(1, endPage - 4);
+    // Buton durumlarını güncelle
+    if (currentPage <= 1) {
+        firstBtn.classList.add('disabled');
+        prevBtn.classList.add('disabled');
+    } else {
+        firstBtn.classList.remove('disabled');
+        prevBtn.classList.remove('disabled');
     }
 
+    if (currentPage >= totalPages) {
+        nextBtn.classList.add('disabled');
+        lastBtn.classList.add('disabled');
+    } else {
+        nextBtn.classList.remove('disabled');
+        lastBtn.classList.remove('disabled');
+    }
+
+    // Sayfa başına kayıt sayısı seçimini güncelle
+    if (pageSizeSelect) {
+        pageSizeSelect.value = limit;
+    }
+
+    // Pagination bilgisini göster
+    if (paginationInfo) {
+        if (total > 0) {
+            paginationInfo.textContent = `${startRecord}-${endRecord} / ${total} kayıt`;
+        } else {
+            paginationInfo.textContent = '0 kayıt';
+        }
+    }
+
+    // Sayfa numaralarını render et
+    paginationList.innerHTML = '';
+
+    if (totalPages === 0) {
+        return;
+    }
+
+    // Akıllı sayfa numarası gösterimi
+    let startPage, endPage;
+
+    if (totalPages <= 7) {
+        // 7 veya daha az sayfa varsa hepsini göster
+        startPage = 1;
+        endPage = totalPages;
+    } else {
+        // Çok sayfa varsa akıllı gösterim
+        if (currentPage <= 3) {
+            // İlk sayfalardayız
+            startPage = 1;
+            endPage = 5;
+        } else if (currentPage >= totalPages - 2) {
+            // Son sayfalardayız
+            startPage = totalPages - 4;
+            endPage = totalPages;
+        } else {
+            // Ortada bir yerdeyiz
+            startPage = currentPage - 2;
+            endPage = currentPage + 2;
+        }
+    }
+
+    // İlk sayfa ve "..." ekle
+    if (startPage > 1) {
+        const li = document.createElement('li');
+        li.className = 'page-item';
+        li.innerHTML = `<a class="page-link" href="javascript:void(0);" onclick="goToPage(1)">1</a>`;
+        paginationList.appendChild(li);
+
+        if (startPage > 2) {
+            const liEllipsis = document.createElement('li');
+            liEllipsis.className = 'page-item disabled';
+            liEllipsis.innerHTML = `<span class="page-link">...</span>`;
+            paginationList.appendChild(liEllipsis);
+        }
+    }
+
+    // Sayfa numaralarını göster
     for (let i = startPage; i <= endPage; i++) {
         const li = document.createElement('li');
         li.className = `page-item ${i === currentPage ? 'active' : ''}`;
         li.innerHTML = `<a class="page-link" href="javascript:void(0);" onclick="goToPage(${i})">${i}</a>`;
         paginationList.appendChild(li);
     }
+
+    // Son sayfa ve "..." ekle
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            const liEllipsis = document.createElement('li');
+            liEllipsis.className = 'page-item disabled';
+            liEllipsis.innerHTML = `<span class="page-link">...</span>`;
+            paginationList.appendChild(liEllipsis);
+        }
+
+        const li = document.createElement('li');
+        li.className = 'page-item';
+        li.innerHTML = `<a class="page-link" href="javascript:void(0);" onclick="goToPage(${totalPages})">${totalPages}</a>`;
+        paginationList.appendChild(li);
+    }
 }
 
-window.goToPage = function (page) {
+function goToPage(page) {
+    if (paginationData && (page < 1 || page > paginationData.totalPages)) {
+        return;
+    }
     currentFilters.offset = (page - 1) * currentFilters.limit;
     loadTransactions();
+    // Sayfayı yukarı kaydır
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goToFirstPage() {
+    goToPage(1);
+}
+
+function goToLastPage() {
+    if (paginationData && paginationData.totalPages > 0) {
+        goToPage(paginationData.totalPages);
+    }
 }
 
 function changePage(direction) {
-    currentFilters.offset += direction * currentFilters.limit;
-    if (currentFilters.offset < 0) currentFilters.offset = 0;
+    if (!paginationData) return;
+    
+    const newPage = paginationData.page + direction;
+    if (newPage < 1 || newPage > paginationData.totalPages) {
+        return;
+    }
+    goToPage(newPage);
+}
+
+function changePageSize() {
+    const pageSizeSelect = document.getElementById('pageSizeSelect');
+    const newLimit = parseInt(pageSizeSelect.value);
+    
+    // Mevcut sayfadaki ilk kaydın index'ini koru
+    const currentOffset = currentFilters.offset;
+    const currentPage = Math.floor(currentOffset / currentFilters.limit) + 1;
+    
+    currentFilters.limit = newLimit;
+    currentFilters.offset = (currentPage - 1) * newLimit;
+    
     loadTransactions();
 }
 
@@ -327,9 +464,14 @@ function resetFilters() {
     document.getElementById('filterStartDate').value = '';
     document.getElementById('filterEndDate').value = '';
     document.getElementById('searchTransaction').value = '';
+    
+    const pageSizeSelect = document.getElementById('pageSizeSelect');
+    if (pageSizeSelect) {
+        pageSizeSelect.value = '25';
+    }
 
     currentFilters = {
-        limit: 20,
+        limit: 25,
         offset: 0
     };
     loadTransactions();
