@@ -17,6 +17,84 @@ export async function loadContent() {
             </div>
         </div>
 
+        <!-- Özet İstatistik Kartları -->
+        <div class="row mb-4" id="summaryCards">
+            <div class="col-xl-4 col-md-6">
+                <div class="card card-animate">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <p class="fw-medium text-muted mb-0">Kurum Sayısı</p>
+                                <h2 class="mt-4 ff-secondary fw-semibold" id="institutionCount">0</h2>
+                                <p class="mb-0 text-muted">
+                                    <span class="badge bg-light text-primary mb-0">
+                                        <i class="ri-building-line align-middle"></i> Toplam Kurum
+                                    </span>
+                                </p>
+                            </div>
+                            <div>
+                                <div class="avatar-sm flex-shrink-0">
+                                    <span class="avatar-title bg-primary-subtle rounded-circle fs-2">
+                                        <i class="ri-building-4-line text-primary"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-6">
+                <div class="card card-animate">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <p class="fw-medium text-muted mb-0">Banka Hesap Sayısı</p>
+                                <h2 class="mt-4 ff-secondary fw-semibold" id="accountCount">0</h2>
+                                <p class="mb-0 text-muted">
+                                    <span class="badge bg-light text-success mb-0">
+                                        <i class="ri-bank-card-line align-middle"></i> Aktif Hesaplar
+                                    </span>
+                                </p>
+                            </div>
+                            <div>
+                                <div class="avatar-sm flex-shrink-0">
+                                    <span class="avatar-title bg-success-subtle rounded-circle fs-2">
+                                        <i class="ri-bank-line text-success"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-6">
+                <div class="card card-animate">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <p class="fw-medium text-muted mb-0">Toplam Bakiye</p>
+                                <h2 class="mt-4 ff-secondary fw-semibold" id="totalBalance">₺0,00</h2>
+                                <p class="mb-0 text-muted">
+                                    <span class="badge bg-light text-info mb-0">
+                                        <i class="ri-wallet-3-line align-middle"></i> Tüm Hesaplar
+                                    </span>
+                                </p>
+                            </div>
+                            <div>
+                                <div class="avatar-sm flex-shrink-0">
+                                    <span class="avatar-title bg-info-subtle rounded-circle fs-2">
+                                        <i class="ri-money-dollar-circle-line text-info"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row mb-4">
             <div class="col-12">
                 <div class="search-box">
@@ -64,6 +142,8 @@ function filterAccounts(searchTerm) {
         (acc.account_name || '').toLowerCase().includes(searchTerm) ||
         (acc.account_number || '').includes(searchTerm)
     );
+    // Arama yapıldığında özet kartları güncelle (filtrelenmiş verilerle)
+    updateSummaryCards(filtered);
     renderGroupedAccounts(filtered);
 }
 
@@ -102,6 +182,7 @@ async function loadAccounts() {
 
         if (data.success) {
             accounts = data.data || [];
+            updateSummaryCards(accounts);
             renderGroupedAccounts(accounts);
         } else {
             container.innerHTML = `
@@ -115,6 +196,43 @@ async function loadAccounts() {
         container.innerHTML = `
             <div class="alert alert-danger">Sunucu hatası!</div>
         `;
+    }
+}
+
+function updateSummaryCards(accountList) {
+    // Kurum sayısını hesapla
+    const uniqueInstitutions = new Set();
+    accountList.forEach(acc => {
+        if (acc.institution_name) {
+            uniqueInstitutions.add(acc.institution_name);
+        }
+    });
+    const institutionCount = uniqueInstitutions.size;
+
+    // Aktif hesap sayısını hesapla
+    const activeAccountCount = accountList.filter(acc => acc.is_active === true).length;
+
+    // Toplam bakiyeyi hesapla
+    const totalBalance = accountList.reduce((sum, acc) => {
+        return sum + parseFloat(acc.last_balance || 0);
+    }, 0);
+
+    // DOM'u güncelle
+    const institutionCountEl = document.getElementById('institutionCount');
+    const accountCountEl = document.getElementById('accountCount');
+    const totalBalanceEl = document.getElementById('totalBalance');
+
+    if (institutionCountEl) {
+        institutionCountEl.textContent = institutionCount;
+    }
+    if (accountCountEl) {
+        accountCountEl.textContent = activeAccountCount;
+    }
+    if (totalBalanceEl) {
+        totalBalanceEl.textContent = new Intl.NumberFormat('tr-TR', {
+            style: 'currency',
+            currency: 'TRY'
+        }).format(totalBalance);
     }
 }
 
