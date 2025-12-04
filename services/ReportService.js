@@ -122,6 +122,8 @@ class ReportService {
 
     /**
      * Son bir aylık bakiye geçmişini getirir
+     * Günlük maksimum bakiyeyi gösterir (otomatik transferlerden etkilenmez)
+     * 
      * @param {number} institutionId - Kurum ID
      * @param {boolean} groupByBank - Kurum bazında grupla (true) veya toplam (false)
      * @param {number} days - Kaç günlük veri (varsayılan 30)
@@ -132,82 +134,51 @@ class ReportService {
         const safeDays = parseInt(days) || 30;
         
         if (groupByBank) {
-            // Kurum bazında bakiye geçmişi
+            // Kurum bazında bakiye geçmişi - Günlük maksimum bakiye
             let query, params;
+            
             if (institutionId === null) {
                 query = `
-                    WITH daily_balances AS (
+                    SELECT 
+                        date,
+                        bank_name,
+                        SUM(max_balance) as total_balance
+                    FROM (
                         SELECT 
                             DATE(t.date) as date,
                             ba.bank_name,
                             t.account_id,
-                            t.balance_after_transaction,
-                            ROW_NUMBER() OVER (
-                                PARTITION BY DATE(t.date), ba.bank_name, t.account_id 
-                                ORDER BY t.date DESC, t.id DESC
-                            ) as rn
+                            MAX(t.balance_after_transaction) as max_balance
                         FROM transactions t
                         JOIN bank_accounts ba ON t.account_id = ba.id
                         WHERE t.date >= CURRENT_DATE - INTERVAL '${safeDays} days'
                           AND t.balance_after_transaction IS NOT NULL
-                    ),
-                    latest_daily_balances AS (
-                        SELECT date, bank_name, account_id, balance_after_transaction
-                        FROM daily_balances
-                        WHERE rn = 1
-                    ),
-                    bank_daily_totals AS (
-                        SELECT 
-                            date,
-                            bank_name,
-                            SUM(balance_after_transaction) as total_balance
-                        FROM latest_daily_balances
-                        GROUP BY date, bank_name
-                    )
-                    SELECT 
-                        date,
-                        bank_name,
-                        total_balance
-                    FROM bank_daily_totals
+                        GROUP BY DATE(t.date), ba.bank_name, t.account_id
+                    ) t
+                    GROUP BY date, bank_name
                     ORDER BY date ASC, bank_name ASC
                 `;
                 params = [];
             } else {
                 query = `
-                    WITH daily_balances AS (
+                    SELECT 
+                        date,
+                        bank_name,
+                        SUM(max_balance) as total_balance
+                    FROM (
                         SELECT 
                             DATE(t.date) as date,
                             ba.bank_name,
                             t.account_id,
-                            t.balance_after_transaction,
-                            ROW_NUMBER() OVER (
-                                PARTITION BY DATE(t.date), ba.bank_name, t.account_id 
-                                ORDER BY t.date DESC, t.id DESC
-                            ) as rn
+                            MAX(t.balance_after_transaction) as max_balance
                         FROM transactions t
                         JOIN bank_accounts ba ON t.account_id = ba.id
                         WHERE ba.institution_id = $1 
                           AND t.date >= CURRENT_DATE - INTERVAL '${safeDays} days'
                           AND t.balance_after_transaction IS NOT NULL
-                    ),
-                    latest_daily_balances AS (
-                        SELECT date, bank_name, account_id, balance_after_transaction
-                        FROM daily_balances
-                        WHERE rn = 1
-                    ),
-                    bank_daily_totals AS (
-                        SELECT 
-                            date,
-                            bank_name,
-                            SUM(balance_after_transaction) as total_balance
-                        FROM latest_daily_balances
-                        GROUP BY date, bank_name
-                    )
-                    SELECT 
-                        date,
-                        bank_name,
-                        total_balance
-                    FROM bank_daily_totals
+                        GROUP BY DATE(t.date), ba.bank_name, t.account_id
+                    ) t
+                    GROUP BY date, bank_name
                     ORDER BY date ASC, bank_name ASC
                 `;
                 params = [institutionId];
@@ -215,76 +186,47 @@ class ReportService {
             const result = await pool.query(query, params);
             return result.rows;
         } else {
-            // Toplam bakiye geçmişi
+            // Toplam bakiye geçmişi - Günlük maksimum bakiye
             let query, params;
+            
             if (institutionId === null) {
                 query = `
-                    WITH daily_balances AS (
+                    SELECT 
+                        date,
+                        SUM(max_balance) as total_balance
+                    FROM (
                         SELECT 
                             DATE(t.date) as date,
                             t.account_id,
-                            t.balance_after_transaction,
-                            ROW_NUMBER() OVER (
-                                PARTITION BY DATE(t.date), t.account_id 
-                                ORDER BY t.date DESC, t.id DESC
-                            ) as rn
+                            MAX(t.balance_after_transaction) as max_balance
                         FROM transactions t
                         JOIN bank_accounts ba ON t.account_id = ba.id
                         WHERE t.date >= CURRENT_DATE - INTERVAL '${safeDays} days'
                           AND t.balance_after_transaction IS NOT NULL
-                    ),
-                    latest_daily_balances AS (
-                        SELECT date, account_id, balance_after_transaction
-                        FROM daily_balances
-                        WHERE rn = 1
-                    ),
-                    daily_totals AS (
-                        SELECT 
-                            date,
-                            SUM(balance_after_transaction) as total_balance
-                        FROM latest_daily_balances
-                        GROUP BY date
-                    )
-                    SELECT 
-                        date,
-                        total_balance
-                    FROM daily_totals
+                        GROUP BY DATE(t.date), t.account_id
+                    ) t
+                    GROUP BY date
                     ORDER BY date ASC
                 `;
                 params = [];
             } else {
                 query = `
-                    WITH daily_balances AS (
+                    SELECT 
+                        date,
+                        SUM(max_balance) as total_balance
+                    FROM (
                         SELECT 
                             DATE(t.date) as date,
                             t.account_id,
-                            t.balance_after_transaction,
-                            ROW_NUMBER() OVER (
-                                PARTITION BY DATE(t.date), t.account_id 
-                                ORDER BY t.date DESC, t.id DESC
-                            ) as rn
+                            MAX(t.balance_after_transaction) as max_balance
                         FROM transactions t
                         JOIN bank_accounts ba ON t.account_id = ba.id
                         WHERE ba.institution_id = $1 
                           AND t.date >= CURRENT_DATE - INTERVAL '${safeDays} days'
                           AND t.balance_after_transaction IS NOT NULL
-                    ),
-                    latest_daily_balances AS (
-                        SELECT date, account_id, balance_after_transaction
-                        FROM daily_balances
-                        WHERE rn = 1
-                    ),
-                    daily_totals AS (
-                        SELECT 
-                            date,
-                            SUM(balance_after_transaction) as total_balance
-                        FROM latest_daily_balances
-                        GROUP BY date
-                    )
-                    SELECT 
-                        date,
-                        total_balance
-                    FROM daily_totals
+                        GROUP BY DATE(t.date), t.account_id
+                    ) t
+                    GROUP BY date
                     ORDER BY date ASC
                 `;
                 params = [institutionId];
