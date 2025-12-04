@@ -134,16 +134,29 @@ class ReportService {
         const safeDays = parseInt(days) || 30;
         
         if (groupByBank) {
-            // Kurum bazında bakiye geçmişi - Günlük maksimum bakiye
+            // Banka bazında bakiye geçmişi - Günlük maksimum bakiye (forward fill ile)
             let query, params;
             
             if (institutionId === null) {
                 query = `
-                    SELECT 
-                        date,
-                        bank_name,
-                        SUM(max_balance) as total_balance
-                    FROM (
+                    WITH date_series AS (
+                        SELECT generate_series(
+                            CURRENT_DATE - INTERVAL '${safeDays} days',
+                            CURRENT_DATE,
+                            '1 day'::interval
+                        )::date AS date
+                    ),
+                    bank_list AS (
+                        SELECT DISTINCT ba.bank_name
+                        FROM bank_accounts ba
+                        WHERE ba.is_active = true
+                    ),
+                    date_bank_combinations AS (
+                        SELECT ds.date, bl.bank_name
+                        FROM date_series ds
+                        CROSS JOIN bank_list bl
+                    ),
+                    daily_max_balances AS (
                         SELECT 
                             DATE(t.date) as date,
                             ba.bank_name,
@@ -154,18 +167,58 @@ class ReportService {
                         WHERE t.date >= CURRENT_DATE - INTERVAL '${safeDays} days'
                           AND t.balance_after_transaction IS NOT NULL
                         GROUP BY DATE(t.date), ba.bank_name, t.account_id
-                    ) t
-                    GROUP BY date, bank_name
+                    ),
+                    daily_balances AS (
+                        SELECT 
+                            date,
+                            bank_name,
+                            SUM(max_balance) as total_balance
+                        FROM daily_max_balances
+                        GROUP BY date, bank_name
+                    ),
+                    filled_balances AS (
+                        SELECT 
+                            dbc.date,
+                            dbc.bank_name,
+                            (
+                                SELECT db2.total_balance
+                                FROM daily_balances db2
+                                WHERE db2.bank_name = dbc.bank_name
+                                  AND db2.date <= dbc.date
+                                  AND db2.total_balance IS NOT NULL
+                                ORDER BY db2.date DESC
+                                LIMIT 1
+                            ) as total_balance
+                        FROM date_bank_combinations dbc
+                    )
+                    SELECT 
+                        date,
+                        bank_name,
+                        COALESCE(total_balance, 0) as total_balance
+                    FROM filled_balances
                     ORDER BY date ASC, bank_name ASC
                 `;
                 params = [];
             } else {
                 query = `
-                    SELECT 
-                        date,
-                        bank_name,
-                        SUM(max_balance) as total_balance
-                    FROM (
+                    WITH date_series AS (
+                        SELECT generate_series(
+                            CURRENT_DATE - INTERVAL '${safeDays} days',
+                            CURRENT_DATE,
+                            '1 day'::interval
+                        )::date AS date
+                    ),
+                    bank_list AS (
+                        SELECT DISTINCT ba.bank_name
+                        FROM bank_accounts ba
+                        WHERE ba.institution_id = $1 AND ba.is_active = true
+                    ),
+                    date_bank_combinations AS (
+                        SELECT ds.date, bl.bank_name
+                        FROM date_series ds
+                        CROSS JOIN bank_list bl
+                    ),
+                    daily_max_balances AS (
                         SELECT 
                             DATE(t.date) as date,
                             ba.bank_name,
@@ -177,8 +230,35 @@ class ReportService {
                           AND t.date >= CURRENT_DATE - INTERVAL '${safeDays} days'
                           AND t.balance_after_transaction IS NOT NULL
                         GROUP BY DATE(t.date), ba.bank_name, t.account_id
-                    ) t
-                    GROUP BY date, bank_name
+                    ),
+                    daily_balances AS (
+                        SELECT 
+                            date,
+                            bank_name,
+                            SUM(max_balance) as total_balance
+                        FROM daily_max_balances
+                        GROUP BY date, bank_name
+                    ),
+                    filled_balances AS (
+                        SELECT 
+                            dbc.date,
+                            dbc.bank_name,
+                            (
+                                SELECT db2.total_balance
+                                FROM daily_balances db2
+                                WHERE db2.bank_name = dbc.bank_name
+                                  AND db2.date <= dbc.date
+                                  AND db2.total_balance IS NOT NULL
+                                ORDER BY db2.date DESC
+                                LIMIT 1
+                            ) as total_balance
+                        FROM date_bank_combinations dbc
+                    )
+                    SELECT 
+                        date,
+                        bank_name,
+                        COALESCE(total_balance, 0) as total_balance
+                    FROM filled_balances
                     ORDER BY date ASC, bank_name ASC
                 `;
                 params = [institutionId];
@@ -186,15 +266,19 @@ class ReportService {
             const result = await pool.query(query, params);
             return result.rows;
         } else {
-            // Toplam bakiye geçmişi - Günlük maksimum bakiye
+            // Toplam bakiye geçmişi - Günlük maksimum bakiye (forward fill ile)
             let query, params;
             
             if (institutionId === null) {
                 query = `
-                    SELECT 
-                        date,
-                        SUM(max_balance) as total_balance
-                    FROM (
+                    WITH date_series AS (
+                        SELECT generate_series(
+                            CURRENT_DATE - INTERVAL '${safeDays} days',
+                            CURRENT_DATE,
+                            '1 day'::interval
+                        )::date AS date
+                    ),
+                    daily_max_balances AS (
                         SELECT 
                             DATE(t.date) as date,
                             t.account_id,
@@ -204,17 +288,44 @@ class ReportService {
                         WHERE t.date >= CURRENT_DATE - INTERVAL '${safeDays} days'
                           AND t.balance_after_transaction IS NOT NULL
                         GROUP BY DATE(t.date), t.account_id
-                    ) t
-                    GROUP BY date
+                    ),
+                    daily_balances AS (
+                        SELECT 
+                            date,
+                            SUM(max_balance) as total_balance
+                        FROM daily_max_balances
+                        GROUP BY date
+                    ),
+                    filled_balances AS (
+                        SELECT 
+                            ds.date,
+                            (
+                                SELECT db2.total_balance
+                                FROM daily_balances db2
+                                WHERE db2.date <= ds.date
+                                  AND db2.total_balance IS NOT NULL
+                                ORDER BY db2.date DESC
+                                LIMIT 1
+                            ) as total_balance
+                        FROM date_series ds
+                    )
+                    SELECT 
+                        date,
+                        COALESCE(total_balance, 0) as total_balance
+                    FROM filled_balances
                     ORDER BY date ASC
                 `;
                 params = [];
             } else {
                 query = `
-                    SELECT 
-                        date,
-                        SUM(max_balance) as total_balance
-                    FROM (
+                    WITH date_series AS (
+                        SELECT generate_series(
+                            CURRENT_DATE - INTERVAL '${safeDays} days',
+                            CURRENT_DATE,
+                            '1 day'::interval
+                        )::date AS date
+                    ),
+                    daily_max_balances AS (
                         SELECT 
                             DATE(t.date) as date,
                             t.account_id,
@@ -225,8 +336,31 @@ class ReportService {
                           AND t.date >= CURRENT_DATE - INTERVAL '${safeDays} days'
                           AND t.balance_after_transaction IS NOT NULL
                         GROUP BY DATE(t.date), t.account_id
-                    ) t
-                    GROUP BY date
+                    ),
+                    daily_balances AS (
+                        SELECT 
+                            date,
+                            SUM(max_balance) as total_balance
+                        FROM daily_max_balances
+                        GROUP BY date
+                    ),
+                    filled_balances AS (
+                        SELECT 
+                            ds.date,
+                            (
+                                SELECT db2.total_balance
+                                FROM daily_balances db2
+                                WHERE db2.date <= ds.date
+                                  AND db2.total_balance IS NOT NULL
+                                ORDER BY db2.date DESC
+                                LIMIT 1
+                            ) as total_balance
+                        FROM date_series ds
+                    )
+                    SELECT 
+                        date,
+                        COALESCE(total_balance, 0) as total_balance
+                    FROM filled_balances
                     ORDER BY date ASC
                 `;
                 params = [institutionId];
