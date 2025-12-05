@@ -79,7 +79,8 @@ function parseResponse(xml) {
     console.log('✅ Ham XML yanıtı halkbank_response.xml dosyasına kaydedildi.');
 
     const extract = (tag, content) => {
-        const regex = new RegExp(`<[^:]*${tag}[^>]*>(.*?)</[^:]*${tag}>`, 'g');
+        // Namespace'li veya namespace'siz tagleri yakala (Örn: <a:HataKodu> veya <HataKodu>)
+        const regex = new RegExp(`<(?:[\\w]+:)?${tag}(?: [^>]*)?>(.*?)</(?:[\\w]+:)?${tag}>`, 'g');
         const matches = [];
         let match;
         while ((match = regex.exec(content)) !== null) {
@@ -100,9 +101,33 @@ function parseResponse(xml) {
         const bakiyeler = extract('Bakiye', xml);
 
         if (bakiyeler.length > 0) {
-            console.log(`\n${bakiyeler.length} hesap bulundu.`);
+            console.log(`\n✅ ${bakiyeler.length} hesap bulundu.`);
+
+            // Detaylı hesap bilgilerini çek
+            const hesapNolar = extract('HesapNo', xml);
+            const subeKodlari = extract('SubeKodu', xml);
+            const musteriNolar = extract('MusteriNo', xml);
+            const ibanlar = extract('IbanNo', xml);
+            const subeAdlari = extract('SubeAdi', xml);
+
             for (let i = 0; i < bakiyeler.length; i++) {
-                console.log(`Hesap ${i + 1} Bakiye: ${bakiyeler[i]}`);
+                console.log(`\n--- HESAP ${i + 1} ---`);
+                console.log(`Hesap No (Tam): ${hesapNolar[i]}`);
+                console.log(`Şube Kodu: ${subeKodlari[i]} (${subeAdlari[i]})`);
+                console.log(`Müşteri No: ${musteriNolar[i]}`);
+                console.log(`IBAN: ${ibanlar[i]}`);
+                console.log(`Bakiye: ${bakiyeler[i]}`);
+
+                // Kullanıcıya öneri
+                let shortAccountNo = hesapNolar[i];
+                if (hesapNolar[i].includes('-')) {
+                    const parts = hesapNolar[i].split('-');
+                    if (parts.length === 3) shortAccountNo = parts[2];
+                }
+
+                console.log(`\n👉 ÖNERİLEN AYARLAR:`);
+                console.log(`Account Number: ${shortAccountNo}`);
+                console.log(`Branch Code: ${subeKodlari[i]}`);
             }
         }
 
