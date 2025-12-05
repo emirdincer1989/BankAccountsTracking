@@ -1,0 +1,2670 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:s1="http://tr.com.erdemir.ziraat" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:import namespace="http://tr.com.erdemir.ziraat" />
+      <s:element name="MusteriHesapHareket">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="KurumKod" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sifre" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="MusteriNo" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="EkNo" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="SubeKodu" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="BaslangicTarihi" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="BitisTarihi" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="MusteriHesapHareketResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="MusteriHesapHareketResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="HesapEkstre">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="KurumKod" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Sifre" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="HesapNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="BaslangicTarihi" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="BitisTarihi" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="HesapEkstreResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="HesapEkstreResult" type="s1:HareketlerBakiye" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="HesapEkstreZamanIle">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="kurumKod" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sifre" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="hesapNo" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="baslangicZamani" type="s:dateTime" />
+            <s:element minOccurs="1" maxOccurs="1" name="bitisZamani" type="s:dateTime" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="HesapEkstreZamanIleResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="HesapEkstreZamanIleResult" type="s1:HareketlerBakiye" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SorgulaDetayWS">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="kullaniciKod" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sifre" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ibanNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="baslangicTarihi" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="bitisTarihi" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SorgulaDetayWSResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SorgulaDetayWSResult" type="tns:Hareketler" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="Hareketler">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="hataKodu" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="hataAciklama" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="IBAN" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="subeAdi" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="hareket" type="tns:ArrayOfHareket" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfHareket">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Hareket" nillable="true" type="tns:Hareket" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Hareket">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="islemTarihi" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="aciklama" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="tutar" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="kalanBakiye" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="islemZamani" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="islemKodu" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="islemAciklama" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="SorgulaDetayWSZamanIle">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="kullaniciKod" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sifre" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ibanNo" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="baslangicZamani" type="s:dateTime" />
+            <s:element minOccurs="1" maxOccurs="1" name="bitisZamani" type="s:dateTime" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SorgulaDetayWSZamanIleResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SorgulaDetayWSZamanIleResult" type="tns:Hareketler" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SorgulaOzetWS">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="kullaniciKod" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sifre" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ibanNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="baslangicTarihi" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="bitisTarihi" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SorgulaOzetWSResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SorgulaOzetWSResult" type="tns:Hesap" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="Hesap">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="IBAN" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="subeAdi" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="hataKodu" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="hataAciklama" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="gunlukHareket" type="tns:ArrayOfGunlukHareket" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfGunlukHareket">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="GunlukHareket" nillable="true" type="tns:GunlukHareket" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="GunlukHareket">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="islemTarihi" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="borcTutar" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="alacakTutar" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="bakiye" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="SorgulaOzetWSZamanIle">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="kullaniciKod" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sifre" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ibanNo" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="baslangicZamani" type="s:dateTime" />
+            <s:element minOccurs="1" maxOccurs="1" name="bitisZamani" type="s:dateTime" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SorgulaOzetWSZamanIleResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SorgulaOzetWSZamanIleResult" type="tns:Hesap" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="HareketSorgulaVknIle">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="kullaniciKod" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sifre" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="vkn" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="muhasebeTarihi" type="s:dateTime" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="HareketSorgulaVknIleResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="HareketSorgulaVknIleResult" type="tns:ArrayOfDetayliEkstre" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfDetayliEkstre">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="DetayliEkstre" nillable="true" type="tns:DetayliEkstre" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="DetayliEkstre">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="hesaplar" type="tns:ArrayOfDetayliHesap" />
+          <s:element minOccurs="1" maxOccurs="1" name="responseCode" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="responseAciklama" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="VKN" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="musteriNo" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="kurumAdi" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ilKodu" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="toplamAcilisBakiyeTry" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="toplamKapanisBakiyeTry" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="toplamGuniciAlacakTry" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="toplamGuniciBorcTry" type="s:decimal" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfDetayliHesap">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="DetayliHesap" nillable="true" type="tns:DetayliHesap" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="DetayliHesap">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="hareketler" type="tns:ArrayOfHareketSB" />
+          <s:element minOccurs="0" maxOccurs="1" name="IBAN" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="ekNo" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="subeAdi" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="subeKod" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="hesapTuru" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="faizOrani" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="vadeBaslangicTarihi" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="vadeBitisTarihi" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="vadeGunSayisi" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="paraCinsi" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="toplamBakiye" type="s:decimal" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfHareketSB">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="HareketSB" nillable="true" type="tns:HareketSB" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="HareketSB">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="karsiHesaplar" type="tns:ArrayOfKarsiHesap" />
+          <s:element minOccurs="1" maxOccurs="1" name="islemTarihi" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="islemAciklama" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="islemTutari" type="s:decimal" />
+          <s:element minOccurs="0" maxOccurs="1" name="borcAlacakBilgisi" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="muhasebeSubeKodu" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="muhasebeReferansi" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="muhasebeTarihi" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="islemTipi" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="islemZamani" type="s:dateTime" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfKarsiHesap">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="KarsiHesap" nillable="true" type="tns:KarsiHesap" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="KarsiHesap">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="tcknVkn" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="tutar" type="s:decimal" />
+          <s:element minOccurs="0" maxOccurs="1" name="borcAlacakBilgisi" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="aciklama" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetirPdfDekont">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="kurumKod" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sifre" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="musteriNo" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="ekNo" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="baslangicTarihi" type="s:dateTime" />
+            <s:element minOccurs="1" maxOccurs="1" name="bitisTarihi" type="s:dateTime" />
+            <s:element minOccurs="1" maxOccurs="1" name="suAnkiSayfa" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="sayfaBoyutu" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="dosyaFormati" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetirPdfDekontResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetirPdfDekontResult" type="tns:dPdfDekontC" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="dPdfDekontC">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:CompoundDto">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="CevapKodu" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="CevapAciklama" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="ToplamSayfa" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="DekontDetaylari" type="tns:ArrayOfDPdfDekontDetay" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="CompoundDto" abstract="true">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:CompositeBase" />
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="CompositeBase">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="ProperytName" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="DTOBase" abstract="true">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:CompositeBase" />
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dHata">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:DTOBase">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="HataKodu" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="HataAciklamasi" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dSube">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:DTOBase">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="SubeAd" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dHesapHareket">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:DTOBase">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="MuhasebeTr" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Valor" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="SubeKd" nillable="true" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="MuhasebeRef" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="Borc" nillable="true" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="Alacak" nillable="true" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="Bakiye" nillable="true" type="s:decimal" />
+              <s:element minOccurs="0" maxOccurs="1" name="Aciklama" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="MuhasebeSubeKd" nillable="true" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="SiraNo" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="SistemTr" nillable="true" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="IslemKodu" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IslemAciklama" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dKurumSorgu">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:DTOBase">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="BankaKodu" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BankaAdi" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BankaVergiDairesi" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BankaVergiNumarasi" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="HataKodu" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="HataAciklamasi" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="SubeKodu" nillable="true" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="SubeAdi" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="HesapNo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="DovizTipi" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="AcilisBakiye" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="CariBakiye" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IslemTarihi" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Valor" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Referans" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Aciklama" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Tutar" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BorcAlacak" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IslemTipi" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="TimeStamp" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="musteriVergiNumarasi" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="IslemTar" nillable="true" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="Bakiye" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IslemKodu" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IslemAciklama" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dHesapEkstreOzet">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:DTOBase">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="BorcTutar" nillable="true" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="AlacakTutar" nillable="true" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="Tarih" nillable="true" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="Bakiye" nillable="true" type="s:decimal" />
+              <s:element minOccurs="0" maxOccurs="1" name="SubeAd" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Iban" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dHesapEkstreOzetHata">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:DTOBase">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="Kod" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Aciklama" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dPdfDekontDetay">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:DTOBase">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="MuhasebeTarihi" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="MuhasebeSubeKodu" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="MuhasebeRef" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="Alacak" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="Borc" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="SiraNo" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="PdfDekont" type="tns:ArrayOfUnsignedByte" />
+              <s:element minOccurs="1" maxOccurs="1" name="IslemZamani" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="DekontBase64" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IslemKodu" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IslemAciklama" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="ArrayOfUnsignedByte">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="unsignedByte" type="s:unsignedByte" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="dIbanBilgi">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:DTOBase">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="IbanCozuldu" nillable="true" type="s:boolean" />
+              <s:element minOccurs="1" maxOccurs="1" name="SubeNo" nillable="true" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="MusteriNo" nillable="true" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="EkNo" nillable="true" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="BankaKodu" nillable="true" type="s:int" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dPdfDekontHesapHareketi">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:DTOBase">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="MuhasebeTarihi" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="MuhasebeSubeKodu" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="MuhasebeRef" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="Borc" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="Alacak" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="SiraNo" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="IslemZamani" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="IslemKodu" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IslemAciklama" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dPdfDekont">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:DTOBase">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="DekontFormati" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="Zipli" type="s:boolean" />
+              <s:element minOccurs="1" maxOccurs="1" name="MuhasebeTarihi" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="MuhasebeSubeKodu" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="MuhasebeReferansi" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="DekontByteListesi" type="tns:ArrayOfUnsignedByte" />
+              <s:element minOccurs="0" maxOccurs="1" name="DekontBase64" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dHesapHareketSorgu">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:DTOBase">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="DovizTipi" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="IslemZamani" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="Tutar" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BorcAlacak" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Aciklama" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="MuhasebeTarihi" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="ValorTarihi" nillable="true" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="TimeStamp" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IslemKodu" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IslemAciklama" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Tckn" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="AdUnvan" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IBAN" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="MuhasebeReferansi" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ProgramKod" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="DekontNo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IslemTipi" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Bakiye" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dHesapHareketDetay">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:DTOBase">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="DekontNo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ProgramKod" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="MuhRef" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IBAN" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ADUNVAN" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="TCKNVKN" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IslemAciklama" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IslemTipi" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="TimeStamp" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="MuhasebeTarihi" nillable="true" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="Aciklama" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BorcAlacak" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Tutar" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="IslemTarihi" nillable="true" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="DovizTipi" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="ValorTarihi" nillable="true" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="KayitDurumu" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="IptalZamani" nillable="true" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="Bakiye" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IslemKodu" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dHesapHareketDetayHizli">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:DTOBase">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="ProgramKod" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IBAN" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ADUNVAN" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="TCKNVKN" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Aciklama" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BorcAlacak" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Tutar" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="IslemTarihi" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="DovizTipi" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IslemKodu" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IslemAciklama" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="DekontNo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="TimeStamp" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dKullaniciHesapBilgi">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:DTOBase">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="SubeKodu" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="MusteriNo" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="EkNo" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="DovizKodu" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IBAN" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="SubeAdi" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="SubeIlPlakaKodu" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="TcknVkn" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Unvan" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="HesapTipiKodu" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="HesapTipiAdi" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dHesapHareketWSTekilHareket">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:DTOBase">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="HareketNo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="DekontNo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="KayitDurumu" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="IslemZamani" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="ValorTarihi" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="BorcAlacakKodu" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="DovizTipi" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="Tutar" type="s:decimal" />
+              <s:element minOccurs="0" maxOccurs="1" name="Aciklama" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ProgramKod" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="KarsiTcknVkn" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="KarsiAdUnvan" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="KarsiIban" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dMutabakatHesapHareketOzet">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:DTOBase">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="ToplamBorc" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="ToplamAlacak" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="HareketSayisi" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="IptalToplamBorc" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="IptalToplamAlacak" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="IptalHareketSayisi" type="s:int" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dMutabakatHesapHareket">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:DTOBase">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="MuhasebeTarihi" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="MuhasebeSubeKodu" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="MuhasebeReferansi" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="SiraNo" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="KayitDurumu" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="IslemZamani" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="IptalZamani" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="ValorTarihi" type="s:dateTime" />
+              <s:element minOccurs="0" maxOccurs="1" name="BorcAlacakKodu" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="DovizTipi" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Aciklama" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="Borc" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="Alacak" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="IslemKodu" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="KarsiTcknVkn" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="KarsiAdUnvan" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="KarsiIban" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="ProgramKod" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="HareketNo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="DekontNo" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="Tutar" type="s:decimal" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dHesapHareketC">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:CompoundDto">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="HesapHareket" type="tns:ArrayOfDHesapHareket" />
+              <s:element minOccurs="0" maxOccurs="1" name="Sube" type="tns:ArrayOfDSube" />
+              <s:element minOccurs="0" maxOccurs="1" name="Hata" type="tns:ArrayOfDHata" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="ArrayOfDHesapHareket">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="dHesapHareket" nillable="true" type="tns:dHesapHareket" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfDSube">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="dSube" nillable="true" type="tns:dSube" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfDHata">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="dHata" nillable="true" type="tns:dHata" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="dKurumSorguC">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:CompoundDto">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="HataKodu" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="HataAciklama" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BankaAdi" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BankaKodu" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BankaVergiDairesi" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BankaVergiNumarasi" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Hareketler" type="tns:ArrayOfDKurumSorgu" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="ArrayOfDKurumSorgu">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="dKurumSorgu" nillable="true" type="tns:dKurumSorgu" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="dHesapEkstreOzetC">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:CompoundDto">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="HesapEkstreOzetleri" type="tns:ArrayOfDHesapEkstreOzet" />
+              <s:element minOccurs="0" maxOccurs="1" name="dHesapEkstreOzetHata" type="tns:ArrayOfDHesapEkstreOzetHata" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="ArrayOfDHesapEkstreOzet">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="dHesapEkstreOzet" nillable="true" type="tns:dHesapEkstreOzet" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfDHesapEkstreOzetHata">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="dHesapEkstreOzetHata" nillable="true" type="tns:dHesapEkstreOzetHata" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="dHesapHareketPdfDekontNoluC">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:CompoundDto">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="CevapKodu" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="CevapAciklama" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="DekontHareketi" type="tns:dPdfDekontHesapHareketi" />
+              <s:element minOccurs="0" maxOccurs="1" name="PdfDekont" type="tns:dPdfDekont" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dHesapHareketSorguC">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:CompoundDto">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="CevapKodu" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="CevapAciklama" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="AcilisBakiye" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="CariBakiye" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BlokeliBakiye" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="HesapIBAN" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="SubeAdi" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="SubeKodu" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="HesapHareketleri" type="tns:ArrayOfDHesapHareketSorgu" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="ArrayOfDHesapHareketSorgu">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="dHesapHareketSorgu" nillable="true" type="tns:dHesapHareketSorgu" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="dHesapHareketDetayC">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:CompoundDto">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="HesapHareketDetaylari" type="tns:ArrayOfDHesapHareketDetay" />
+              <s:element minOccurs="0" maxOccurs="1" name="AcilisBakiye" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="CariBakiye" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="BlokeliBakiye" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="HesapNo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="SubeAdi" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="SubeKodu" nillable="true" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="CevapKodu" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="CevapAciklama" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="ArrayOfDHesapHareketDetay">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="dHesapHareketDetay" nillable="true" type="tns:dHesapHareketDetay" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="dHesapHareketDetayHizliC">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:CompoundDto">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="HesapHareketDetaylari" type="tns:ArrayOfDHesapHareketDetayHizli" />
+              <s:element minOccurs="0" maxOccurs="1" name="CariBakiye" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="CevapKodu" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="CevapAciklama" type="s:string" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="ArrayOfDHesapHareketDetayHizli">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="dHesapHareketDetayHizli" nillable="true" type="tns:dHesapHareketDetayHizli" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="dHesapHareketWSGelenParaTransferC">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:CompoundDto">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="CevapKodu" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="CevapMesaji" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="GelenParaTransferiIBAN" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="HesapHareketi" type="tns:dHesapHareketWSTekilHareket" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dMutabakatOzetZamanIleC">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:CompoundDto">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="CevapKodu" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="CevapMesaji" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="MutabakatHesapHareketOzet" type="tns:dMutabakatHesapHareketOzet" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="dMutabakatDetayZamanIleC">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:CompoundDto">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="CevapKodu" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="CevapMesaji" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="HesapHareketleri" type="tns:ArrayOfDMutabakatHesapHareket" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="ArrayOfDMutabakatHesapHareket">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="dMutabakatHesapHareket" nillable="true" type="tns:dMutabakatHesapHareket" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfDPdfDekontDetay">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="dPdfDekontDetay" nillable="true" type="tns:dPdfDekontDetay" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetirPdfDekontZamanIle">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="kurumKod" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sifre" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="musteriNo" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="ekNo" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="baslangicZamani" type="s:dateTime" />
+            <s:element minOccurs="1" maxOccurs="1" name="bitisZamani" type="s:dateTime" />
+            <s:element minOccurs="1" maxOccurs="1" name="suAnkiSayfa" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="sayfaBoyutu" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="dosyaFormati" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetirPdfDekontZamanIleResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetirPdfDekontZamanIleResult" type="tns:dPdfDekontC" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetirPdfDekontDekontNoIle">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="kurumKod" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sifre" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="musteriNo" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="ekNo" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="dekontNo" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetirPdfDekontDekontNoIleResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetirPdfDekontDekontNoIleResult" type="tns:DekontCevap" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="DekontCevap">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="CevapKodu" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="CevapAciklama" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="DekontDetayi" type="tns:DekontDetay" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="DekontDetay">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="MuhasebeTarihi" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="MuhasebeSubeKodu" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="MuhasebeRef" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="Borc" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="Alacak" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="SiraNo" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="IslemZamani" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="IslemKodu" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="IslemAciklama" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="PdfDekont" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="SorgulaHesapHareket">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="musteriNo" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="ekNo" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="baslangicTr" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="bitisTr" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="kurumKod" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sifre" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SorgulaHesapHareketResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SorgulaHesapHareketResult" type="tns:HesapHareketCevap" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="HesapHareketCevap">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="hataKodu" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="hataAck" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="subeKodu" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="subeAdi" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="hesapNo" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="AcilisBakiye" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CariBakiye" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="hareketdetay" type="tns:ArrayOfHareketlerDetay" />
+          <s:element minOccurs="0" maxOccurs="1" name="BlokeliBakiye" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfHareketlerDetay">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="HareketlerDetay" nillable="true" type="tns:HareketlerDetay" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="HareketlerDetay">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="dovizTipi" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="islemTarihi" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="tutar" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="borcAlacak" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="aciklama" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="muhasebetarihi" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="valorTarihi" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="timeStamp" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="islemAciklama" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="tcknVkn" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="adUnvan" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="iban" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="muhref" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="programKod" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="dekontNo" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="islemTipi" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="kayitDurumu" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="iptalZamani" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="Bakiye" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="islemKodu" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="SorgulaHesapHareketZamanIle">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="musteriNo" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="ekNo" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="baslangicZamani" type="s:dateTime" />
+            <s:element minOccurs="1" maxOccurs="1" name="bitisZamani" type="s:dateTime" />
+            <s:element minOccurs="0" maxOccurs="1" name="kurumKod" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sifre" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="iptalFisGetir" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SorgulaHesapHareketZamanIleResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SorgulaHesapHareketZamanIleResult" type="tns:HesapHareketCevap" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SorgulaHesapHareketZamanIleHizli">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="musteriNo" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="ekNo" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="baslangicZamani" type="s:dateTime" />
+            <s:element minOccurs="1" maxOccurs="1" name="bitisZamani" type="s:dateTime" />
+            <s:element minOccurs="0" maxOccurs="1" name="kurumKod" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sifre" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SorgulaHesapHareketZamanIleHizliResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SorgulaHesapHareketZamanIleHizliResult" type="tns:HesapHareketHizliCevap" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="HesapHareketHizliCevap">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="hataKodu" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="hataAck" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="cariBakiye" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="hareketdetay" type="tns:ArrayOfHareketlerDetayHizli" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfHareketlerDetayHizli">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="HareketlerDetayHizli" nillable="true" type="tns:HareketlerDetayHizli" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="HareketlerDetayHizli">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="dovizTipi" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="islemTarihi" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="tutar" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="borcAlacak" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="aciklama" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="tcknVkn" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="adUnvan" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="iban" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="programKod" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="islemKodu" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="islemAciklama" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="timeStamp" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="dekontNo" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetirTanimliHesapBilgileri">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="kurumKod" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sifre" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="tcknVkn" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetirTanimliHesapBilgileriResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetirTanimliHesapBilgileriResult" type="tns:KullaniciHesapBilgiCevap" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="KullaniciHesapBilgiCevap">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="CevapKodu" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="CevapAciklama" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="KullaniciHesapBilgileri" type="tns:ArrayOfKullaniciHesapBilgi" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfKullaniciHesapBilgi">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="KullaniciHesapBilgi" nillable="true" type="tns:KullaniciHesapBilgi" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="KullaniciHesapBilgi">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="SubeKodu" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="MusteriNo" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="EkNo" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="DovizKodu" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="IBAN" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="SubeAdi" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="SubeIlPlakaKodu" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="TcknVkn" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="AdSoyadUnvan" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="SorgulaGelenParaTransfer">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="kurumKod" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sifre" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="musteriNo" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="ekNo" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="gonderenBankaKodu" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="islemTarihi" type="s:dateTime" />
+            <s:element minOccurs="0" maxOccurs="1" name="sorguNo" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="islemSubeKodu" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="fisReferansi" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SorgulaGelenParaTransferResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SorgulaGelenParaTransferResult" type="tns:GelenParaTransferCevap" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="GelenParaTransferCevap">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="CevapKodu" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="CevapMesaji" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="GelenParaTransferiIBAN" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="GelenParaTransferHareket" type="tns:GelenParaTransferHareket" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="GelenParaTransferHareket">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="HareketNo" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="DekontNo" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="KayitDurumu" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="IslemZamani" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="ValorTarihi" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="BorcAlacakKodu" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="DovizTipi" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="Tutar" type="s:decimal" />
+          <s:element minOccurs="0" maxOccurs="1" name="Aciklama" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="KarsiTcknVkn" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="KarsiAdUnvan" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="KarsiIban" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ProgramKod" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="SorgulaMutabakatOzetZamanIle">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="kurumKod" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sifre" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="musteriNo" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="ekNo" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="tarih" type="s:dateTime" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SorgulaMutabakatOzetZamanIleResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SorgulaMutabakatOzetZamanIleResult" type="tns:MutabakatOzetCevap" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="MutabakatOzetCevap">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="CevapKodu" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="CevapMesaji" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="MutabakatHesapHareketOzet" type="tns:MutabakatHesapHareketOzet" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="MutabakatHesapHareketOzet">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="ToplamBorc" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="ToplamAlacak" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="HareketSayisi" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="IptalToplamBorc" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="IptalToplamAlacak" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="IptalHareketSayisi" type="s:int" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="SorgulaMutabakatDetayZamanIle">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="kurumKod" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="sifre" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="musteriNo" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="ekNo" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="tarih" type="s:dateTime" />
+            <s:element minOccurs="1" maxOccurs="1" name="sayfaNumarasi" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="sayfaSatirSayisi" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="kayitDurumu" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SorgulaMutabakatDetayZamanIleResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SorgulaMutabakatDetayZamanIleResult" type="tns:MutabakatDetayCevap" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="MutabakatDetayCevap">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="CevapKodu" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="CevapMesaji" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="HesapHareketleri" type="tns:ArrayOfMutabakatHesapHareketDetay" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfMutabakatHesapHareketDetay">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="MutabakatHesapHareketDetay" nillable="true" type="tns:MutabakatHesapHareketDetay" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="MutabakatHesapHareketDetay">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="HareketNo" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="DekontNo" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="MuhasebeTarihi" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="MuhasebeSubeKodu" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="MuhasebeReferansi" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="KayitDurumu" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="IslemZamani" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="IptalZamani" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="ValorTarihi" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="BorcAlacakKodu" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="DovizTipi" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="Tutar" type="s:decimal" />
+          <s:element minOccurs="0" maxOccurs="1" name="Aciklama" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="KarsiTcknVkn" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="KarsiAdUnvan" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="KarsiIban" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ProgramKod" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="DataSet" nillable="true">
+        <s:complexType>
+          <s:sequence>
+            <s:element ref="s:schema" />
+            <s:any />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="HareketlerBakiye" nillable="true" type="s1:HareketlerBakiye" />
+      <s:element name="Hareketler" nillable="true" type="tns:Hareketler" />
+      <s:element name="Hesap" nillable="true" type="tns:Hesap" />
+      <s:element name="ArrayOfDetayliEkstre" nillable="true" type="tns:ArrayOfDetayliEkstre" />
+      <s:element name="dPdfDekontC" nillable="true" type="tns:dPdfDekontC" />
+      <s:element name="DekontCevap" nillable="true" type="tns:DekontCevap" />
+      <s:element name="HesapHareketCevap" nillable="true" type="tns:HesapHareketCevap" />
+      <s:element name="HesapHareketHizliCevap" nillable="true" type="tns:HesapHareketHizliCevap" />
+      <s:element name="KullaniciHesapBilgiCevap" nillable="true" type="tns:KullaniciHesapBilgiCevap" />
+      <s:element name="GelenParaTransferCevap" nillable="true" type="tns:GelenParaTransferCevap" />
+      <s:element name="MutabakatOzetCevap" nillable="true" type="tns:MutabakatOzetCevap" />
+      <s:element name="MutabakatDetayCevap" nillable="true" type="tns:MutabakatDetayCevap" />
+    </s:schema>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tr.com.erdemir.ziraat">
+      <s:complexType name="HareketlerBakiye">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="BankaKodu" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="BankaAdi" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="BankaVergiDairesi" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="BankaVergiNumarasi" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="hataKodu" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="hataAciklamasi" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="unbounded" form="unqualified" name="Bakiye" type="s1:HareketlerBakiyeHesap" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="HareketlerBakiyeHesap">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="subeKodu" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="SubeAdi" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="HesapNo" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="DovizTipi" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="AcilisBakiye" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="CariBakiye" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="Detay" type="s1:ArrayOfHareketlerBakiyeHesapHareketlerDetay" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfHareketlerBakiyeHesapHareketlerDetay">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" form="unqualified" name="HareketlerDetay" type="s1:HareketlerBakiyeHesapHareketlerDetay" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="HareketlerBakiyeHesapHareketlerDetay">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="IslemTarihi" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="Valor" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="Referans" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="Aciklama" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="Tutar" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="BorcAlacak" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="IslemTipi" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="TimeStamp" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="musteriVergiNumarasi" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="Bakiye" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" form="unqualified" name="IslemZamani" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="IslemAciklama" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="IslemKodu" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="MusteriHesapHareketSoapIn">
+    <wsdl:part name="parameters" element="tns:MusteriHesapHareket" />
+  </wsdl:message>
+  <wsdl:message name="MusteriHesapHareketSoapOut">
+    <wsdl:part name="parameters" element="tns:MusteriHesapHareketResponse" />
+  </wsdl:message>
+  <wsdl:message name="HesapEkstreSoapIn">
+    <wsdl:part name="parameters" element="tns:HesapEkstre" />
+  </wsdl:message>
+  <wsdl:message name="HesapEkstreSoapOut">
+    <wsdl:part name="parameters" element="tns:HesapEkstreResponse" />
+  </wsdl:message>
+  <wsdl:message name="HesapEkstreZamanIleSoapIn">
+    <wsdl:part name="parameters" element="tns:HesapEkstreZamanIle" />
+  </wsdl:message>
+  <wsdl:message name="HesapEkstreZamanIleSoapOut">
+    <wsdl:part name="parameters" element="tns:HesapEkstreZamanIleResponse" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaDetayWSSoapIn">
+    <wsdl:part name="parameters" element="tns:SorgulaDetayWS" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaDetayWSSoapOut">
+    <wsdl:part name="parameters" element="tns:SorgulaDetayWSResponse" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaDetayWSZamanIleSoapIn">
+    <wsdl:part name="parameters" element="tns:SorgulaDetayWSZamanIle" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaDetayWSZamanIleSoapOut">
+    <wsdl:part name="parameters" element="tns:SorgulaDetayWSZamanIleResponse" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaOzetWSSoapIn">
+    <wsdl:part name="parameters" element="tns:SorgulaOzetWS" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaOzetWSSoapOut">
+    <wsdl:part name="parameters" element="tns:SorgulaOzetWSResponse" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaOzetWSZamanIleSoapIn">
+    <wsdl:part name="parameters" element="tns:SorgulaOzetWSZamanIle" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaOzetWSZamanIleSoapOut">
+    <wsdl:part name="parameters" element="tns:SorgulaOzetWSZamanIleResponse" />
+  </wsdl:message>
+  <wsdl:message name="HareketSorgulaVknIleSoapIn">
+    <wsdl:part name="parameters" element="tns:HareketSorgulaVknIle" />
+  </wsdl:message>
+  <wsdl:message name="HareketSorgulaVknIleSoapOut">
+    <wsdl:part name="parameters" element="tns:HareketSorgulaVknIleResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetirPdfDekontSoapIn">
+    <wsdl:part name="parameters" element="tns:GetirPdfDekont" />
+  </wsdl:message>
+  <wsdl:message name="GetirPdfDekontSoapOut">
+    <wsdl:part name="parameters" element="tns:GetirPdfDekontResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetirPdfDekontZamanIleSoapIn">
+    <wsdl:part name="parameters" element="tns:GetirPdfDekontZamanIle" />
+  </wsdl:message>
+  <wsdl:message name="GetirPdfDekontZamanIleSoapOut">
+    <wsdl:part name="parameters" element="tns:GetirPdfDekontZamanIleResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetirPdfDekontDekontNoIleSoapIn">
+    <wsdl:part name="parameters" element="tns:GetirPdfDekontDekontNoIle" />
+  </wsdl:message>
+  <wsdl:message name="GetirPdfDekontDekontNoIleSoapOut">
+    <wsdl:part name="parameters" element="tns:GetirPdfDekontDekontNoIleResponse" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaHesapHareketSoapIn">
+    <wsdl:part name="parameters" element="tns:SorgulaHesapHareket" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaHesapHareketSoapOut">
+    <wsdl:part name="parameters" element="tns:SorgulaHesapHareketResponse" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaHesapHareketZamanIleSoapIn">
+    <wsdl:part name="parameters" element="tns:SorgulaHesapHareketZamanIle" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaHesapHareketZamanIleSoapOut">
+    <wsdl:part name="parameters" element="tns:SorgulaHesapHareketZamanIleResponse" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaHesapHareketZamanIleHizliSoapIn">
+    <wsdl:part name="parameters" element="tns:SorgulaHesapHareketZamanIleHizli" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaHesapHareketZamanIleHizliSoapOut">
+    <wsdl:part name="parameters" element="tns:SorgulaHesapHareketZamanIleHizliResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetirTanimliHesapBilgileriSoapIn">
+    <wsdl:part name="parameters" element="tns:GetirTanimliHesapBilgileri" />
+  </wsdl:message>
+  <wsdl:message name="GetirTanimliHesapBilgileriSoapOut">
+    <wsdl:part name="parameters" element="tns:GetirTanimliHesapBilgileriResponse" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaGelenParaTransferSoapIn">
+    <wsdl:part name="parameters" element="tns:SorgulaGelenParaTransfer" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaGelenParaTransferSoapOut">
+    <wsdl:part name="parameters" element="tns:SorgulaGelenParaTransferResponse" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaMutabakatOzetZamanIleSoapIn">
+    <wsdl:part name="parameters" element="tns:SorgulaMutabakatOzetZamanIle" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaMutabakatOzetZamanIleSoapOut">
+    <wsdl:part name="parameters" element="tns:SorgulaMutabakatOzetZamanIleResponse" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaMutabakatDetayZamanIleSoapIn">
+    <wsdl:part name="parameters" element="tns:SorgulaMutabakatDetayZamanIle" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaMutabakatDetayZamanIleSoapOut">
+    <wsdl:part name="parameters" element="tns:SorgulaMutabakatDetayZamanIleResponse" />
+  </wsdl:message>
+  <wsdl:message name="MusteriHesapHareketHttpGetIn">
+    <wsdl:part name="KurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="MusteriNo" type="s:string" />
+    <wsdl:part name="EkNo" type="s:string" />
+    <wsdl:part name="SubeKodu" type="s:string" />
+    <wsdl:part name="BaslangicTarihi" type="s:string" />
+    <wsdl:part name="BitisTarihi" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="MusteriHesapHareketHttpGetOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="HesapEkstreHttpGetIn">
+    <wsdl:part name="KurumKod" type="s:string" />
+    <wsdl:part name="Sifre" type="s:string" />
+    <wsdl:part name="HesapNo" type="s:string" />
+    <wsdl:part name="BaslangicTarihi" type="s:string" />
+    <wsdl:part name="BitisTarihi" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="HesapEkstreHttpGetOut">
+    <wsdl:part name="Body" element="tns:HareketlerBakiye" />
+  </wsdl:message>
+  <wsdl:message name="HesapEkstreZamanIleHttpGetIn">
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="hesapNo" type="s:string" />
+    <wsdl:part name="baslangicZamani" type="s:string" />
+    <wsdl:part name="bitisZamani" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="HesapEkstreZamanIleHttpGetOut">
+    <wsdl:part name="Body" element="tns:HareketlerBakiye" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaDetayWSHttpGetIn">
+    <wsdl:part name="kullaniciKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="ibanNo" type="s:string" />
+    <wsdl:part name="baslangicTarihi" type="s:string" />
+    <wsdl:part name="bitisTarihi" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaDetayWSHttpGetOut">
+    <wsdl:part name="Body" element="tns:Hareketler" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaDetayWSZamanIleHttpGetIn">
+    <wsdl:part name="kullaniciKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="ibanNo" type="s:string" />
+    <wsdl:part name="baslangicZamani" type="s:string" />
+    <wsdl:part name="bitisZamani" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaDetayWSZamanIleHttpGetOut">
+    <wsdl:part name="Body" element="tns:Hareketler" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaOzetWSHttpGetIn">
+    <wsdl:part name="kullaniciKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="ibanNo" type="s:string" />
+    <wsdl:part name="baslangicTarihi" type="s:string" />
+    <wsdl:part name="bitisTarihi" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaOzetWSHttpGetOut">
+    <wsdl:part name="Body" element="tns:Hesap" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaOzetWSZamanIleHttpGetIn">
+    <wsdl:part name="kullaniciKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="ibanNo" type="s:string" />
+    <wsdl:part name="baslangicZamani" type="s:string" />
+    <wsdl:part name="bitisZamani" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaOzetWSZamanIleHttpGetOut">
+    <wsdl:part name="Body" element="tns:Hesap" />
+  </wsdl:message>
+  <wsdl:message name="HareketSorgulaVknIleHttpGetIn">
+    <wsdl:part name="kullaniciKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="vkn" type="s:string" />
+    <wsdl:part name="muhasebeTarihi" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="HareketSorgulaVknIleHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfDetayliEkstre" />
+  </wsdl:message>
+  <wsdl:message name="GetirPdfDekontHttpGetIn">
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="musteriNo" type="s:string" />
+    <wsdl:part name="ekNo" type="s:string" />
+    <wsdl:part name="baslangicTarihi" type="s:string" />
+    <wsdl:part name="bitisTarihi" type="s:string" />
+    <wsdl:part name="suAnkiSayfa" type="s:string" />
+    <wsdl:part name="sayfaBoyutu" type="s:string" />
+    <wsdl:part name="dosyaFormati" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetirPdfDekontHttpGetOut">
+    <wsdl:part name="Body" element="tns:dPdfDekontC" />
+  </wsdl:message>
+  <wsdl:message name="GetirPdfDekontZamanIleHttpGetIn">
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="musteriNo" type="s:string" />
+    <wsdl:part name="ekNo" type="s:string" />
+    <wsdl:part name="baslangicZamani" type="s:string" />
+    <wsdl:part name="bitisZamani" type="s:string" />
+    <wsdl:part name="suAnkiSayfa" type="s:string" />
+    <wsdl:part name="sayfaBoyutu" type="s:string" />
+    <wsdl:part name="dosyaFormati" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetirPdfDekontZamanIleHttpGetOut">
+    <wsdl:part name="Body" element="tns:dPdfDekontC" />
+  </wsdl:message>
+  <wsdl:message name="GetirPdfDekontDekontNoIleHttpGetIn">
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="musteriNo" type="s:string" />
+    <wsdl:part name="ekNo" type="s:string" />
+    <wsdl:part name="dekontNo" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetirPdfDekontDekontNoIleHttpGetOut">
+    <wsdl:part name="Body" element="tns:DekontCevap" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaHesapHareketHttpGetIn">
+    <wsdl:part name="musteriNo" type="s:string" />
+    <wsdl:part name="ekNo" type="s:string" />
+    <wsdl:part name="baslangicTr" type="s:string" />
+    <wsdl:part name="bitisTr" type="s:string" />
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaHesapHareketHttpGetOut">
+    <wsdl:part name="Body" element="tns:HesapHareketCevap" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaHesapHareketZamanIleHttpGetIn">
+    <wsdl:part name="musteriNo" type="s:string" />
+    <wsdl:part name="ekNo" type="s:string" />
+    <wsdl:part name="baslangicZamani" type="s:string" />
+    <wsdl:part name="bitisZamani" type="s:string" />
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="iptalFisGetir" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaHesapHareketZamanIleHttpGetOut">
+    <wsdl:part name="Body" element="tns:HesapHareketCevap" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaHesapHareketZamanIleHizliHttpGetIn">
+    <wsdl:part name="musteriNo" type="s:string" />
+    <wsdl:part name="ekNo" type="s:string" />
+    <wsdl:part name="baslangicZamani" type="s:string" />
+    <wsdl:part name="bitisZamani" type="s:string" />
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaHesapHareketZamanIleHizliHttpGetOut">
+    <wsdl:part name="Body" element="tns:HesapHareketHizliCevap" />
+  </wsdl:message>
+  <wsdl:message name="GetirTanimliHesapBilgileriHttpGetIn">
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="tcknVkn" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetirTanimliHesapBilgileriHttpGetOut">
+    <wsdl:part name="Body" element="tns:KullaniciHesapBilgiCevap" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaGelenParaTransferHttpGetIn">
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="musteriNo" type="s:string" />
+    <wsdl:part name="ekNo" type="s:string" />
+    <wsdl:part name="gonderenBankaKodu" type="s:string" />
+    <wsdl:part name="islemTarihi" type="s:string" />
+    <wsdl:part name="sorguNo" type="s:string" />
+    <wsdl:part name="islemSubeKodu" type="s:string" />
+    <wsdl:part name="fisReferansi" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaGelenParaTransferHttpGetOut">
+    <wsdl:part name="Body" element="tns:GelenParaTransferCevap" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaMutabakatOzetZamanIleHttpGetIn">
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="musteriNo" type="s:string" />
+    <wsdl:part name="ekNo" type="s:string" />
+    <wsdl:part name="tarih" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaMutabakatOzetZamanIleHttpGetOut">
+    <wsdl:part name="Body" element="tns:MutabakatOzetCevap" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaMutabakatDetayZamanIleHttpGetIn">
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="musteriNo" type="s:string" />
+    <wsdl:part name="ekNo" type="s:string" />
+    <wsdl:part name="tarih" type="s:string" />
+    <wsdl:part name="sayfaNumarasi" type="s:string" />
+    <wsdl:part name="sayfaSatirSayisi" type="s:string" />
+    <wsdl:part name="kayitDurumu" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaMutabakatDetayZamanIleHttpGetOut">
+    <wsdl:part name="Body" element="tns:MutabakatDetayCevap" />
+  </wsdl:message>
+  <wsdl:message name="MusteriHesapHareketHttpPostIn">
+    <wsdl:part name="KurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="MusteriNo" type="s:string" />
+    <wsdl:part name="EkNo" type="s:string" />
+    <wsdl:part name="SubeKodu" type="s:string" />
+    <wsdl:part name="BaslangicTarihi" type="s:string" />
+    <wsdl:part name="BitisTarihi" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="MusteriHesapHareketHttpPostOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="HesapEkstreHttpPostIn">
+    <wsdl:part name="KurumKod" type="s:string" />
+    <wsdl:part name="Sifre" type="s:string" />
+    <wsdl:part name="HesapNo" type="s:string" />
+    <wsdl:part name="BaslangicTarihi" type="s:string" />
+    <wsdl:part name="BitisTarihi" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="HesapEkstreHttpPostOut">
+    <wsdl:part name="Body" element="tns:HareketlerBakiye" />
+  </wsdl:message>
+  <wsdl:message name="HesapEkstreZamanIleHttpPostIn">
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="hesapNo" type="s:string" />
+    <wsdl:part name="baslangicZamani" type="s:string" />
+    <wsdl:part name="bitisZamani" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="HesapEkstreZamanIleHttpPostOut">
+    <wsdl:part name="Body" element="tns:HareketlerBakiye" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaDetayWSHttpPostIn">
+    <wsdl:part name="kullaniciKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="ibanNo" type="s:string" />
+    <wsdl:part name="baslangicTarihi" type="s:string" />
+    <wsdl:part name="bitisTarihi" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaDetayWSHttpPostOut">
+    <wsdl:part name="Body" element="tns:Hareketler" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaDetayWSZamanIleHttpPostIn">
+    <wsdl:part name="kullaniciKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="ibanNo" type="s:string" />
+    <wsdl:part name="baslangicZamani" type="s:string" />
+    <wsdl:part name="bitisZamani" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaDetayWSZamanIleHttpPostOut">
+    <wsdl:part name="Body" element="tns:Hareketler" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaOzetWSHttpPostIn">
+    <wsdl:part name="kullaniciKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="ibanNo" type="s:string" />
+    <wsdl:part name="baslangicTarihi" type="s:string" />
+    <wsdl:part name="bitisTarihi" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaOzetWSHttpPostOut">
+    <wsdl:part name="Body" element="tns:Hesap" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaOzetWSZamanIleHttpPostIn">
+    <wsdl:part name="kullaniciKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="ibanNo" type="s:string" />
+    <wsdl:part name="baslangicZamani" type="s:string" />
+    <wsdl:part name="bitisZamani" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaOzetWSZamanIleHttpPostOut">
+    <wsdl:part name="Body" element="tns:Hesap" />
+  </wsdl:message>
+  <wsdl:message name="HareketSorgulaVknIleHttpPostIn">
+    <wsdl:part name="kullaniciKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="vkn" type="s:string" />
+    <wsdl:part name="muhasebeTarihi" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="HareketSorgulaVknIleHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfDetayliEkstre" />
+  </wsdl:message>
+  <wsdl:message name="GetirPdfDekontHttpPostIn">
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="musteriNo" type="s:string" />
+    <wsdl:part name="ekNo" type="s:string" />
+    <wsdl:part name="baslangicTarihi" type="s:string" />
+    <wsdl:part name="bitisTarihi" type="s:string" />
+    <wsdl:part name="suAnkiSayfa" type="s:string" />
+    <wsdl:part name="sayfaBoyutu" type="s:string" />
+    <wsdl:part name="dosyaFormati" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetirPdfDekontHttpPostOut">
+    <wsdl:part name="Body" element="tns:dPdfDekontC" />
+  </wsdl:message>
+  <wsdl:message name="GetirPdfDekontZamanIleHttpPostIn">
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="musteriNo" type="s:string" />
+    <wsdl:part name="ekNo" type="s:string" />
+    <wsdl:part name="baslangicZamani" type="s:string" />
+    <wsdl:part name="bitisZamani" type="s:string" />
+    <wsdl:part name="suAnkiSayfa" type="s:string" />
+    <wsdl:part name="sayfaBoyutu" type="s:string" />
+    <wsdl:part name="dosyaFormati" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetirPdfDekontZamanIleHttpPostOut">
+    <wsdl:part name="Body" element="tns:dPdfDekontC" />
+  </wsdl:message>
+  <wsdl:message name="GetirPdfDekontDekontNoIleHttpPostIn">
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="musteriNo" type="s:string" />
+    <wsdl:part name="ekNo" type="s:string" />
+    <wsdl:part name="dekontNo" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetirPdfDekontDekontNoIleHttpPostOut">
+    <wsdl:part name="Body" element="tns:DekontCevap" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaHesapHareketHttpPostIn">
+    <wsdl:part name="musteriNo" type="s:string" />
+    <wsdl:part name="ekNo" type="s:string" />
+    <wsdl:part name="baslangicTr" type="s:string" />
+    <wsdl:part name="bitisTr" type="s:string" />
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaHesapHareketHttpPostOut">
+    <wsdl:part name="Body" element="tns:HesapHareketCevap" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaHesapHareketZamanIleHttpPostIn">
+    <wsdl:part name="musteriNo" type="s:string" />
+    <wsdl:part name="ekNo" type="s:string" />
+    <wsdl:part name="baslangicZamani" type="s:string" />
+    <wsdl:part name="bitisZamani" type="s:string" />
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="iptalFisGetir" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaHesapHareketZamanIleHttpPostOut">
+    <wsdl:part name="Body" element="tns:HesapHareketCevap" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaHesapHareketZamanIleHizliHttpPostIn">
+    <wsdl:part name="musteriNo" type="s:string" />
+    <wsdl:part name="ekNo" type="s:string" />
+    <wsdl:part name="baslangicZamani" type="s:string" />
+    <wsdl:part name="bitisZamani" type="s:string" />
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaHesapHareketZamanIleHizliHttpPostOut">
+    <wsdl:part name="Body" element="tns:HesapHareketHizliCevap" />
+  </wsdl:message>
+  <wsdl:message name="GetirTanimliHesapBilgileriHttpPostIn">
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="tcknVkn" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetirTanimliHesapBilgileriHttpPostOut">
+    <wsdl:part name="Body" element="tns:KullaniciHesapBilgiCevap" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaGelenParaTransferHttpPostIn">
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="musteriNo" type="s:string" />
+    <wsdl:part name="ekNo" type="s:string" />
+    <wsdl:part name="gonderenBankaKodu" type="s:string" />
+    <wsdl:part name="islemTarihi" type="s:string" />
+    <wsdl:part name="sorguNo" type="s:string" />
+    <wsdl:part name="islemSubeKodu" type="s:string" />
+    <wsdl:part name="fisReferansi" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaGelenParaTransferHttpPostOut">
+    <wsdl:part name="Body" element="tns:GelenParaTransferCevap" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaMutabakatOzetZamanIleHttpPostIn">
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="musteriNo" type="s:string" />
+    <wsdl:part name="ekNo" type="s:string" />
+    <wsdl:part name="tarih" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaMutabakatOzetZamanIleHttpPostOut">
+    <wsdl:part name="Body" element="tns:MutabakatOzetCevap" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaMutabakatDetayZamanIleHttpPostIn">
+    <wsdl:part name="kurumKod" type="s:string" />
+    <wsdl:part name="sifre" type="s:string" />
+    <wsdl:part name="musteriNo" type="s:string" />
+    <wsdl:part name="ekNo" type="s:string" />
+    <wsdl:part name="tarih" type="s:string" />
+    <wsdl:part name="sayfaNumarasi" type="s:string" />
+    <wsdl:part name="sayfaSatirSayisi" type="s:string" />
+    <wsdl:part name="kayitDurumu" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SorgulaMutabakatDetayZamanIleHttpPostOut">
+    <wsdl:part name="Body" element="tns:MutabakatDetayCevap" />
+  </wsdl:message>
+  <wsdl:portType name="HesapHareketleriSoap">
+    <wsdl:operation name="MusteriHesapHareket">
+      <wsdl:input message="tns:MusteriHesapHareketSoapIn" />
+      <wsdl:output message="tns:MusteriHesapHareketSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="HesapEkstre">
+      <wsdl:input message="tns:HesapEkstreSoapIn" />
+      <wsdl:output message="tns:HesapEkstreSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="HesapEkstreZamanIle">
+      <wsdl:input message="tns:HesapEkstreZamanIleSoapIn" />
+      <wsdl:output message="tns:HesapEkstreZamanIleSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaDetayWS">
+      <wsdl:input message="tns:SorgulaDetayWSSoapIn" />
+      <wsdl:output message="tns:SorgulaDetayWSSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaDetayWSZamanIle">
+      <wsdl:input message="tns:SorgulaDetayWSZamanIleSoapIn" />
+      <wsdl:output message="tns:SorgulaDetayWSZamanIleSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaOzetWS">
+      <wsdl:input message="tns:SorgulaOzetWSSoapIn" />
+      <wsdl:output message="tns:SorgulaOzetWSSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaOzetWSZamanIle">
+      <wsdl:input message="tns:SorgulaOzetWSZamanIleSoapIn" />
+      <wsdl:output message="tns:SorgulaOzetWSZamanIleSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="HareketSorgulaVknIle">
+      <wsdl:input message="tns:HareketSorgulaVknIleSoapIn" />
+      <wsdl:output message="tns:HareketSorgulaVknIleSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekont">
+      <wsdl:input message="tns:GetirPdfDekontSoapIn" />
+      <wsdl:output message="tns:GetirPdfDekontSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekontZamanIle">
+      <wsdl:input message="tns:GetirPdfDekontZamanIleSoapIn" />
+      <wsdl:output message="tns:GetirPdfDekontZamanIleSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekontDekontNoIle">
+      <wsdl:input message="tns:GetirPdfDekontDekontNoIleSoapIn" />
+      <wsdl:output message="tns:GetirPdfDekontDekontNoIleSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareket">
+      <wsdl:input message="tns:SorgulaHesapHareketSoapIn" />
+      <wsdl:output message="tns:SorgulaHesapHareketSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareketZamanIle">
+      <wsdl:input message="tns:SorgulaHesapHareketZamanIleSoapIn" />
+      <wsdl:output message="tns:SorgulaHesapHareketZamanIleSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareketZamanIleHizli">
+      <wsdl:input message="tns:SorgulaHesapHareketZamanIleHizliSoapIn" />
+      <wsdl:output message="tns:SorgulaHesapHareketZamanIleHizliSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetirTanimliHesapBilgileri">
+      <wsdl:input message="tns:GetirTanimliHesapBilgileriSoapIn" />
+      <wsdl:output message="tns:GetirTanimliHesapBilgileriSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaGelenParaTransfer">
+      <wsdl:input message="tns:SorgulaGelenParaTransferSoapIn" />
+      <wsdl:output message="tns:SorgulaGelenParaTransferSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaMutabakatOzetZamanIle">
+      <wsdl:input message="tns:SorgulaMutabakatOzetZamanIleSoapIn" />
+      <wsdl:output message="tns:SorgulaMutabakatOzetZamanIleSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaMutabakatDetayZamanIle">
+      <wsdl:input message="tns:SorgulaMutabakatDetayZamanIleSoapIn" />
+      <wsdl:output message="tns:SorgulaMutabakatDetayZamanIleSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="HesapHareketleriHttpGet">
+    <wsdl:operation name="MusteriHesapHareket">
+      <wsdl:input message="tns:MusteriHesapHareketHttpGetIn" />
+      <wsdl:output message="tns:MusteriHesapHareketHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="HesapEkstre">
+      <wsdl:input message="tns:HesapEkstreHttpGetIn" />
+      <wsdl:output message="tns:HesapEkstreHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="HesapEkstreZamanIle">
+      <wsdl:input message="tns:HesapEkstreZamanIleHttpGetIn" />
+      <wsdl:output message="tns:HesapEkstreZamanIleHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaDetayWS">
+      <wsdl:input message="tns:SorgulaDetayWSHttpGetIn" />
+      <wsdl:output message="tns:SorgulaDetayWSHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaDetayWSZamanIle">
+      <wsdl:input message="tns:SorgulaDetayWSZamanIleHttpGetIn" />
+      <wsdl:output message="tns:SorgulaDetayWSZamanIleHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaOzetWS">
+      <wsdl:input message="tns:SorgulaOzetWSHttpGetIn" />
+      <wsdl:output message="tns:SorgulaOzetWSHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaOzetWSZamanIle">
+      <wsdl:input message="tns:SorgulaOzetWSZamanIleHttpGetIn" />
+      <wsdl:output message="tns:SorgulaOzetWSZamanIleHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="HareketSorgulaVknIle">
+      <wsdl:input message="tns:HareketSorgulaVknIleHttpGetIn" />
+      <wsdl:output message="tns:HareketSorgulaVknIleHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekont">
+      <wsdl:input message="tns:GetirPdfDekontHttpGetIn" />
+      <wsdl:output message="tns:GetirPdfDekontHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekontZamanIle">
+      <wsdl:input message="tns:GetirPdfDekontZamanIleHttpGetIn" />
+      <wsdl:output message="tns:GetirPdfDekontZamanIleHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekontDekontNoIle">
+      <wsdl:input message="tns:GetirPdfDekontDekontNoIleHttpGetIn" />
+      <wsdl:output message="tns:GetirPdfDekontDekontNoIleHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareket">
+      <wsdl:input message="tns:SorgulaHesapHareketHttpGetIn" />
+      <wsdl:output message="tns:SorgulaHesapHareketHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareketZamanIle">
+      <wsdl:input message="tns:SorgulaHesapHareketZamanIleHttpGetIn" />
+      <wsdl:output message="tns:SorgulaHesapHareketZamanIleHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareketZamanIleHizli">
+      <wsdl:input message="tns:SorgulaHesapHareketZamanIleHizliHttpGetIn" />
+      <wsdl:output message="tns:SorgulaHesapHareketZamanIleHizliHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetirTanimliHesapBilgileri">
+      <wsdl:input message="tns:GetirTanimliHesapBilgileriHttpGetIn" />
+      <wsdl:output message="tns:GetirTanimliHesapBilgileriHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaGelenParaTransfer">
+      <wsdl:input message="tns:SorgulaGelenParaTransferHttpGetIn" />
+      <wsdl:output message="tns:SorgulaGelenParaTransferHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaMutabakatOzetZamanIle">
+      <wsdl:input message="tns:SorgulaMutabakatOzetZamanIleHttpGetIn" />
+      <wsdl:output message="tns:SorgulaMutabakatOzetZamanIleHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaMutabakatDetayZamanIle">
+      <wsdl:input message="tns:SorgulaMutabakatDetayZamanIleHttpGetIn" />
+      <wsdl:output message="tns:SorgulaMutabakatDetayZamanIleHttpGetOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="HesapHareketleriHttpPost">
+    <wsdl:operation name="MusteriHesapHareket">
+      <wsdl:input message="tns:MusteriHesapHareketHttpPostIn" />
+      <wsdl:output message="tns:MusteriHesapHareketHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="HesapEkstre">
+      <wsdl:input message="tns:HesapEkstreHttpPostIn" />
+      <wsdl:output message="tns:HesapEkstreHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="HesapEkstreZamanIle">
+      <wsdl:input message="tns:HesapEkstreZamanIleHttpPostIn" />
+      <wsdl:output message="tns:HesapEkstreZamanIleHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaDetayWS">
+      <wsdl:input message="tns:SorgulaDetayWSHttpPostIn" />
+      <wsdl:output message="tns:SorgulaDetayWSHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaDetayWSZamanIle">
+      <wsdl:input message="tns:SorgulaDetayWSZamanIleHttpPostIn" />
+      <wsdl:output message="tns:SorgulaDetayWSZamanIleHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaOzetWS">
+      <wsdl:input message="tns:SorgulaOzetWSHttpPostIn" />
+      <wsdl:output message="tns:SorgulaOzetWSHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaOzetWSZamanIle">
+      <wsdl:input message="tns:SorgulaOzetWSZamanIleHttpPostIn" />
+      <wsdl:output message="tns:SorgulaOzetWSZamanIleHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="HareketSorgulaVknIle">
+      <wsdl:input message="tns:HareketSorgulaVknIleHttpPostIn" />
+      <wsdl:output message="tns:HareketSorgulaVknIleHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekont">
+      <wsdl:input message="tns:GetirPdfDekontHttpPostIn" />
+      <wsdl:output message="tns:GetirPdfDekontHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekontZamanIle">
+      <wsdl:input message="tns:GetirPdfDekontZamanIleHttpPostIn" />
+      <wsdl:output message="tns:GetirPdfDekontZamanIleHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekontDekontNoIle">
+      <wsdl:input message="tns:GetirPdfDekontDekontNoIleHttpPostIn" />
+      <wsdl:output message="tns:GetirPdfDekontDekontNoIleHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareket">
+      <wsdl:input message="tns:SorgulaHesapHareketHttpPostIn" />
+      <wsdl:output message="tns:SorgulaHesapHareketHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareketZamanIle">
+      <wsdl:input message="tns:SorgulaHesapHareketZamanIleHttpPostIn" />
+      <wsdl:output message="tns:SorgulaHesapHareketZamanIleHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareketZamanIleHizli">
+      <wsdl:input message="tns:SorgulaHesapHareketZamanIleHizliHttpPostIn" />
+      <wsdl:output message="tns:SorgulaHesapHareketZamanIleHizliHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetirTanimliHesapBilgileri">
+      <wsdl:input message="tns:GetirTanimliHesapBilgileriHttpPostIn" />
+      <wsdl:output message="tns:GetirTanimliHesapBilgileriHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaGelenParaTransfer">
+      <wsdl:input message="tns:SorgulaGelenParaTransferHttpPostIn" />
+      <wsdl:output message="tns:SorgulaGelenParaTransferHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaMutabakatOzetZamanIle">
+      <wsdl:input message="tns:SorgulaMutabakatOzetZamanIleHttpPostIn" />
+      <wsdl:output message="tns:SorgulaMutabakatOzetZamanIleHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaMutabakatDetayZamanIle">
+      <wsdl:input message="tns:SorgulaMutabakatDetayZamanIleHttpPostIn" />
+      <wsdl:output message="tns:SorgulaMutabakatDetayZamanIleHttpPostOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="HesapHareketleriSoap" type="tns:HesapHareketleriSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="MusteriHesapHareket">
+      <soap:operation soapAction="http://tempuri.org/MusteriHesapHareket" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="HesapEkstre">
+      <soap:operation soapAction="http://tempuri.org/HesapEkstre" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="HesapEkstreZamanIle">
+      <soap:operation soapAction="http://tempuri.org/HesapEkstreZamanIle" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaDetayWS">
+      <soap:operation soapAction="http://tempuri.org/SorgulaDetayWS" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaDetayWSZamanIle">
+      <soap:operation soapAction="http://tempuri.org/SorgulaDetayWSZamanIle" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaOzetWS">
+      <soap:operation soapAction="http://tempuri.org/SorgulaOzetWS" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaOzetWSZamanIle">
+      <soap:operation soapAction="http://tempuri.org/SorgulaOzetWSZamanIle" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="HareketSorgulaVknIle">
+      <soap:operation soapAction="http://tempuri.org/HareketSorgulaVknIle" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekont">
+      <soap:operation soapAction="http://tempuri.org/GetirPdfDekont" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekontZamanIle">
+      <soap:operation soapAction="http://tempuri.org/GetirPdfDekontZamanIle" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekontDekontNoIle">
+      <soap:operation soapAction="http://tempuri.org/GetirPdfDekontDekontNoIle" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareket">
+      <soap:operation soapAction="http://tempuri.org/SorgulaHesapHareket" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareketZamanIle">
+      <soap:operation soapAction="http://tempuri.org/SorgulaHesapHareketZamanIle" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareketZamanIleHizli">
+      <soap:operation soapAction="http://tempuri.org/SorgulaHesapHareketZamanIleHizli" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetirTanimliHesapBilgileri">
+      <soap:operation soapAction="http://tempuri.org/GetirTanimliHesapBilgileri" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaGelenParaTransfer">
+      <soap:operation soapAction="http://tempuri.org/SorgulaGelenParaTransfer" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaMutabakatOzetZamanIle">
+      <soap:operation soapAction="http://tempuri.org/SorgulaMutabakatOzetZamanIle" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaMutabakatDetayZamanIle">
+      <soap:operation soapAction="http://tempuri.org/SorgulaMutabakatDetayZamanIle" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="HesapHareketleriSoap12" type="tns:HesapHareketleriSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="MusteriHesapHareket">
+      <soap12:operation soapAction="http://tempuri.org/MusteriHesapHareket" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="HesapEkstre">
+      <soap12:operation soapAction="http://tempuri.org/HesapEkstre" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="HesapEkstreZamanIle">
+      <soap12:operation soapAction="http://tempuri.org/HesapEkstreZamanIle" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaDetayWS">
+      <soap12:operation soapAction="http://tempuri.org/SorgulaDetayWS" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaDetayWSZamanIle">
+      <soap12:operation soapAction="http://tempuri.org/SorgulaDetayWSZamanIle" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaOzetWS">
+      <soap12:operation soapAction="http://tempuri.org/SorgulaOzetWS" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaOzetWSZamanIle">
+      <soap12:operation soapAction="http://tempuri.org/SorgulaOzetWSZamanIle" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="HareketSorgulaVknIle">
+      <soap12:operation soapAction="http://tempuri.org/HareketSorgulaVknIle" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekont">
+      <soap12:operation soapAction="http://tempuri.org/GetirPdfDekont" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekontZamanIle">
+      <soap12:operation soapAction="http://tempuri.org/GetirPdfDekontZamanIle" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekontDekontNoIle">
+      <soap12:operation soapAction="http://tempuri.org/GetirPdfDekontDekontNoIle" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareket">
+      <soap12:operation soapAction="http://tempuri.org/SorgulaHesapHareket" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareketZamanIle">
+      <soap12:operation soapAction="http://tempuri.org/SorgulaHesapHareketZamanIle" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareketZamanIleHizli">
+      <soap12:operation soapAction="http://tempuri.org/SorgulaHesapHareketZamanIleHizli" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetirTanimliHesapBilgileri">
+      <soap12:operation soapAction="http://tempuri.org/GetirTanimliHesapBilgileri" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaGelenParaTransfer">
+      <soap12:operation soapAction="http://tempuri.org/SorgulaGelenParaTransfer" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaMutabakatOzetZamanIle">
+      <soap12:operation soapAction="http://tempuri.org/SorgulaMutabakatOzetZamanIle" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaMutabakatDetayZamanIle">
+      <soap12:operation soapAction="http://tempuri.org/SorgulaMutabakatDetayZamanIle" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="HesapHareketleriHttpGet" type="tns:HesapHareketleriHttpGet">
+    <http:binding verb="GET" />
+    <wsdl:operation name="MusteriHesapHareket">
+      <http:operation location="/MusteriHesapHareket" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="HesapEkstre">
+      <http:operation location="/HesapEkstre" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="HesapEkstreZamanIle">
+      <http:operation location="/HesapEkstreZamanIle" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaDetayWS">
+      <http:operation location="/SorgulaDetayWS" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaDetayWSZamanIle">
+      <http:operation location="/SorgulaDetayWSZamanIle" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaOzetWS">
+      <http:operation location="/SorgulaOzetWS" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaOzetWSZamanIle">
+      <http:operation location="/SorgulaOzetWSZamanIle" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="HareketSorgulaVknIle">
+      <http:operation location="/HareketSorgulaVknIle" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekont">
+      <http:operation location="/GetirPdfDekont" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekontZamanIle">
+      <http:operation location="/GetirPdfDekontZamanIle" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekontDekontNoIle">
+      <http:operation location="/GetirPdfDekontDekontNoIle" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareket">
+      <http:operation location="/SorgulaHesapHareket" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareketZamanIle">
+      <http:operation location="/SorgulaHesapHareketZamanIle" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareketZamanIleHizli">
+      <http:operation location="/SorgulaHesapHareketZamanIleHizli" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetirTanimliHesapBilgileri">
+      <http:operation location="/GetirTanimliHesapBilgileri" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaGelenParaTransfer">
+      <http:operation location="/SorgulaGelenParaTransfer" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaMutabakatOzetZamanIle">
+      <http:operation location="/SorgulaMutabakatOzetZamanIle" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaMutabakatDetayZamanIle">
+      <http:operation location="/SorgulaMutabakatDetayZamanIle" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="HesapHareketleriHttpPost" type="tns:HesapHareketleriHttpPost">
+    <http:binding verb="POST" />
+    <wsdl:operation name="MusteriHesapHareket">
+      <http:operation location="/MusteriHesapHareket" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="HesapEkstre">
+      <http:operation location="/HesapEkstre" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="HesapEkstreZamanIle">
+      <http:operation location="/HesapEkstreZamanIle" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaDetayWS">
+      <http:operation location="/SorgulaDetayWS" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaDetayWSZamanIle">
+      <http:operation location="/SorgulaDetayWSZamanIle" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaOzetWS">
+      <http:operation location="/SorgulaOzetWS" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaOzetWSZamanIle">
+      <http:operation location="/SorgulaOzetWSZamanIle" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="HareketSorgulaVknIle">
+      <http:operation location="/HareketSorgulaVknIle" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekont">
+      <http:operation location="/GetirPdfDekont" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekontZamanIle">
+      <http:operation location="/GetirPdfDekontZamanIle" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetirPdfDekontDekontNoIle">
+      <http:operation location="/GetirPdfDekontDekontNoIle" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareket">
+      <http:operation location="/SorgulaHesapHareket" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareketZamanIle">
+      <http:operation location="/SorgulaHesapHareketZamanIle" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaHesapHareketZamanIleHizli">
+      <http:operation location="/SorgulaHesapHareketZamanIleHizli" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetirTanimliHesapBilgileri">
+      <http:operation location="/GetirTanimliHesapBilgileri" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaGelenParaTransfer">
+      <http:operation location="/SorgulaGelenParaTransfer" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaMutabakatOzetZamanIle">
+      <http:operation location="/SorgulaMutabakatOzetZamanIle" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SorgulaMutabakatDetayZamanIle">
+      <http:operation location="/SorgulaMutabakatDetayZamanIle" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="HesapHareketleri">
+    <wsdl:port name="HesapHareketleriSoap" binding="tns:HesapHareketleriSoap">
+      <soap:address location="https://hesap.ziraatbank.com.tr/HEK_NKYWS/HesapHareketleri.asmx" />
+    </wsdl:port>
+    <wsdl:port name="HesapHareketleriSoap12" binding="tns:HesapHareketleriSoap12">
+      <soap12:address location="https://hesap.ziraatbank.com.tr/HEK_NKYWS/HesapHareketleri.asmx" />
+    </wsdl:port>
+    <wsdl:port name="HesapHareketleriHttpGet" binding="tns:HesapHareketleriHttpGet">
+      <http:address location="https://hesap.ziraatbank.com.tr/HEK_NKYWS/HesapHareketleri.asmx" />
+    </wsdl:port>
+    <wsdl:port name="HesapHareketleriHttpPost" binding="tns:HesapHareketleriHttpPost">
+      <http:address location="https://hesap.ziraatbank.com.tr/HEK_NKYWS/HesapHareketleri.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
