@@ -79,7 +79,7 @@ function parseResponse(xml) {
     console.log('✅ Ham XML yanıtı halkbank_response.xml dosyasına kaydedildi.');
 
     const extract = (tag, content) => {
-        // Namespace'li veya namespace'siz tagleri yakala (Örn: <a:HataKodu> veya <HataKodu>)
+        // Namespace'li veya namespace'siz tagleri yakala
         const regex = new RegExp(`<(?:[\\w]+:)?${tag}(?: [^>]*)?>(.*?)</(?:[\\w]+:)?${tag}>`, 'g');
         const matches = [];
         let match;
@@ -97,42 +97,61 @@ function parseResponse(xml) {
     console.log(`Durum: ${hataKodu} - ${hataAciklama}`);
 
     if (hataKodu === '0') {
-        const hesaplar = extract('Hesap', xml);
-        const bakiyeler = extract('Bakiye', xml);
-
-        if (bakiyeler.length > 0) {
-            console.log(`\n✅ ${bakiyeler.length} hesap bulundu.`);
-
-            // Detaylı hesap bilgilerini çek
-            const hesapNolar = extract('HesapNo', xml);
-            const subeKodlari = extract('SubeKodu', xml);
-            const musteriNolar = extract('MusteriNo', xml);
-            const ibanlar = extract('IbanNo', xml);
-            const subeAdlari = extract('SubeAdi', xml);
-
-            for (let i = 0; i < bakiyeler.length; i++) {
-                console.log(`\n--- HESAP ${i + 1} ---`);
-                console.log(`Hesap No (Tam): ${hesapNolar[i]}`);
-                console.log(`Şube Kodu: ${subeKodlari[i]} (${subeAdlari[i]})`);
-                console.log(`Müşteri No: ${musteriNolar[i]}`);
-                console.log(`IBAN: ${ibanlar[i]}`);
-                console.log(`Bakiye: ${bakiyeler[i]}`);
-
-                // Kullanıcıya öneri
-                let shortAccountNo = hesapNolar[i];
-                if (hesapNolar[i].includes('-')) {
-                    const parts = hesapNolar[i].split('-');
-                    if (parts.length === 3) shortAccountNo = parts[2];
-                }
-
-                console.log(`\n👉 ÖNERİLEN AYARLAR:`);
-                console.log(`Account Number: ${shortAccountNo}`);
-                console.log(`Branch Code: ${subeKodlari[i]}`);
-            }
+        // <Hesap> bloklarını bul
+        // Regex ile <b:Hesap>...</b:Hesap> veya <Hesap>...</Hesap> bloklarını ayırıyoruz.
+        // Dotall mode için [\s\S]*? kullanıyoruz.
+        const hesapRegex = /<(?:[\w]+:)?Hesap>([\s\S]*?)<\/(?:[\w]+:)?Hesap>/g;
+        const hesapBloklari = [];
+        let match;
+        while ((match = hesapRegex.exec(xml)) !== null) {
+            hesapBloklari.push(match[1]);
         }
 
+        console.log(`\n✅ ${hesapBloklari.length} gerçek hesap bulundu.`);
+
+        hesapBloklari.forEach((block, index) => {
+            // Blok içinden değerleri çek
+            const getVal = (tag) => {
+                const r = new RegExp(`<(?:[\\w]+:)?${tag}(?: [^>]*)?>(.*?)</(?:[\\w]+:)?${tag}>`);
+                const m = r.exec(block);
+                return m ? m[1] : 'Bulunamadı';
+            };
+
+            const hesapNo = getVal('HesapNo');
+            const subeKodu = getVal('SubeKodu');
+            const subeAdi = getVal('SubeAdi');
+            const musteriNo = getVal('MusteriNo');
+            const iban = getVal('IbanNo');
+
+            // Bakiye: Hesap bloğunun hemen altındaki Bakiye tag'ini almalıyız.
+            // Ancak Hareketler içindeki Bakiye ile karışmaması için, Hareketler taginden öncesine bakabiliriz
+            // Veya basitçe ilk Bakiye tagini alırız (çünkü Hareketler daha sonra gelir)
+            const bakiyeMatch = /<(?:[\w]+:)?Bakiye>(.*?)<\/(?:[\w]+:)?Bakiye>/.exec(block);
+            const bakiye = bakiyeMatch ? bakiyeMatch[1] : 'Bulunamadı';
+
+            console.log(`\n--- HESAP ${index + 1} ---`);
+            console.log(`Hesap No: ${hesapNo}`);
+            console.log(`Şube: ${subeKodu} - ${subeAdi}`);
+            console.log(`Müşteri No: ${musteriNo}`);
+            console.log(`IBAN: ${iban}`);
+            console.log(`Bakiye: ${bakiye}`);
+
+            // Hareket Sayısı
+            const hareketMatch = block.match(/<(?:[\w]+:)?Hareket>/g);
+            console.log(`Hareket Sayısı: ${hareketMatch ? hareketMatch.length : 0}`);
+
+            // Öneri
+            let shortAccountNo = hesapNo;
+            if (hesapNo && hesapNo.includes('-')) {
+                const parts = hesapNo.split('-');
+                if (parts.length === 3) shortAccountNo = parts[2];
+            }
+            console.log(`👉 ÖNERİLEN AYARLAR -> Account Number: ${shortAccountNo}, Branch Code: ${subeKodu}`);
+        });
+
         console.log('\n--- HAM XML ---');
-        console.log(xml);
+        // console.log(xml); // Çok uzun olabilir, sadece gerekirse açın
+        console.log('(XML içeriği dosyaya kaydedildi)');
     } else {
         console.log('\n--- HATA DETAYI ---');
         console.log(xml);
